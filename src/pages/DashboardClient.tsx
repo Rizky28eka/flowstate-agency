@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Handshake, Eye, MessageCircle, Download, Clock, CheckCircle2 } from "lucide-react";
+import { Handshake, Eye, MessageCircle, Download, Clock, CircleCheck as CheckCircle2 } from "lucide-react";
 import { RoleSidebar } from "@/components/RoleSidebar";
 import { useState } from "react";
 

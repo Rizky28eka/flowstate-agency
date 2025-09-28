@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DollarSign, TrendingUp, CreditCard, Receipt, AlertTriangle, Calendar } from "lucide-react";
+import { DollarSign, TrendingUp, CreditCard, Receipt, TriangleAlert as AlertTriangle, Calendar } from "lucide-react";
 import { RoleSidebar } from "@/components/RoleSidebar";
 import { useState } from "react";
 

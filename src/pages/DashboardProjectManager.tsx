@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Calendar, CheckCircle, Clock, AlertCircle, TrendingUp } from "lucide-react";
+import { User, Calendar, CircleCheck as CheckCircle, Clock, CircleAlert as AlertCircle, TrendingUp } from "lucide-react";
 import { RoleSidebar } from "@/components/RoleSidebar";
 import { useState } from "react";
 

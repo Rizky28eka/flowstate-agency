@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Shield, Users, Settings, Lock, UserCheck, AlertTriangle } from "lucide-react";
+import { Shield, Users, Settings, Lock, UserCheck, TriangleAlert as AlertTriangle } from "lucide-react";
 import { RoleSidebar } from "@/components/RoleSidebar";
 import { useState } from "react";
 

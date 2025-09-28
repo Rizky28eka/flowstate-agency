@@ -3,14 +3,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Crown, Shield, User, Users, Code, DollarSign, Handshake,
-  LayoutDashboard, FolderKanban, MessageSquare, Calendar, 
-  Settings, BarChart3, FileText, Clock, Target, CreditCard,
-  Receipt, TrendingUp, Eye, CheckCircle2, Download, Building2,
-  UserCheck, AlertTriangle, Lock, Briefcase, PieChart,
-  ChevronLeft, ChevronRight, LogOut
-} from "lucide-react";
+import { Crown, Shield, User, Users, Code, DollarSign, Handshake, LayoutDashboard, FolderKanban, MessageSquare, Calendar, Settings, ChartBar as BarChart3, FileText, Clock, Target, CreditCard, Receipt, TrendingUp, Eye, CircleCheck as CheckCircle2, Download, Building2, UserCheck, TriangleAlert as AlertTriangle, Lock, Briefcase, ChartPie as PieChart, ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 
 interface SidebarItem {
   id: string;
