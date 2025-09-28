@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Crown, Shield, User, Users, Code, DollarSign, Handshake, LayoutDashboard, FolderKanban, MessageSquare, Calendar, Settings, ChartBar as BarChart3, FileText, Clock, Target, CreditCard, Receipt, TrendingUp, Eye, CircleCheck as CheckCircle2, Download, Building2, UserCheck, TriangleAlert as AlertTriangle, Lock, Briefcase, ChartPie as PieChart, ChevronLeft, ChevronRight, LogOut, Bell, Plug } from "lucide-react";
+import { Crown, Shield, User, Users, Code, DollarSign, Handshake, LayoutDashboard, FolderKanban, MessageSquare, Calendar, Settings, ChartBar as BarChart3, FileText, Clock, Target, CreditCard, Receipt, TrendingUp, Eye, CircleCheck as CheckCircle2, Download, Building2, UserCheck, TriangleAlert as AlertTriangle, Lock, Briefcase, ChartPie as PieChart, ChevronLeft, ChevronRight, LogOut, Bell, Plug, Activity, Database, HardDrive, Zap, Folder, Presentation, Headphones, UserCog } from "lucide-react";
 
 interface SidebarItem {
   id: string;
@@ -45,6 +45,9 @@ const roleConfigs = {
     items: [
       { id: "users", label: "User Management", icon: UserCheck, href: "/dashboard/admin/users" },
       { id: "security", label: "Security & Permissions", icon: Lock, href: "/dashboard/admin/security" },
+      { id: "system", label: "System Health", icon: Activity, href: "/dashboard/admin/system" },
+      { id: "audit", label: "Audit Logs", icon: FileText, href: "/dashboard/admin/audit" },
+      { id: "backup", label: "Backup & Recovery", icon: HardDrive, href: "/dashboard/admin/backup" },
     ]
   },
   PROJECT_MANAGER: {

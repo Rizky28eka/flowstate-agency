@@ -33,6 +33,56 @@ import OwnerOverview from "./pages/owner/OwnerOverview";
 
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSecurity from "./pages/admin/AdminSecurity";
+import AdminSystemHealth from "./pages/admin/AdminSystemHealth";
+import AdminAuditLogs from "./pages/admin/AdminAuditLogs";
+import AdminBackup from "./pages/admin/AdminBackup";
+
+import ProjectManagerDashboard from "./pages/project-manager/ProjectManagerDashboard";
+import ProjectManagerProjects from "./pages/project-manager/ProjectManagerProjects";
+import ProjectManagerProjectDetail from "./pages/project-manager/ProjectManagerProjectDetail";
+import ProjectManagerCalendar from "./pages/project-manager/ProjectManagerCalendar";
+import ProjectManagerTeam from "./pages/project-manager/ProjectManagerTeam";
+import ProjectManagerResources from "./pages/project-manager/ProjectManagerResources";
+import ProjectManagerReports from "./pages/project-manager/ProjectManagerReports";
+import ProjectManagerClients from "./pages/project-manager/ProjectManagerClients";
+import ProjectManagerTemplates from "./pages/project-manager/ProjectManagerTemplates";
+
+import TeamLeadDashboard from "./pages/team-lead/TeamLeadDashboard";
+import TeamLeadTeam from "./pages/team-lead/TeamLeadTeam";
+import TeamLeadGoals from "./pages/team-lead/TeamLeadGoals";
+import TeamLeadPerformance from "./pages/team-lead/TeamLeadPerformance";
+import TeamLeadMeetings from "./pages/team-lead/TeamLeadMeetings";
+import TeamLeadCommunication from "./pages/team-lead/TeamLeadCommunication";
+import TeamLeadResources from "./pages/team-lead/TeamLeadResources";
+import TeamLeadReports from "./pages/team-lead/TeamLeadReports";
+
+import MemberDashboard from "./pages/member/MemberDashboard";
+import MemberTasks from "./pages/member/MemberTasks";
+import MemberProjects from "./pages/member/MemberProjects";
+import MemberTimesheet from "./pages/member/MemberTimesheet";
+import MemberCalendar from "./pages/member/MemberCalendar";
+import MemberResources from "./pages/member/MemberResources";
+import MemberCommunication from "./pages/member/MemberCommunication";
+import MemberProfile from "./pages/member/MemberProfile";
+
+import FinanceDashboard from "./pages/finance/FinanceDashboard";
+import FinanceInvoices from "./pages/finance/FinanceInvoices";
+import FinanceExpenses from "./pages/finance/FinanceExpenses";
+import FinanceRevenue from "./pages/finance/FinanceRevenue";
+import FinanceBudgets from "./pages/finance/FinanceBudgets";
+import FinanceReports from "./pages/finance/FinanceReports";
+import FinancePayments from "./pages/finance/FinancePayments";
+import FinanceTaxes from "./pages/finance/FinanceTaxes";
+
+import ClientDashboard from "./pages/client/ClientDashboard";
+import ClientProjects from "./pages/client/ClientProjects";
+import ClientProjectDetail from "./pages/client/ClientProjectDetail";
+import ClientMessages from "./pages/client/ClientMessages";
+import ClientFiles from "./pages/client/ClientFiles";
+import ClientInvoices from "./pages/client/ClientInvoices";
+import ClientCalendar from "./pages/client/ClientCalendar";
+import ClientFeedback from "./pages/client/ClientFeedback";
+import ClientSupport from "./pages/client/ClientSupport";
 
 const queryClient = new QueryClient();
 
@@ -69,58 +119,63 @@ const App = () => (
             <Route index element={<Navigate to="users" replace />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="security" element={<AdminSecurity />} />
+            <Route path="system" element={<AdminSystemHealth />} />
+            <Route path="audit" element={<AdminAuditLogs />} />
+            <Route path="backup" element={<AdminBackup />} />
           </Route>
 
           {/* Other dashboards */}
           <Route path="/dashboard/project-manager" element={<DashboardProjectManager />}>
-            <Route index element={<Navigate to="projects" replace />} />
-            <Route path="projects" element={<NotFound />} />
-            <Route path="calendar" element={<NotFound />} />
-            <Route path="team" element={<NotFound />} />
-            <Route path="resources" element={<NotFound />} />
-            <Route path="reports" element={<NotFound />} />
-            <Route path="clients" element={<NotFound />} />
-            <Route path="templates" element={<NotFound />} />
+            <Route index element={<ProjectManagerDashboard />} />
+            <Route path="projects" element={<ProjectManagerProjects />} />
+            <Route path="projects/:id" element={<ProjectManagerProjectDetail />} />
+            <Route path="calendar" element={<ProjectManagerCalendar />} />
+            <Route path="team" element={<ProjectManagerTeam />} />
+            <Route path="resources" element={<ProjectManagerResources />} />
+            <Route path="reports" element={<ProjectManagerReports />} />
+            <Route path="clients" element={<ProjectManagerClients />} />
+            <Route path="templates" element={<ProjectManagerTemplates />} />
           </Route>
           <Route path="/dashboard/team-lead" element={<DashboardTeamLead />}>
-            <Route index element={<Navigate to="team" replace />} />
-            <Route path="team" element={<NotFound />} />
-            <Route path="goals" element={<NotFound />} />
-            <Route path="performance" element={<NotFound />} />
-            <Route path="meetings" element={<NotFound />} />
-            <Route path="communication" element={<NotFound />} />
-            <Route path="resources" element={<NotFound />} />
-            <Route path="reports" element={<NotFound />} />
+            <Route index element={<TeamLeadDashboard />} />
+            <Route path="team" element={<TeamLeadTeam />} />
+            <Route path="goals" element={<TeamLeadGoals />} />
+            <Route path="performance" element={<TeamLeadPerformance />} />
+            <Route path="meetings" element={<TeamLeadMeetings />} />
+            <Route path="communication" element={<TeamLeadCommunication />} />
+            <Route path="resources" element={<TeamLeadResources />} />
+            <Route path="reports" element={<TeamLeadReports />} />
           </Route>
           <Route path="/dashboard/member" element={<DashboardMember />}>
-            <Route index element={<Navigate to="tasks" replace />} />
-            <Route path="tasks" element={<NotFound />} />
-            <Route path="projects" element={<NotFound />} />
-            <Route path="timesheet" element={<NotFound />} />
-            <Route path="calendar" element={<NotFound />} />
-            <Route path="resources" element={<NotFound />} />
-            <Route path="communication" element={<NotFound />} />
-            <Route path="profile" element={<NotFound />} />
+            <Route index element={<MemberDashboard />} />
+            <Route path="tasks" element={<MemberTasks />} />
+            <Route path="projects" element={<MemberProjects />} />
+            <Route path="timesheet" element={<MemberTimesheet />} />
+            <Route path="calendar" element={<MemberCalendar />} />
+            <Route path="resources" element={<MemberResources />} />
+            <Route path="communication" element={<MemberCommunication />} />
+            <Route path="profile" element={<MemberProfile />} />
           </Route>
           <Route path="/dashboard/finance" element={<DashboardFinance />}>
-            <Route index element={<Navigate to="invoices" replace />} />
-            <Route path="invoices" element={<NotFound />} />
-            <Route path="expenses" element={<NotFound />} />
-            <Route path="revenue" element={<NotFound />} />
-            <Route path="budgets" element={<NotFound />} />
-            <Route path="reports" element={<NotFound />} />
-            <Route path="payments" element={<NotFound />} />
-            <Route path="taxes" element={<NotFound />} />
+            <Route index element={<FinanceDashboard />} />
+            <Route path="invoices" element={<FinanceInvoices />} />
+            <Route path="expenses" element={<FinanceExpenses />} />
+            <Route path="revenue" element={<FinanceRevenue />} />
+            <Route path="budgets" element={<FinanceBudgets />} />
+            <Route path="reports" element={<FinanceReports />} />
+            <Route path="payments" element={<FinancePayments />} />
+            <Route path="taxes" element={<FinanceTaxes />} />
           </Route>
           <Route path="/dashboard/client" element={<DashboardClient />}>
-            <Route index element={<Navigate to="projects" replace />} />
-            <Route path="projects" element={<NotFound />} />
-            <Route path="messages" element={<NotFound />} />
-            <Route path="files" element={<NotFound />} />
-            <Route path="invoices" element={<NotFound />} />
-            <Route path="calendar" element={<NotFound />} />
-            <Route path="feedback" element={<NotFound />} />
-            <Route path="support" element={<NotFound />} />
+            <Route index element={<ClientDashboard />} />
+            <Route path="projects" element={<ClientProjects />} />
+            <Route path="projects/:id" element={<ClientProjectDetail />} />
+            <Route path="messages" element={<ClientMessages />} />
+            <Route path="files" element={<ClientFiles />} />
+            <Route path="invoices" element={<ClientInvoices />} />
+            <Route path="calendar" element={<ClientCalendar />} />
+            <Route path="feedback" element={<ClientFeedback />} />
+            <Route path="support" element={<ClientSupport />} />
           </Route>
 
           {/* Catch-all */}
