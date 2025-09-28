@@ -1160,57 +1160,71 @@ export const risks = [
 
 export const settings = {
   company: {
-    name: "AgencyFlow",
-    address: "123 Business Street, Suite 100, New York, NY 10001",
-    phone: "+1 (555) 123-FLOW",
-    email: "hello@agencyflow.com",
-    website: "www.agencyflow.com",
-    taxId: "12-3456789",
-    logo: "/api/placeholder/200/80"
+    name: "Future Analytics Inc.",
+    website: "https://futureanalytics.com",
+    address: "123 Innovation Drive, Tech City, TC 12345",
+    logo: "/api/placeholder/256/256",
+    description: "Leading data analytics solutions provider",
+    industry: "Technology",
+    size: "51-200",
+    founded: "2020"
   },
-  billing: {
-    currency: "USD",
-    taxRate: 8.25,
-    paymentTerms: "Net 30",
-    lateFee: 1.5,
-    invoicePrefix: "AGF",
-    nextInvoiceNumber: 1004
+  branding: {
+    primaryColor: "#6D28D9",
+    secondaryColor: "#EC4899",
+    logoUrl: "/api/placeholder/256/256",
+    favicon: "/api/placeholder/32/32",
+    customCSS: ""
   },
   notifications: {
     emailNotifications: true,
     projectDeadlines: true,
-    paymentReminders: true,
-    teamUpdates: true,
-    clientCommunications: true
+    teamUpdates: false,
+    systemMaintenance: true,
+    securityAlerts: true,
+    weeklyReports: false,
+    frequency: "immediate"
   },
-  integration: {
-    timeZone: "America/New_York",
-    dateFormat: "MM/DD/YYYY",
-    workingHours: {
-      start: "09:00",
-      end: "17:00",
-      workingDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-    }
+  billing: {
+    currency: "USD",
+    taxRate: 8.5,
+    paymentTerms: "Net 30",
+    invoicePrefix: "INV-2024",
+    autoRenewal: true,
+    billingAddress: "123 Innovation Drive, Tech City, TC 12345",
+    paymentMethod: "Credit Card ending in 4242"
+  },
+  security: {
+    enforce2FA: true,
+    sessionTimeout: 120,
+    passwordPolicy: {
+      minLength: 8,
+      requireSpecialChars: true,
+      requireNumbers: true,
+      requireUppercase: true
+    },
+    ipWhitelist: [],
+    auditLogging: true,
+    dataRetention: 365
   }
 };
 
 export const securityRoles = [
-  { id: "OWNER", role: "Owner", permissions: ["All Access"], users: 1, color: "bg-purple-100 text-purple-800", icon: "Crown" },
-  { id: "ADMIN", role: "Admin", permissions: ["User Management", "Security", "System"], users: 2, color: "bg-red-100 text-red-800", icon: "Shield" },
-  { id: "PROJECT_MANAGER", role: "Project Manager", permissions: ["Projects", "Team", "Clients"], users: 5, color: "bg-blue-100 text-blue-800", icon: "User" },
-  { id: "TEAM_LEAD", role: "Team Lead", permissions: ["Team", "Projects"], users: 4, color: "bg-green-100 text-green-800", icon: "Users" },
-  { id: "MEMBER", role: "Member", permissions: ["Tasks", "Projects"], users: 18, color: "bg-gray-100 text-gray-800", icon: "Code" },
-  { id: "FINANCE", role: "Finance", permissions: ["Finance", "Reports"], users: 2, color: "bg-amber-100 text-amber-800", icon: "DollarSign" },
-  { id: "CLIENT", role: "Client", permissions: ["Client Portal"], users: 8, color: "bg-teal-100 text-teal-800", icon: "Handshake" }
+  { id: "OWNER", role: "Owner", description: "Full system access", color: "destructive" },
+  { id: "ADMIN", role: "Admin", description: "Administrative access", color: "default" },
+  { id: "MANAGER", role: "Manager", description: "Team management", color: "secondary" },
+  { id: "MEMBER", role: "Member", description: "Basic access", color: "outline" }
 ];
 
 export const permissionMatrix = [
-  { permission: "User Management", owner: true, admin: true, pm: false, lead: false, member: false },
-  { permission: "Project Creation", owner: true, admin: true, pm: true, lead: false, member: false },
-  { permission: "Team Management", owner: true, admin: true, pm: true, lead: true, member: false },
-  { permission: "Financial Data", owner: true, admin: false, pm: false, lead: false, member: false },
-  { permission: "Client Portal", owner: true, admin: true, pm: true, lead: false, member: false },
-  { permission: "System Settings", owner: true, admin: true, pm: false, lead: false, member: false }
+  { permission: "Create Projects", owner: true, admin: true, manager: true, member: false },
+  { permission: "Delete Projects", owner: true, admin: true, manager: false, member: false },
+  { permission: "Manage Users", owner: true, admin: true, manager: false, member: false },
+  { permission: "View Reports", owner: true, admin: true, manager: true, member: true },
+  { permission: "Export Data", owner: true, admin: true, manager: true, member: false },
+  { permission: "System Settings", owner: true, admin: false, manager: false, member: false },
+  { permission: "Billing Access", owner: true, admin: true, manager: false, member: false },
+  { permission: "Security Settings", owner: true, admin: false, manager: false, member: false }
 ];
 
 export const complianceData = [
@@ -1368,6 +1382,210 @@ export const services = [
     uptime: "98.50%",
     lastCheck: "1 minute ago",
   },
+];
+
+export const contracts = [
+  {
+    id: "CTR-001",
+    title: "Master Service Agreement",
+    clientName: "TechCorp Inc.",
+    clientId: "CLI-001",
+    status: "Active",
+    startDate: "2022-03-15",
+    endDate: "2025-03-14",
+    renewalDate: "2025-02-12",
+    value: 500000,
+    documentUrl: "/mock-document.pdf",
+  },
+  {
+    id: "CTR-002",
+    title: "Project Agreement - E-commerce Platform",
+    clientName: "RetailBrand Co.",
+    clientId: "CLI-002",
+    status: "Active",
+    startDate: "2021-09-01",
+    endDate: "2025-08-31",
+    renewalDate: "2025-07-31",
+    value: 750000,
+    documentUrl: "/mock-document.pdf",
+  },
+  {
+    id: "CTR-003",
+    title: "Retainer Agreement Q4 2024",
+    clientName: "FinanceApp Ltd.",
+    clientId: "CLI-003",
+    status: "Expiring Soon",
+    startDate: "2024-10-01",
+    endDate: "2024-12-31",
+    renewalDate: "2024-12-01",
+    value: 100000,
+    documentUrl: "/mock-document.pdf",
+  },
+  {
+    id: "CTR-004",
+    title: "Vendor Agreement - Cloud Services",
+    clientName: "AWS",
+    clientId: null,
+    status: "Active",
+    startDate: "2023-01-01",
+    endDate: "2025-12-31",
+    renewalDate: "2025-11-30",
+    value: 50000,
+    documentUrl: "/mock-document.pdf",
+  },
+  {
+    id: "CTR-005",
+    title: "Past Project - Global Foods",
+    clientName: "Global Foods",
+    clientId: "CLI-005",
+    status: "Expired",
+    startDate: "2020-05-25",
+    endDate: "2022-05-24",
+    renewalDate: null,
+    value: 450000,
+    documentUrl: "/mock-document.pdf",
+  },
+];
+
+export const strategicRoadmap = [
+  {
+    id: "RM-01",
+    title: "Launch New SaaS Product",
+    description: "Develop and launch a new recurring revenue product based on our internal tools.",
+    quarter: "Q1",
+    year: 2025,
+    status: "On Track",
+    goalId: "1",
+  },
+  {
+    id: "RM-02",
+    title: "Expand to Southeast Asia Market",
+    description: "Initial market research and establishing a local presence.",
+    quarter: "Q1",
+    year: 2025,
+    status: "On Track",
+    goalId: "1",
+  },
+  {
+    id: "RM-03",
+    title: "Achieve SOC 2 Type II Certification",
+    description: "Complete the audit process to enhance security and compliance.",
+    quarter: "Q2",
+    year: 2025,
+    status: "Not Started",
+    goalId: "3",
+  },
+  {
+    id: "RM-04",
+    title: "Reduce Client Churn by 50%",
+    description: "Implement new client retention strategies and improve onboarding.",
+    quarter: "Q2",
+    year: 2025,
+    status: "Not Started",
+    goalId: "2",
+  },
+  {
+    id: "RM-05",
+    title: "Hire 10 Senior Engineers",
+    description: "Scale up the development team to handle new projects and the SaaS product.",
+    quarter: "Q3",
+    year: 2025,
+    status: "Not Started",
+    goalId: "4",
+  },
+];
+
+export const salesLeads = [
+  {
+    id: "LEAD-001",
+    companyName: "Innovate Solutions",
+    contactPerson: "John Doe",
+    potentialValue: 75000,
+    status: "Proposal",
+    probability: 70,
+    lastContactDate: "2024-11-25",
+  },
+  {
+    id: "LEAD-002",
+    companyName: "Data Systems Co.",
+    contactPerson: "Jane Smith",
+    potentialValue: 120000,
+    status: "Qualified",
+    probability: 50,
+    lastContactDate: "2024-11-28",
+  },
+  {
+    id: "LEAD-003",
+    companyName: "Creative Minds Agency",
+    contactPerson: "Peter Jones",
+    potentialValue: 45000,
+    status: "Prospect",
+    probability: 25,
+    lastContactDate: "2024-11-15",
+  },
+  {
+    id: "LEAD-004",
+    companyName: "NextGen Tech",
+    contactPerson: "Emily White",
+    potentialValue: 250000,
+    status: "Negotiation",
+    probability: 85,
+    lastContactDate: "2024-11-29",
+  },
+  {
+    id: "LEAD-005",
+    companyName: "Health Analytics Inc.",
+    contactPerson: "Michael Brown",
+    potentialValue: 95000,
+    status: "Qualified",
+    probability: 45,
+    lastContactDate: "2024-11-22",
+  },
+  {
+    id: "LEAD-006",
+    companyName: "Market Leaders LLC",
+    contactPerson: "Sarah Green",
+    potentialValue: 60000,
+    status: "Prospect",
+    probability: 20,
+    lastContactDate: "2024-11-10",
+  },
+  {
+    id: "LEAD-007",
+    companyName: "E-commerce Gurus",
+    contactPerson: "David Lee",
+    potentialValue: 150000,
+    status: "Proposal",
+    probability: 65,
+    lastContactDate: "2024-11-26",
+  },
+];
+
+export const chatChannels = [
+  { id: 'C1', name: '#announcements', type: 'group', unread: 1 },
+  { id: 'C2', name: '#prj-ecommerce', type: 'group', unread: 0 },
+  { id: 'C3', name: '#creative-team', type: 'group', unread: 3 },
+  { id: 'C4', name: '#random', type: 'group', unread: 0 },
+  { id: 'D1', name: 'Sarah Wilson', type: 'dm', unread: 2, avatar: '/api/placeholder/40/40' },
+  { id: 'D2', name: 'Mike Johnson', type: 'dm', unread: 0, avatar: '/api/placeholder/40/40' },
+  { id: 'D3', name: 'Tom Rodriguez', type: 'dm', unread: 1, avatar: '/api/placeholder/40/40' },
+];
+
+export const chatMessages = [
+  // Announcements
+  { id: 'M1', channelId: 'C1', author: 'Owner', avatar: '/api/placeholder/40/40', content: 'Team, great work on Q4 goals! Let\'s keep up the momentum.', timestamp: '10:00 AM' },
+  // Project E-commerce
+  { id: 'M2', channelId: 'C2', author: 'Tom Rodriguez', avatar: '/api/placeholder/40/40', content: 'Client just approved the wireframes.', timestamp: '9:30 AM' },
+  { id: 'M3', channelId: 'C2', author: 'Mike Johnson', avatar: '/api/placeholder/40/40', content: 'Great! I\'ll start scaffolding the backend components.', timestamp: '9:32 AM' },
+  // Creative Team
+  { id: 'M4', channelId: 'C3', author: 'Lisa Chen', avatar: '/api/placeholder/40/40', content: 'Does anyone have the latest font files for the TechCorp redesign?', timestamp: '11:15 AM' },
+  { id: 'M5', channelId: 'C3', author: 'Sarah Wilson', avatar: '/api/placeholder/40/40', content: 'Check the shared Google Drive folder, I uploaded them this morning.', timestamp: '11:16 AM' },
+  { id: 'M6', channelId: 'C3', author: 'David Kim', avatar: '/api/placeholder/40/40', content: 'Found them, thanks!', timestamp: '11:18 AM' },
+  // DM with Sarah Wilson
+  { id: 'M7', channelId: 'D1', author: 'Owner', avatar: '/api/placeholder/40/40', content: 'Can we get a status update on the TechCorp project?', timestamp: '2:00 PM' },
+  { id: 'M8', channelId: 'D1', author: 'Sarah Wilson', avatar: '/api/placeholder/40/40', content: 'Things are going well. We are on track to present the final concepts by Friday.', timestamp: '2:05 PM' },
+  // DM with Tom Rodriguez
+  { id: 'M9', channelId: 'D3', author: 'Tom Rodriguez', avatar: '/api/placeholder/40/40', content: 'FYI, the client for the e-commerce platform has requested a meeting for tomorrow.', timestamp: '3:30 PM' },
 ];
 
 // Utility functions for data manipulation

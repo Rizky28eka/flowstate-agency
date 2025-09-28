@@ -3,7 +3,12 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Crown, Shield, User, Users, Code, DollarSign, Handshake, LayoutDashboard, FolderKanban, MessageSquare, Calendar, Settings, ChartBar as BarChart3, FileText, Clock, Target, CreditCard, Receipt, TrendingUp, Eye, CircleCheck as CheckCircle2, Download, Building2, UserCheck, TriangleAlert as AlertTriangle, Lock, Briefcase, ChartPie as PieChart, ChevronLeft, ChevronRight, LogOut, Bell, Plug, Activity, Database, HardDrive, Zap, Folder, Presentation, Headphones, UserCog } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Crown, Shield, User, Users, Code, DollarSign, Handshake, LayoutDashboard, FolderKanban, MessageSquare, Calendar, Settings, ChartBar as BarChart3, FileText, Clock, Target, CreditCard, Receipt, TrendingUp, Eye, CircleCheck as CheckCircle2, Download, Building2, UserCheck, TriangleAlert as AlertTriangle, Lock, Briefcase, ChartPie as PieChart, ChevronLeft, ChevronRight, LogOut, Bell, Plug, Activity, Database, HardDrive, Zap, Folder, Presentation, Headphones, UserCog, ChevronsUpDown } from "lucide-react";
 
 interface SidebarItem {
   id: string;
@@ -26,17 +31,59 @@ const roleConfigs = {
     icon: Crown,
     items: [
       { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/owner" },
-      { id: "analytics", label: "Business Analytics", icon: BarChart3, href: "/dashboard/owner/analytics" },
-      { id: "goals", label: "Company Goals", icon: Target, href: "/dashboard/owner/goals" },
-      { id: "forecasting", label: "Forecasting", icon: TrendingUp, href: "/dashboard/owner/forecasting" },
-      { id: "risks", label: "Risk Management", icon: AlertTriangle, href: "/dashboard/owner/risks" },
-      { id: "integrations", label: "Integrations", icon: Plug, href: "/dashboard/owner/integrations" },
-      { id: "projects", label: "All Projects", icon: FolderKanban, href: "/dashboard/owner/projects", badge: "47" },
-      { id: "teams", label: "Team Management", icon: Users, href: "/dashboard/owner/teams" },
-      { id: "finances", label: "Financial Overview", icon: DollarSign, href: "/dashboard/owner/finances" },
-      { id: "clients", label: "Client Relations", icon: Handshake, href: "/dashboard/owner/clients" },
-      { id: "reports", label: "Executive Reports", icon: FileText, href: "/dashboard/owner/reports" },
-      { id: "settings", label: "Company Settings", icon: Settings, href: "/dashboard/owner/settings" }
+      {
+        id: "strategy",
+        label: "Strategy & Growth",
+        icon: Presentation,
+        children: [
+          { id: "analytics", label: "Business Analytics", icon: BarChart3, href: "/dashboard/owner/analytics" },
+          { id: "kpi-dashboard", label: "KPI Dashboard", icon: BarChart3, href: "/dashboard/owner/kpi-dashboard" },
+          { id: "goals", label: "Company Goals", icon: Target, href: "/dashboard/owner/goals" },
+          { id: "strategic-roadmap", label: "Strategic Roadmap", icon: Presentation, href: "/dashboard/owner/strategic-roadmap" },
+          { id: "forecasting", label: "Forecasting", icon: TrendingUp, href: "/dashboard/owner/forecasting" },
+          { id: "sales-pipeline", label: "Sales Pipeline", icon: Briefcase, href: "/dashboard/owner/sales-pipeline" },
+        ],
+      },
+      {
+        id: "operations",
+        label: "Operations",
+        icon: Zap,
+        children: [
+          { id: "projects", label: "All Projects", icon: FolderKanban, href: "/dashboard/owner/projects", badge: "47" },
+          { id: "risks", label: "Risk Management", icon: AlertTriangle, href: "/dashboard/owner/risks" },
+          { id: "contract-management", label: "Contract Management", icon: FileText, href: "/dashboard/owner/contract-management" },
+          { id: "integrations", label: "Integrations", icon: Plug, href: "/dashboard/owner/integrations" },
+        ],
+      },
+      {
+        id: "team",
+        label: "Team",
+        icon: Users,
+        children: [
+          { id: "teams", label: "Team Management", icon: Users, href: "/dashboard/owner/teams" },
+          { id: "resource-allocation", label: "Resource Allocation", icon: Users, href: "/dashboard/owner/resource-allocation" },
+          { id: "communication", label: "Communication", icon: MessageSquare, href: "/dashboard/owner/communication" },
+        ],
+      },
+      {
+        id: "finance",
+        label: "Finance",
+        icon: DollarSign,
+        children: [
+          { id: "finances", label: "Financial Overview", icon: DollarSign, href: "/dashboard/owner/finances" },
+          { id: "profitability", label: "Profitability Analysis", icon: PieChart, href: "/dashboard/owner/profitability" },
+        ],
+      },
+      {
+        id: "clients-reports",
+        label: "Clients & Reports",
+        icon: FileText,
+        children: [
+          { id: "clients", label: "Client Relations", icon: Handshake, href: "/dashboard/owner/clients" },
+          { id: "reports", label: "Executive Reports", icon: FileText, href: "/dashboard/owner/reports" },
+        ],
+      },
+      { id: "settings", label: "Company Settings", icon: Settings, href: "/dashboard/owner/settings" },
     ]
   },
   ADMIN: {
@@ -122,10 +169,8 @@ const roleConfigs = {
   }
 };
 
-export const RoleSidebar = ({ role, currentPath, onNavigate }: RoleSidebarProps) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const config = roleConfigs[role];
-  const IconComponent = config.icon;
+const SidebarMenu = ({ items, currentPath, onNavigate, isCollapsed }) => {
+  const isActive = (href: string) => currentPath === href;
 
   const handleItemClick = (item: SidebarItem) => {
     if (item.href && onNavigate) {
@@ -133,9 +178,66 @@ export const RoleSidebar = ({ role, currentPath, onNavigate }: RoleSidebarProps)
     }
   };
 
-  const isActive = (href: string) => {
-    return currentPath === href;
-  };
+  return (
+    <nav className="space-y-1">
+      {items.map((item) => {
+        const ItemIcon = item.icon;
+        
+        if (!isCollapsed && item.children && item.children.length > 0) {
+          const isChildActive = item.children.some(child => child.href && isActive(child.href));
+          return (
+            <Collapsible key={item.id} defaultOpen={isChildActive}>
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant={isChildActive ? "secondary" : "ghost"}
+                  className={cn("w-full justify-start h-10 px-3")}
+                >
+                  <ItemIcon className={cn("h-4 w-4 mr-3")} />
+                  <span className="flex-1 text-left">{item.label}</span>
+                  <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pl-7 pt-1 space-y-1">
+                <SidebarMenu items={item.children} currentPath={currentPath} onNavigate={onNavigate} isCollapsed={isCollapsed} />
+              </CollapsibleContent>
+            </Collapsible>
+          );
+        }
+
+        const active = item.href ? isActive(item.href) : false;
+        return (
+          <Button
+            key={item.id}
+            variant={active ? "secondary" : "ghost"}
+            className={cn(
+              "w-full justify-start h-10 px-3",
+              active && "bg-primary/10 text-primary border-primary/20",
+              isCollapsed && "px-2"
+            )}
+            onClick={() => handleItemClick(item)}
+          >
+            <ItemIcon className={cn("h-4 w-4", !isCollapsed && "mr-3")} />
+            {!isCollapsed && (
+              <>
+                <span className="flex-1 text-left">{item.label}</span>
+                {item.badge && (
+                  <span className="ml-auto bg-primary/20 text-primary text-xs px-2 py-0.5 rounded-full">
+                    {item.badge}
+                  </span>
+                )}
+              </>
+            )}
+          </Button>
+        );
+      })}
+    </nav>
+  );
+};
+
+export const RoleSidebar = ({ role, currentPath, onNavigate }: RoleSidebarProps) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const config = roleConfigs[role];
+  const IconComponent = config.icon;
 
   return (
     <div className={cn(
@@ -143,7 +245,7 @@ export const RoleSidebar = ({ role, currentPath, onNavigate }: RoleSidebarProps)
       isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
+      <div className="flex items-center justify-between p-4 border-b border-border h-16">
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
@@ -170,38 +272,13 @@ export const RoleSidebar = ({ role, currentPath, onNavigate }: RoleSidebarProps)
       </div>
 
       {/* Navigation */}
-      <ScrollArea className="flex-1 px-3 py-4">
-        <nav className="space-y-2">
-          {config.items.map((item) => {
-            const ItemIcon = item.icon;
-            const active = item.href ? isActive(item.href) : false;
-            
-            return (
-              <Button
-                key={item.id}
-                variant={active ? "secondary" : "ghost"}
-                className={cn(
-                  "w-full justify-start h-10 px-3",
-                  active && "bg-primary/10 text-primary border-primary/20",
-                  isCollapsed && "px-2"
-                )}
-                onClick={() => handleItemClick(item)}
-              >
-                <ItemIcon className={cn("h-4 w-4", !isCollapsed && "mr-3")} />
-                {!isCollapsed && (
-                  <>
-                    <span className="flex-1 text-left">{item.label}</span>
-                    {item.badge && (
-                      <span className="ml-auto bg-primary/20 text-primary text-xs px-2 py-0.5 rounded-full">
-                        {item.badge}
-                      </span>
-                    )}
-                  </>
-                )}
-              </Button>
-            );
-          })}
-        </nav>
+      <ScrollArea className="flex-1 px-2 py-4">
+        <SidebarMenu 
+          items={config.items} 
+          currentPath={currentPath} 
+          onNavigate={onNavigate}
+          isCollapsed={isCollapsed}
+        />
       </ScrollArea>
 
       {/* Footer */}

@@ -1,199 +1,110 @@
-
-import { useParams } from "react-router-dom";
-import { clients, projects, invoices } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { clients as initialClients, projects as initialProjects, invoices as initialInvoices } from "@/lib/mock-data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Plus, Mail, Phone, Globe, Briefcase, DollarSign, Star, Calendar, FileText } from "lucide-react";
+import { Edit, Trash2, Plus, Mail, Phone, Globe, Briefcase, DollarSign, Star, Calendar } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Link } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
+const EditClientForm = ({ client, onSave }) => {
+    const [formData, setFormData] = useState(client);
+    const handleChange = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
+
+    return (
+        <div className="grid gap-4 py-4">
+            <Input placeholder="Client Name" value={formData.name} onChange={e => handleChange('name', e.target.value)} />
+            <Input placeholder="Industry" value={formData.industry} onChange={e => handleChange('industry', e.target.value)} />
+            <Input placeholder="Contact Person" value={formData.contact} onChange={e => handleChange('contact', e.target.value)} />
+            <Input placeholder="Email" type="email" value={formData.email} onChange={e => handleChange('email', e.target.value)} />
+            <DialogFooter><DialogClose asChild><Button onClick={() => onSave(formData)}>Save Changes</Button></DialogClose></DialogFooter>
+        </div>
+    );
+};
+
+const AddProjectForm = ({ clientId, onAddProject }) => {
+    const [name, setName] = useState('');
+    const [budget, setBudget] = useState('');
+
+    const handleSubmit = () => {
+        if (!name || !budget) return;
+        const newProject = { id: `PRJ-${Math.random().toString(36).substr(2, 3).toUpperCase()}`, name, budget: `$${parseInt(budget).toLocaleString()}`, clientId, status: 'Planning', endDate: new Date().toLocaleDateString() };
+        onAddProject(newProject);
+    };
+
+    return (
+        <div className="grid gap-4 py-4">
+            <Input placeholder="Project Name" value={name} onChange={e => setName(e.target.value)} />
+            <Input placeholder="Budget" type="number" value={budget} onChange={e => setBudget(e.target.value)} />
+            <DialogFooter><DialogClose asChild><Button onClick={handleSubmit}>Add Project</Button></DialogClose></DialogFooter>
+        </div>
+    );
+};
 
 const OwnerClientDetail = () => {
   const { clientId } = useParams();
-  const client = clients.find(c => c.id === clientId);
-  const clientProjects = projects.filter(p => p.clientId === clientId);
-  const clientInvoices = invoices.filter(i => i.clientId === clientId);
+  const navigate = useNavigate();
 
-  if (!client) {
-    return <div className="p-8">Client not found.</div>;
-  }
+  const [client, setClient] = useState(initialClients.find(c => c.id === clientId));
+  const [clientProjects, setClientProjects] = useState(initialProjects.filter(p => p.clientId === clientId));
+  const [clientInvoices, setClientInvoices] = useState(initialInvoices.filter(i => i.clientId === clientId));
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Active": return "bg-green-100 text-green-800";
-      case "Onboarding": return "bg-blue-100 text-blue-800";
-      case "Churned": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
+  if (!client) return <div className="p-8">Client not found.</div>;
+
+  const handleSaveClient = (updatedClient) => setClient(updatedClient);
+  const handleDeleteClient = () => {
+    console.log(`Client ${clientId} deleted!`);
+    navigate("/dashboard/owner/clients");
+  };
+  const handleAddProject = (newProject) => setClientProjects(prev => [newProject, ...prev]);
+
+  const getStatusColor = (status) => {
+    if (status === "Active") return "bg-green-100 text-green-800";
+    if (status === "Churned") return "bg-gray-100 text-gray-800";
+    return "bg-blue-100 text-blue-800";
   };
 
   return (
     <main className="flex-1 px-6 py-8 bg-background">
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-8">
         <div className="flex items-center space-x-4">
-            <Avatar className="w-16 h-16 border">
-                <AvatarFallback className="text-2xl">{client.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-            </Avatar>
+            <Avatar className="w-16 h-16 border"><AvatarFallback className="text-2xl">{client.name.split(' ').map(n => n[0]).join('')}</AvatarFallback></Avatar>
             <div>
-                <div className="flex items-center space-x-2">
-                    <h1 className="text-3xl font-bold text-foreground">{client.name}</h1>
-                    <Badge className={getStatusColor(client.status)}>{client.status}</Badge>
-                </div>
+                <div className="flex items-center space-x-2"><h1 className="text-3xl font-bold">{client.name}</h1><Badge className={getStatusColor(client.status)}>{client.status}</Badge></div>
                 <p className="text-muted-foreground">{client.industry}</p>
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-2">
-                    <div className="flex items-center space-x-1">
-                        <Mail className="w-4 h-4" />
-                        <a href={`mailto:${client.email}`} className="hover:text-primary">{client.email}</a>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                        <Phone className="w-4 h-4" />
-                        <span>{client.phone}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                        <Globe className="w-4 h-4" />
-                        <a href={`https://${client.website}`} target="_blank" rel="noreferrer" className="hover:text-primary">{client.website}</a>
-                    </div>
+                    <a href={`mailto:${client.email}`} className="hover:text-primary flex items-center space-x-1"><Mail className="w-4 h-4" /><span>{client.email}</span></a>
+                    <div className="flex items-center space-x-1"><Phone className="w-4 h-4" /><span>{client.phone}</span></div>
                 </div>
             </div>
         </div>
         <div className="flex space-x-2 mt-4 md:mt-0">
-            <Button variant="outline"><Edit className="w-4 h-4 mr-2"/> Edit Client</Button>
-            <Button variant="destructive"><Trash2 className="w-4 h-4 mr-2"/> Delete Client</Button>
+            <Dialog><DialogTrigger asChild><Button variant="outline"><Edit className="w-4 h-4 mr-2"/> Edit Client</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>Edit Client</DialogTitle></DialogHeader><EditClientForm client={client} onSave={handleSaveClient} /></DialogContent></Dialog>
+            <AlertDialog><AlertDialogTrigger asChild><Button variant="destructive"><Trash2 className="w-4 h-4 mr-2"/> Delete Client</Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Are you sure?</AlertDialogTitle><AlertDialogDescription>This will permanently delete the client and all their associated data.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={handleDeleteClient}>Delete</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
         </div>
-      </div>
-
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Billed</CardTitle>
-            <DollarSign className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${client.totalBilled.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">from {client.projects} projects</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-            <Briefcase className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{client.activeProjects}</div>
-            <p className="text-xs text-muted-foreground">out of {client.projects} total</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Client Since</CardTitle>
-            <Calendar className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{new Date(client.joinDate).toLocaleDateString()}</div>
-            <p className="text-xs text-muted-foreground">Last contact: {new Date(client.lastContact).toLocaleDateString()}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Satisfaction</CardTitle>
-            <Star className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{client.satisfaction} / 5.0</div>
-            <p className="text-xs text-muted-foreground">Based on project feedback</p>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-            {/* Projects */}
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>Projects ({clientProjects.length})</CardTitle>
-                    <Button size="sm" variant="outline"><Plus className="w-4 h-4 mr-2"/>Add Project</Button>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Project Name</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Budget</TableHead>
-                                <TableHead>End Date</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {clientProjects.map(project => (
-                                <TableRow key={project.id}>
-                                    <TableCell>
-                                        <Link to={`/dashboard/owner/projects/${project.id}`} className="font-medium text-primary hover:underline">{project.name}</Link>
-                                    </TableCell>
-                                    <TableCell><Badge className={getStatusColor(project.status)}>{project.status}</Badge></TableCell>
-                                    <TableCell>{project.budget}</TableCell>
-                                    <TableCell>{new Date(project.endDate).toLocaleDateString()}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
+                <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Projects ({clientProjects.length})</CardTitle><Dialog><DialogTrigger asChild><Button size="sm" variant="outline"><Plus className="w-4 h-4 mr-2"/>Add Project</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>Add New Project</DialogTitle></DialogHeader><AddProjectForm clientId={client.id} onAddProject={handleAddProject} /></DialogContent></Dialog></CardHeader>
+                <CardContent><Table><TableHeader><TableRow><TableHead>Project Name</TableHead><TableHead>Status</TableHead><TableHead>Budget</TableHead><TableHead>End Date</TableHead></TableRow></TableHeader><TableBody>{clientProjects.map(p => (<TableRow key={p.id}><TableCell><Link to={`/dashboard/owner/projects/${p.id}`} className="font-medium text-primary hover:underline">{p.name}</Link></TableCell><TableCell><Badge>{p.status}</Badge></TableCell><TableCell>{p.budget}</TableCell><TableCell>{p.endDate}</TableCell></TableRow>))}</TableBody></Table></CardContent>
             </Card>
-
-            {/* Invoices */}
             <Card>
-                <CardHeader>
-                    <CardTitle>Invoices</CardTitle>
-                </CardHeader>
-                <CardContent>
-                <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Invoice #</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Amount</TableHead>
-                                <TableHead>Due Date</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {clientInvoices.map(invoice => (
-                                <TableRow key={invoice.id}>
-                                    <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
-                                    <TableCell><Badge variant={invoice.status === 'Paid' ? 'default' : 'secondary'}>{invoice.status}</Badge></TableCell>
-                                    <TableCell>${invoice.amount.toLocaleString()}</TableCell>
-                                    <TableCell>{new Date(invoice.dueDate).toLocaleDateString()}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
+                <CardHeader><CardTitle>Invoices</CardTitle></CardHeader>
+                <CardContent><Table><TableHeader><TableRow><TableHead>Invoice #</TableHead><TableHead>Status</TableHead><TableHead>Amount</TableHead><TableHead>Due Date</TableHead></TableRow></TableHeader><TableBody>{clientInvoices.map(i => (<TableRow key={i.id}><TableCell>{i.invoiceNumber}</TableCell><TableCell><Badge variant={i.status === 'Paid' ? 'default' : 'secondary'}>{i.status}</Badge></TableCell><TableCell>${i.amount.toLocaleString()}</TableCell><TableCell>{i.dueDate}</TableCell></TableRow>))}</TableBody></Table></CardContent>
             </Card>
         </div>
-
-        {/* Contact Person & Details */}
         <div className="space-y-8">
             <Card>
-                <CardHeader>
-                    <CardTitle>Contact Person</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex items-center space-x-3">
-                        <Avatar className="w-12 h-12">
-                            <AvatarFallback>{client.contact.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <p className="font-semibold text-lg">{client.contact}</p>
-                            <p className="text-sm text-muted-foreground">Primary Contact</p>
-                        </div>
-                    </div>
-                    <div className="text-sm space-y-2">
-                        <p><strong className="font-medium">Address:</strong><br/>{client.address}</p>
-                        <p><strong className="font-medium">Payment Terms:</strong> {client.paymentTerms}</p>
-                        <p><strong className="font-medium">Contract Value:</strong> {client.contractValue}</p>
-                    </div>
-                </CardContent>
+                <CardHeader><CardTitle>Contact Person</CardTitle></CardHeader>
+                <CardContent className="space-y-4"><div className="flex items-center space-x-3"><Avatar className="w-12 h-12"><AvatarFallback>{client.contact.split(' ').map(n => n[0]).join('')}</AvatarFallback></Avatar><div><p className="font-semibold text-lg">{client.contact}</p><p className="text-sm text-muted-foreground">Primary Contact</p></div></div></CardContent>
             </Card>
         </div>
       </div>

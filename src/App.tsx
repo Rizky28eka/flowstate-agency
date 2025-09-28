@@ -31,6 +31,13 @@ import OwnerSettings from "./pages/owner/OwnerSettings";
 import OwnerGoals from "./pages/owner/OwnerGoals";
 import OwnerGoalDetail from "./pages/owner/OwnerGoalDetail";
 import OwnerForecasting from "./pages/owner/OwnerForecasting";
+import OwnerSalesPipeline from "./pages/owner/OwnerSalesPipeline";
+import OwnerStrategicRoadmap from "./pages/owner/OwnerStrategicRoadmap";
+import OwnerProfitability from "./pages/owner/OwnerProfitability";
+import OwnerResourceAllocation from "./pages/owner/OwnerResourceAllocation";
+import OwnerKpiDashboard from "./pages/owner/OwnerKpiDashboard";
+import OwnerContractManagement from "./pages/owner/OwnerContractManagement";
+import OwnerCommunication from "./pages/owner/OwnerCommunication";
 import OwnerOverview from "./pages/owner/OwnerOverview";
 import OwnerTeamDetail from "./pages/owner/OwnerTeamDetail";
 import OwnerRiskDetail from "./pages/owner/OwnerRiskDetail";
@@ -105,14 +112,19 @@ const App = () => (
           <Route path="/dashboard/owner" element={<DashboardOwner />}>
             <Route index element={<OwnerOverview />} />
             <Route path="analytics" element={<OwnerAnalytics />} />
+            <Route path="kpi-dashboard" element={<OwnerKpiDashboard />} />
             <Route path="projects" element={<OwnerProjects />} />
             <Route path="projects/:id" element={<OwnerProjectDetail />} />
             <Route path="teams" element={<OwnerTeams />} />
             <Route path="teams/:teamId" element={<OwnerTeamDetail />} />
+            <Route path="resource-allocation" element={<OwnerResourceAllocation />} />
             <Route path="risks" element={<OwnerRisks />} />
             <Route path="risks/:riskId" element={<OwnerRiskDetail />} />
             <Route path="integrations" element={<OwnerIntegrations />} />
+            <Route path="contract-management" element={<OwnerContractManagement />} />
+            <Route path="communication" element={<OwnerCommunication />} />
             <Route path="finances" element={<OwnerFinances />} />
+            <Route path="profitability" element={<OwnerProfitability />} />
             <Route path="clients" element={<OwnerClients />} />
             <Route path="clients/:clientId" element={<OwnerClientDetail />} />
             <Route path="reports" element={<OwnerReports />} />
@@ -121,6 +133,8 @@ const App = () => (
             <Route path="goals" element={<OwnerGoals />} />
             <Route path="goals/:id" element={<OwnerGoalDetail />} />
             <Route path="forecasting" element={<OwnerForecasting />} />
+            <Route path="sales-pipeline" element={<OwnerSalesPipeline />} />
+            <Route path="strategic-roadmap" element={<OwnerStrategicRoadmap />} />
           </Route>
 
           {/* Admin dashboard (with nested routes) */}
