@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, Lock, Key, AlertTriangle, Eye, Download, Settings, Users, Globe, Server, Database, Wifi } from "lucide-react";
+import { Shield, Lock, Key, TriangleAlert as AlertTriangle, Eye, Download, Settings, Users, Globe, Server, Database, Wifi } from "lucide-react";
 import { RoleSidebar } from "@/components/RoleSidebar";
 import { useState } from "react";
 

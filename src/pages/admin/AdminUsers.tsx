@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
-import { UserCheck, Search, Plus, Filter, Shield, Crown, User, Users, Code, DollarSign, Handshake, MoreHorizontal, Edit, Trash2, Lock, Unlock } from "lucide-react";
+import { UserCheck, Search, Plus, Filter, Shield, Crown, User, Users, Code, DollarSign, Handshake, MoveHorizontal as MoreHorizontal, CreditCard as Edit, Trash2, Lock, Clock as Unlock } from "lucide-react";
 import { RoleSidebar } from "@/components/RoleSidebar";
 import { useState } from "react";
 
