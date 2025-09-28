@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Crown, Shield, User, Users, Code, DollarSign, Handshake, LayoutDashboard, FolderKanban, MessageSquare, Calendar, Settings, ChartBar as BarChart3, FileText, Clock, Target, CreditCard, Receipt, TrendingUp, Eye, CircleCheck as CheckCircle2, Download, Building2, UserCheck, TriangleAlert as AlertTriangle, Lock, Briefcase, ChartPie as PieChart, ChevronLeft, ChevronRight, LogOut } from "lucide-react";
+import { Crown, Shield, User, Users, Code, DollarSign, Handshake, LayoutDashboard, FolderKanban, MessageSquare, Calendar, Settings, ChartBar as BarChart3, FileText, Clock, Target, CreditCard, Receipt, TrendingUp, Eye, CircleCheck as CheckCircle2, Download, Building2, UserCheck, TriangleAlert as AlertTriangle, Lock, Briefcase, ChartPie as PieChart, ChevronLeft, ChevronRight, LogOut, Bell, Plug } from "lucide-react";
 
 interface SidebarItem {
   id: string;
@@ -26,27 +26,25 @@ const roleConfigs = {
     icon: Crown,
     items: [
       { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/owner" },
-      { id: "analytics", label: "Business Analytics", icon: BarChart3, href: "/analytics" },
-      { id: "projects", label: "All Projects", icon: FolderKanban, href: "/projects", badge: "47" },
-      { id: "teams", label: "Team Management", icon: Users, href: "/teams" },
-      { id: "finances", label: "Financial Overview", icon: DollarSign, href: "/finances" },
-      { id: "clients", label: "Client Relations", icon: Handshake, href: "/clients" },
-      { id: "reports", label: "Executive Reports", icon: FileText, href: "/reports" },
-      { id: "settings", label: "Company Settings", icon: Settings, href: "/settings" }
+      { id: "analytics", label: "Business Analytics", icon: BarChart3, href: "/dashboard/owner/analytics" },
+      { id: "goals", label: "Company Goals", icon: Target, href: "/dashboard/owner/goals" },
+      { id: "forecasting", label: "Forecasting", icon: TrendingUp, href: "/dashboard/owner/forecasting" },
+      { id: "risks", label: "Risk Management", icon: AlertTriangle, href: "/dashboard/owner/risks" },
+      { id: "integrations", label: "Integrations", icon: Plug, href: "/dashboard/owner/integrations" },
+      { id: "projects", label: "All Projects", icon: FolderKanban, href: "/dashboard/owner/projects", badge: "47" },
+      { id: "teams", label: "Team Management", icon: Users, href: "/dashboard/owner/teams" },
+      { id: "finances", label: "Financial Overview", icon: DollarSign, href: "/dashboard/owner/finances" },
+      { id: "clients", label: "Client Relations", icon: Handshake, href: "/dashboard/owner/clients" },
+      { id: "reports", label: "Executive Reports", icon: FileText, href: "/dashboard/owner/reports" },
+      { id: "settings", label: "Company Settings", icon: Settings, href: "/dashboard/owner/settings" }
     ]
   },
   ADMIN: {
     title: "Admin Dashboard",
     icon: Shield,
     items: [
-      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/admin" },
-      { id: "users", label: "User Management", icon: UserCheck, href: "/users" },
-      { id: "security", label: "Security & Permissions", icon: Lock, href: "/security" },
-      { id: "system", label: "System Settings", icon: Settings, href: "/system" },
-      { id: "alerts", label: "Security Alerts", icon: AlertTriangle, href: "/alerts", badge: "3" },
-      { id: "workspaces", label: "Team Workspaces", icon: Building2, href: "/workspaces" },
-      { id: "audit", label: "Audit Logs", icon: FileText, href: "/audit" },
-      { id: "backup", label: "Backup & Recovery", icon: Shield, href: "/backup" }
+      { id: "users", label: "User Management", icon: UserCheck, href: "/dashboard/admin/users" },
+      { id: "security", label: "Security & Permissions", icon: Lock, href: "/dashboard/admin/security" },
     ]
   },
   PROJECT_MANAGER: {
@@ -54,13 +52,13 @@ const roleConfigs = {
     icon: User,
     items: [
       { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/project-manager" },
-      { id: "projects", label: "My Projects", icon: FolderKanban, href: "/projects", badge: "12" },
-      { id: "calendar", label: "Project Calendar", icon: Calendar, href: "/calendar" },
-      { id: "team", label: "Team Performance", icon: Users, href: "/team" },
-      { id: "resources", label: "Resource Planning", icon: Target, href: "/resources" },
-      { id: "reports", label: "Project Reports", icon: BarChart3, href: "/reports" },
-      { id: "clients", label: "Client Communication", icon: MessageSquare, href: "/clients" },
-      { id: "templates", label: "Project Templates", icon: FileText, href: "/templates" }
+      { id: "projects", label: "My Projects", icon: FolderKanban, href: "/dashboard/project-manager/projects", badge: "12" },
+      { id: "calendar", label: "Project Calendar", icon: Calendar, href: "/dashboard/project-manager/calendar" },
+      { id: "team", label: "Team Performance", icon: Users, href: "/dashboard/project-manager/team" },
+      { id: "resources", label: "Resource Planning", icon: Target, href: "/dashboard/project-manager/resources" },
+      { id: "reports", label: "Project Reports", icon: BarChart3, href: "/dashboard/project-manager/reports" },
+      { id: "clients", label: "Client Communication", icon: MessageSquare, href: "/dashboard/project-manager/clients" },
+      { id: "templates", label: "Project Templates", icon: FileText, href: "/dashboard/project-manager/templates" }
     ]
   },
   TEAM_LEAD: {
@@ -68,13 +66,13 @@ const roleConfigs = {
     icon: Users,
     items: [
       { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/team-lead" },
-      { id: "team", label: "My Team", icon: Users, href: "/team", badge: "8" },
-      { id: "goals", label: "Team Goals", icon: Target, href: "/goals" },
-      { id: "performance", label: "Performance Review", icon: TrendingUp, href: "/performance" },
-      { id: "meetings", label: "Team Meetings", icon: Calendar, href: "/meetings" },
-      { id: "communication", label: "Team Chat", icon: MessageSquare, href: "/communication", badge: "5" },
-      { id: "resources", label: "Resources & Tools", icon: Briefcase, href: "/resources" },
-      { id: "reports", label: "Team Reports", icon: BarChart3, href: "/reports" }
+      { id: "team", label: "My Team", icon: Users, href: "/dashboard/team-lead/team", badge: "8" },
+      { id: "goals", label: "Team Goals", icon: Target, href: "/dashboard/team-lead/goals" },
+      { id: "performance", label: "Performance Review", icon: TrendingUp, href: "/dashboard/team-lead/performance" },
+      { id: "meetings", label: "Team Meetings", icon: Calendar, href: "/dashboard/team-lead/meetings" },
+      { id: "communication", label: "Team Chat", icon: MessageSquare, href: "/dashboard/team-lead/communication", badge: "5" },
+      { id: "resources", label: "Resources & Tools", icon: Briefcase, href: "/dashboard/team-lead/resources" },
+      { id: "reports", label: "Team Reports", icon: BarChart3, href: "/dashboard/team-lead/reports" }
     ]
   },
   MEMBER: {
@@ -82,13 +80,13 @@ const roleConfigs = {
     icon: Code,
     items: [
       { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/member" },
-      { id: "tasks", label: "My Tasks", icon: CheckCircle2, href: "/tasks", badge: "7" },
-      { id: "projects", label: "My Projects", icon: FolderKanban, href: "/projects" },
-      { id: "timesheet", label: "Time Tracking", icon: Clock, href: "/timesheet" },
-      { id: "calendar", label: "My Calendar", icon: Calendar, href: "/calendar" },
-      { id: "resources", label: "Resources", icon: FileText, href: "/resources" },
-      { id: "communication", label: "Team Chat", icon: MessageSquare, href: "/communication" },
-      { id: "profile", label: "My Profile", icon: User, href: "/profile" }
+      { id: "tasks", label: "My Tasks", icon: CheckCircle2, href: "/dashboard/member/tasks", badge: "7" },
+      { id: "projects", label: "My Projects", icon: FolderKanban, href: "/dashboard/member/projects" },
+      { id: "timesheet", label: "Time Tracking", icon: Clock, href: "/dashboard/member/timesheet" },
+      { id: "calendar", label: "My Calendar", icon: Calendar, href: "/dashboard/member/calendar" },
+      { id: "resources", label: "Resources", icon: FileText, href: "/dashboard/member/resources" },
+      { id: "communication", label: "Team Chat", icon: MessageSquare, href: "/dashboard/member/communication" },
+      { id: "profile", label: "My Profile", icon: User, href: "/dashboard/member/profile" }
     ]
   },
   FINANCE: {
@@ -96,13 +94,13 @@ const roleConfigs = {
     icon: DollarSign,
     items: [
       { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/finance" },
-      { id: "invoices", label: "Invoices", icon: Receipt, href: "/invoices", badge: "7" },
-      { id: "expenses", label: "Expense Tracking", icon: CreditCard, href: "/expenses" },
-      { id: "revenue", label: "Revenue Analytics", icon: TrendingUp, href: "/revenue" },
-      { id: "budgets", label: "Budget Planning", icon: PieChart, href: "/budgets" },
-      { id: "reports", label: "Financial Reports", icon: BarChart3, href: "/reports" },
-      { id: "payments", label: "Payment Processing", icon: DollarSign, href: "/payments" },
-      { id: "taxes", label: "Tax Management", icon: FileText, href: "/taxes" }
+      { id: "invoices", label: "Invoices", icon: Receipt, href: "/dashboard/finance/invoices", badge: "7" },
+      { id: "expenses", label: "Expense Tracking", icon: CreditCard, href: "/dashboard/finance/expenses" },
+      { id: "revenue", label: "Revenue Analytics", icon: TrendingUp, href: "/dashboard/finance/revenue" },
+      { id: "budgets", label: "Budget Planning", icon: PieChart, href: "/dashboard/finance/budgets" },
+      { id: "reports", label: "Financial Reports", icon: BarChart3, href: "/dashboard/finance/reports" },
+      { id: "payments", label: "Payment Processing", icon: DollarSign, href: "/dashboard/finance/payments" },
+      { id: "taxes", label: "Tax Management", icon: FileText, href: "/dashboard/finance/taxes" }
     ]
   },
   CLIENT: {
@@ -110,13 +108,13 @@ const roleConfigs = {
     icon: Handshake,
     items: [
       { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/client" },
-      { id: "projects", label: "My Projects", icon: Eye, href: "/projects", badge: "3" },
-      { id: "messages", label: "Messages", icon: MessageSquare, href: "/messages", badge: "5" },
-      { id: "files", label: "Project Files", icon: Download, href: "/files" },
-      { id: "invoices", label: "Invoices & Billing", icon: Receipt, href: "/invoices" },
-      { id: "calendar", label: "Meetings", icon: Calendar, href: "/calendar" },
-      { id: "feedback", label: "Feedback & Reviews", icon: CheckCircle2, href: "/feedback" },
-      { id: "support", label: "Support", icon: MessageSquare, href: "/support" }
+      { id: "projects", label: "My Projects", icon: Eye, href: "/dashboard/client/projects", badge: "3" },
+      { id: "messages", label: "Messages", icon: MessageSquare, href: "/dashboard/client/messages", badge: "5" },
+      { id: "files", label: "Project Files", icon: Download, href: "/dashboard/client/files" },
+      { id: "invoices", label: "Invoices & Billing", icon: Receipt, href: "/dashboard/client/invoices" },
+      { id: "calendar", label: "Meetings", icon: Calendar, href: "/dashboard/client/calendar" },
+      { id: "feedback", label: "Feedback & Reviews", icon: CheckCircle2, href: "/dashboard/client/feedback" },
+      { id: "support", label: "Support", icon: MessageSquare, href: "/dashboard/client/support" }
     ]
   }
 };
