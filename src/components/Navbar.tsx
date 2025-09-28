@@ -24,9 +24,20 @@ const Navbar = () => {
   }
 
   const handleRoleSelect = (roleId: string) => {
-    console.log(`Selected role: ${roleId}`);
-    // In a real app, this would redirect to the dashboard with the selected role
-    alert(`Redirecting to dashboard as ${roleId}`);
+    const roleRoutes = {
+      "OWNER": "/dashboard/owner",
+      "ADMIN": "/dashboard/admin", 
+      "PROJECT_MANAGER": "/dashboard/project-manager",
+      "TEAM_LEAD": "/dashboard/team-lead",
+      "MEMBER": "/dashboard/member",
+      "FINANCE": "/dashboard/finance",
+      "CLIENT": "/dashboard/client"
+    };
+    
+    const route = roleRoutes[roleId as keyof typeof roleRoutes];
+    if (route) {
+      window.location.href = route;
+    }
   };
 
   return (
