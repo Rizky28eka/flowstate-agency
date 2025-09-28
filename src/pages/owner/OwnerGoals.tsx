@@ -42,8 +42,7 @@ const OwnerGoals = () => {
           const progress = (goal.current / goal.target) * 100;
           const Icon = iconMap[goal.icon as keyof typeof iconMap] || Target;
           return (
-            <Link to={`/goals/${goal.id}`} key={goal.id}>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                          <Link to={`/dashboard/owner/goals/${goal.id}`} key={goal.id}>              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardHeader>
                 <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-3">

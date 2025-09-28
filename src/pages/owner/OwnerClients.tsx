@@ -8,6 +8,7 @@ import { Handshake, Search, Plus, Star, TrendingUp, Users, ArrowUpDown, DollarSi
 import { clients } from "@/lib/mock-data";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell } from "recharts";
+import { Link } from "react-router-dom";
 
 // ==== Types ====
 interface Client {
@@ -297,8 +298,8 @@ const OwnerClients = () => {
                       </div>
                     </td>
                     <td className="p-3 text-right">
-                      <Button variant="outline" size="sm">
-                        View Details
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to={`/dashboard/owner/clients/${client.id}`}>View Details</Link>
                       </Button>
                     </td>
                   </tr>

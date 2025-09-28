@@ -1099,6 +1099,65 @@ export const reports = [
   }
 ];
 
+export const risks = [
+  {
+    id: "RSK-001",
+    title: "Key Personnel Departure",
+    description: "Lead developer for the e-commerce platform is a flight risk, potentially leaving mid-project.",
+    projectId: "PRJ-002",
+    projectName: "E-commerce Platform",
+    status: "Mitigated",
+    impact: "High",
+    probability: "Medium",
+    score: 15,
+    owner: "Mike Johnson",
+    mitigationPlan: "Knowledge transfer sessions are in progress. Secondary developer (Alex Thompson) is being trained to take over if necessary. Retention bonus has been offered.",
+    lastUpdate: "2024-11-25"
+  },
+  {
+    id: "RSK-002",
+    title: "Budget Overrun on Branding Project",
+    description: "Scope creep and additional client requests are pushing the TechCorp Brand Redesign project over budget.",
+    projectId: "PRJ-001",
+    projectName: "TechCorp Brand Redesign",
+    status: "Active",
+    impact: "Medium",
+    probability: "High",
+    score: 18,
+    owner: "Sarah Wilson",
+    mitigationPlan: "A change order for additional work has been sent to the client. Non-essential tasks are being deprioritized. Weekly budget reviews are in place.",
+    lastUpdate: "2024-11-28"
+  },
+  {
+    id: "RSK-003",
+    title: "Third-Party API Instability",
+    description: "The payment gateway API for the FinanceApp has been experiencing intermittent downtime, which could delay testing and launch.",
+    projectId: "PRJ-003",
+    projectName: "Mobile App UI/UX",
+    status: "Active",
+    impact: "High",
+    probability: "Low",
+    score: 10,
+    owner: "David Kim",
+    mitigationPlan: "Developing a fallback mechanism to handle API downtime. Communication channel established with the API provider's technical team. Exploring alternative providers as a backup.",
+    lastUpdate: "2024-11-27"
+  },
+  {
+    id: "RSK-004",
+    title: "Delayed Client Feedback",
+    description: "Client (HealthWell Group) has been slow to provide feedback on initial designs, potentially delaying the entire Healthcare Portal timeline.",
+    projectId: "PRJ-005",
+    projectName: "Healthcare Portal Development",
+    status: "New",
+    impact: "Medium",
+    probability: "Medium",
+    score: 12,
+    owner: "Tom Rodriguez",
+    mitigationPlan: "Schedule a dedicated weekly review meeting with the client. Clearly communicate the impact of delays on the project timeline and budget.",
+    lastUpdate: "2024-11-26"
+  }
+];
+
 export const settings = {
   company: {
     name: "AgencyFlow",

@@ -6,8 +6,8 @@ import { projects, notifications } from "@/lib/mock-data";
 const ClientDashboard = () => {
   // Assuming a logged-in client, we'll filter for a specific client ID
   const clientId = "CLI-001"; // Example: TechCorp Inc.
-  const clientProjects = projects.filter(p => p.clientId === clientId);
-  const clientProjectIds = clientProjects.map(p => p.id);
+  const clientProjects = projects.filter((p) => p.clientId === clientId);
+  const clientProjectIds = clientProjects.map((p) => p.id);
   const recentUpdates = notifications.filter(
     (n) => n.projectId && clientProjectIds.includes(n.projectId)
   );
@@ -114,7 +114,9 @@ const ClientDashboard = () => {
                     <Button variant="outline" size="sm">
                       View Details
                     </Button>
-                    <Button variant="ghost" size="sm">Leave Feedback</Button>
+                    <Button variant="ghost" size="sm">
+                      Leave Feedback
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -144,7 +146,9 @@ const ClientDashboard = () => {
                     </span>
                   </div>
                   <div className="flex space-x-2">
-                    <Button variant="ghost" size="sm">View</Button>
+                    <Button variant="ghost" size="sm">
+                      View
+                    </Button>
                     {update.type === "payment" && (
                       <Button variant="ghost" size="sm">
                         <Download className="w-3 h-3 mr-1" />

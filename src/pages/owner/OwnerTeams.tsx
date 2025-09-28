@@ -11,6 +11,7 @@ import { departments, teamMembers } from "@/lib/mock-data";
 import { Progress } from "@/components/ui/progress";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { Link } from "react-router-dom";
 
 const OwnerTeams = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -100,7 +101,9 @@ const OwnerTeams = () => {
                           <CardTitle className="text-xl">{dept.name}</CardTitle>
                           <CardDescription className="mt-2 text-xs">{dept.description}</CardDescription>
                         </div>
-                        <Button variant="ghost" size="sm">Edit</Button>
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link to={`/dashboard/owner/teams/${dept.id}`}>View Details</Link>
+                        </Button>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">

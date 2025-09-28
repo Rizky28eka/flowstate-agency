@@ -151,7 +151,7 @@ const OwnerProjects = () => {
         <TabsContent value="grid" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProjects.map((project) => (
-              <Link to={`/projects/${project.id}`} key={project.id}>
+              <Link to={`/dashboard/owner/projects/${project.id}`} key={project.id}>
                 <Card className="hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full">
                   <CardHeader>
                     <div className="flex items-start justify-between">
@@ -231,7 +231,7 @@ const OwnerProjects = () => {
                     {filteredProjects.map((project) => (
                       <tr key={project.id} className="border-b hover:bg-muted/50">
                         <td className="p-3">
-                          <Link to={`/projects/${project.id}`} className="font-medium hover:underline">{project.name}</Link>
+                          <Link to={`/dashboard/owner/projects/${project.id}`} className="font-medium hover:underline">{project.name}</Link>
                           <div className="text-sm text-muted-foreground">{project.client}</div>
                         </td>
                         <td className="p-3"><Badge className={getStatusColor(project.status)}>{project.status}</Badge></td>

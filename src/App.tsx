@@ -24,12 +24,16 @@ import OwnerRisks from "./pages/owner/OwnerRisks";
 import OwnerIntegrations from "./pages/owner/OwnerIntegrations";
 import OwnerFinances from "./pages/owner/OwnerFinances";
 import OwnerClients from "./pages/owner/OwnerClients";
+import OwnerClientDetail from "./pages/owner/OwnerClientDetail";
 import OwnerReports from "./pages/owner/OwnerReports";
+import OwnerReportDetail from "./pages/owner/OwnerReportDetail";
 import OwnerSettings from "./pages/owner/OwnerSettings";
 import OwnerGoals from "./pages/owner/OwnerGoals";
 import OwnerGoalDetail from "./pages/owner/OwnerGoalDetail";
 import OwnerForecasting from "./pages/owner/OwnerForecasting";
 import OwnerOverview from "./pages/owner/OwnerOverview";
+import OwnerTeamDetail from "./pages/owner/OwnerTeamDetail";
+import OwnerRiskDetail from "./pages/owner/OwnerRiskDetail";
 
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSecurity from "./pages/admin/AdminSecurity";
@@ -67,6 +71,7 @@ import MemberProfile from "./pages/member/MemberProfile";
 
 import FinanceDashboard from "./pages/finance/FinanceDashboard";
 import FinanceInvoices from "./pages/finance/FinanceInvoices";
+import FinanceInvoiceNew from "./pages/finance/FinanceInvoiceNew";
 import FinanceExpenses from "./pages/finance/FinanceExpenses";
 import FinanceRevenue from "./pages/finance/FinanceRevenue";
 import FinanceBudgets from "./pages/finance/FinanceBudgets";
@@ -103,11 +108,15 @@ const App = () => (
             <Route path="projects" element={<OwnerProjects />} />
             <Route path="projects/:id" element={<OwnerProjectDetail />} />
             <Route path="teams" element={<OwnerTeams />} />
+            <Route path="teams/:teamId" element={<OwnerTeamDetail />} />
             <Route path="risks" element={<OwnerRisks />} />
+            <Route path="risks/:riskId" element={<OwnerRiskDetail />} />
             <Route path="integrations" element={<OwnerIntegrations />} />
             <Route path="finances" element={<OwnerFinances />} />
             <Route path="clients" element={<OwnerClients />} />
+            <Route path="clients/:clientId" element={<OwnerClientDetail />} />
             <Route path="reports" element={<OwnerReports />} />
+            <Route path="reports/:reportId" element={<OwnerReportDetail />} />
             <Route path="settings" element={<OwnerSettings />} />
             <Route path="goals" element={<OwnerGoals />} />
             <Route path="goals/:id" element={<OwnerGoalDetail />} />
@@ -159,6 +168,7 @@ const App = () => (
           <Route path="/dashboard/finance" element={<DashboardFinance />}>
             <Route index element={<FinanceDashboard />} />
             <Route path="invoices" element={<FinanceInvoices />} />
+            <Route path="invoices/new" element={<FinanceInvoiceNew />} />
             <Route path="expenses" element={<FinanceExpenses />} />
             <Route path="revenue" element={<FinanceRevenue />} />
             <Route path="budgets" element={<FinanceBudgets />} />

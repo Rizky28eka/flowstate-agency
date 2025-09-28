@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileText, Download, Calendar, BarChart3, DollarSign, Users, Plus } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import { reports } from "@/lib/mock-data";
 
@@ -103,9 +104,8 @@ const OwnerReports = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                     <Button variant="outline">
-                        <Download className="w-4 h-4 mr-2" />
-                        Download
+                     <Button variant="outline" asChild>
+                        <Link to={`/dashboard/owner/reports/${report.id}`}>View Details</Link>
                       </Button>
                     <p className="text-xs text-muted-foreground mt-2">
                       Generated on {new Date(report.generatedDate).toLocaleDateString()} | {report.period}

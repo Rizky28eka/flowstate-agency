@@ -1,76 +1,132 @@
+
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Line, ComposedChart } from "recharts";
-import { TrendingUp, Users, DollarSign, Activity, Briefcase, Heart, Zap, Award, Target, Clock } from "lucide-react";
+import { TrendingUp, Users, DollarSign, Activity, Briefcase, Heart, Zap, Award, Target, Clock, GripVertical } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 import { monthlyRevenueData, projects, teamMembers, clients, departments, notifications } from "@/lib/mock-data";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+  rectSortingStrategy
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+// Helper component for sortable items
+const SortableItem = ({ id, children }) => {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        touchAction: 'none', // Prevent scrolling on touch devices
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="relative">
+            {children}
+        </div>
+    );
+};
 
 const OwnerOverview = () => {
-  // Calculate dynamic data
+  // --- Original Data Calculations ---
   const totalRevenue = monthlyRevenueData.reduce((sum, item) => sum + item.revenue, 0);
   const totalProfit = monthlyRevenueData.reduce((sum, item) => sum + item.profit, 0);
   const profitMargin = (totalProfit / totalRevenue * 100).toFixed(1);
   const activeProjects = projects.filter(p => p.status === "In Progress").length;
-  const clientRetentionRate = 94; // Placeholder for now, needs more complex calculation
+  const clientRetentionRate = 94;
+  const chartData = monthlyRevenueData.map(item => ({ month: item.month, revenue: item.revenue, profit: item.profit }));
 
-  const chartData = monthlyRevenueData.map(item => ({
-    month: item.month,
-    revenue: item.revenue,
-    profit: item.profit,
-  }));
+  // --- State for Draggable Widgets ---
+  const initialWidgets = [
+    {
+      id: 'revenue',
+      title: 'Total Revenue',
+      value: `$${totalRevenue.toLocaleString()}`,
+      subtext: '+12.5% from last month',
+      icon: <DollarSign className="h-4 w-4 text-green-500" />
+    },
+    {
+      id: 'profit',
+      title: 'Profit Margin',
+      value: `${profitMargin}%`,
+      subtext: '+2.1% from last month',
+      icon: <Award className="h-4 w-4 text-blue-500" />
+    },
+    {
+      id: 'projects',
+      title: 'Active Projects',
+      value: activeProjects,
+      subtext: '3 projects nearing deadline',
+      icon: <Briefcase className="h-4 w-4 text-amber-500" />
+    },
+    {
+      id: 'retention',
+      title: 'Client Retention',
+      value: `${clientRetentionRate}%`,
+      subtext: 'Maintained this quarter',
+      icon: <Heart className="h-4 w-4 text-red-500" />
+    }
+  ];
+
+  const [widgets, setWidgets] = useState(initialWidgets);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      setWidgets((items) => {
+        const oldIndex = items.findIndex(item => item.id === active.id);
+        const newIndex = items.findIndex(item => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
   return (
     <main className="flex-1 px-6 py-8 bg-background">
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">+12.5% from last month</p>
-          </CardContent>
-        </Card>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={widgets.map(w => w.id)} strategy={rectSortingStrategy}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    {widgets.map(widget => (
+                        <SortableItem key={widget.id} id={widget.id}>
+                            <Card className="hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing">
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">{widget.title}</CardTitle>
+                                    {widget.icon}
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{widget.value}</div>
+                                    <p className="text-xs text-muted-foreground">{widget.subtext}</p>
+                                </CardContent>
+                            </Card>
+                        </SortableItem>
+                    ))}
+                </div>
+            </SortableContext>
+        </DndContext>
 
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Profit Margin</CardTitle>
-            <Award className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{profitMargin}%</div>
-            <p className="text-xs text-muted-foreground">+2.1% from last month</p>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-            <Briefcase className="h-4 w-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{activeProjects}</div>
-            <p className="text-xs text-muted-foreground">3 projects nearing deadline</p>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Client Retention</CardTitle>
-            <Heart className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{clientRetentionRate}%</div>
-            <p className="text-xs text-muted-foreground">Maintained this quarter</p>
-          </CardContent>
-        </Card>
-      </div>
-
+      {/* --- The rest of the page remains the same --- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        {/* Revenue vs Profit Chart */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Revenue vs. Profit</CardTitle>
@@ -90,7 +146,6 @@ const OwnerOverview = () => {
           </CardContent>
         </Card>
 
-        {/* Goal Progress */}
         <Card>
           <CardHeader>
             <CardTitle>Goal Progress</CardTitle>
@@ -130,7 +185,6 @@ const OwnerOverview = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Department Performance */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Department Performance</CardTitle>
@@ -152,7 +206,6 @@ const OwnerOverview = () => {
           </CardContent>
         </Card>
 
-        {/* Recent Activity */}
         <Card>
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>

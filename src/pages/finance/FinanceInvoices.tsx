@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Receipt, Search, Plus, Download, Mail, Eye } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { invoices } from "@/lib/mock-data";
 
 const FinanceInvoices = () => {
@@ -23,9 +24,11 @@ const FinanceInvoices = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">Invoice Management</h2>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
-          Create Invoice
+        <Button asChild>
+          <Link to="/dashboard/finance/invoices/new">
+            <Plus className="w-4 h-4 mr-2" />
+            Create Invoice
+          </Link>
         </Button>
       </div>
 
