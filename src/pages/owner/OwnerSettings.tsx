@@ -15,7 +15,9 @@ import { AlertTriangle, Settings, Building2, Palette, Bell, CreditCard, Lock, Us
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-import { settings as initialSettings, securityRoles, permissionMatrix } from "@/lib/mock-data";
+type BadgeVariant = "destructive" | "default" | "secondary" | "outline";
+
+const securityRoles: { id: string; role: string; description: string; color: BadgeVariant }[] = [
 
 // Enhanced Toast Component
 const Toast = ({ message, type = "success", onClose }) => {
@@ -160,7 +162,7 @@ const OwnerSettings = () => {
     input.type = 'file';
     input.accept = 'image/*';
     input.onchange = (e) => {
-      const file = e.target.files[0];
+      const file = (e.target as HTMLInputElement).files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = () => {

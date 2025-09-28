@@ -79,8 +79,9 @@ const ProjectListView = ({ projects }) => (
   </Card>
 );
 
+const statuses = ["Planning", "In Progress", "Review", "Completed"];
+
 const ProjectKanbanView = ({ projects, onDragEnd }) => {
-  const statuses = ["Planning", "In Progress", "Review", "Completed"];
   const projectsByStatus = useMemo(() => statuses.reduce((acc, status) => {
     acc[status] = projects.filter(p => p.status === status);
     return acc;

@@ -37,7 +37,7 @@ const OwnerForecasting = () => {
         // Add some AI "variability" and confidence bands
         const prediction = basePrediction * (1 + (Math.random() - 0.5) * 0.1); // +/- 5% random variance
         return {
-          month: `${nextMonths[i]} \'25`,
+          month: `${nextMonths[i]} '25`,
           revenue: null, // Historical revenue is null
           predictedRevenue: Math.round(prediction),
           confidenceBand: [Math.round(prediction * 0.9), Math.round(prediction * 1.1)], // +/- 10% confidence
