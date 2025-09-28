@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { CreditCard as Edit, CircleCheck as CheckCircle, Plus, Calendar, Users, DollarSign } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ProjectManagerProjectDetail = () => {
   const { id } = useParams();

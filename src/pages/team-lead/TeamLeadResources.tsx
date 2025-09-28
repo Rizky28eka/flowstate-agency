@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Briefcase, Plus, Download, BookOpen, Video, FileText, Link, ExternalLink } from "lucide-react";
+import { Briefcase, Plus, Download, BookOpen, Video, FileText, Link, ExternalLink, TrendingUp } from "lucide-react";
 
 const TeamLeadResources = () => {
   const resources = [

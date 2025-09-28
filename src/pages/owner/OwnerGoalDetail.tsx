@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { DollarSign, Users, TrendingUp, Target, Edit, CheckCircle, MessageSquare } from "lucide-react";
 import { useParams } from "react-router-dom";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const goals = [
   {

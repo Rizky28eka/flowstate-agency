@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { FolderKanban, Calendar, Users, Clock } from "lucide-react";
 import { projects } from "@/lib/mock-data";
+import { Button } from "@/components/ui/button";
 
 const MemberProjects = () => {
   const myProjects = projects.filter(p => p.team.includes("Sarah W.") || p.team.includes("Mike J."));

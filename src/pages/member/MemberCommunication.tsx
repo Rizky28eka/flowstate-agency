@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageSquare, Send, Hash, Users, Bell } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const MemberCommunication = () => {
   const channels = [

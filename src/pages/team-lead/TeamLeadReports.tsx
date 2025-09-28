@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { ChartBar as BarChart3, Download, FileText, TrendingUp, Users, Clock } from "lucide-react";
 import { teamMembers } from "@/lib/mock-data";
+import { Badge } from "@/components/ui/badge";
 
 const TeamLeadReports = () => {
   const myTeam = teamMembers.filter(m => 
