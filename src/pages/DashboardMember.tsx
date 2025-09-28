@@ -1,31 +1,49 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Code, CheckSquare, Clock, Star, FileText, Calendar } from "lucide-react";
+import { RoleSidebar } from "@/components/RoleSidebar";
+import { useState } from "react";
 
 const DashboardMember = () => {
+  const [currentPath, setCurrentPath] = useState("/dashboard/member");
+
+  const handleNavigate = (path: string) => {
+    setCurrentPath(path);
+    console.log("Navigate to:", path);
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Code className="w-8 h-8 text-primary" />
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">Member Dashboard</h1>
-                <p className="text-sm text-muted-foreground">Your workspace & tasks</p>
+    <div className="min-h-screen bg-background flex">
+      {/* Sidebar */}
+      <RoleSidebar 
+        role="MEMBER" 
+        currentPath={currentPath}
+        onNavigate={handleNavigate}
+      />
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="border-b bg-card">
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Code className="w-8 h-8 text-primary" />
+                <div>
+                  <h1 className="text-2xl font-bold text-foreground">Member Dashboard</h1>
+                  <p className="text-sm text-muted-foreground">Your workspace & tasks</p>
+                </div>
+              </div>
+              <div className="flex space-x-2">
+                <Button variant="outline">Time Tracker</Button>
+                <Button>Submit Work</Button>
               </div>
             </div>
-            <div className="flex space-x-2">
-              <Button variant="outline">Time Tracker</Button>
-              <Button>Submit Work</Button>
-            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
+        {/* Main Content */}
+        <main className="flex-1 px-6 py-8 overflow-auto">
         {/* Personal Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
@@ -182,7 +200,8 @@ const DashboardMember = () => {
             </CardContent>
           </Card>
         </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };

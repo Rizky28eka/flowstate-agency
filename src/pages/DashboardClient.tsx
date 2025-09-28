@@ -1,31 +1,49 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Handshake, Eye, MessageCircle, Download, Clock, CheckCircle2 } from "lucide-react";
+import { RoleSidebar } from "@/components/RoleSidebar";
+import { useState } from "react";
 
 const DashboardClient = () => {
+  const [currentPath, setCurrentPath] = useState("/dashboard/client");
+
+  const handleNavigate = (path: string) => {
+    setCurrentPath(path);
+    console.log("Navigate to:", path);
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Handshake className="w-8 h-8 text-primary" />
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">Client Portal</h1>
-                <p className="text-sm text-muted-foreground">Track your projects & collaborate</p>
+    <div className="min-h-screen bg-background flex">
+      {/* Sidebar */}
+      <RoleSidebar 
+        role="CLIENT" 
+        currentPath={currentPath}
+        onNavigate={handleNavigate}
+      />
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="border-b bg-card">
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Handshake className="w-8 h-8 text-primary" />
+                <div>
+                  <h1 className="text-2xl font-bold text-foreground">Client Portal</h1>
+                  <p className="text-sm text-muted-foreground">Track your projects & collaborate</p>
+                </div>
+              </div>
+              <div className="flex space-x-2">
+                <Button variant="outline">New Request</Button>
+                <Button>Contact Team</Button>
               </div>
             </div>
-            <div className="flex space-x-2">
-              <Button variant="outline">New Request</Button>
-              <Button>Contact Team</Button>
-            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
+        {/* Main Content */}
+        <main className="flex-1 px-6 py-8 overflow-auto">
         {/* Project Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
@@ -232,7 +250,8 @@ const DashboardClient = () => {
             </CardContent>
           </Card>
         </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };
