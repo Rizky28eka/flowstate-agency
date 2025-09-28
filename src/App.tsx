@@ -12,6 +12,11 @@ import DashboardTeamLead from "./pages/DashboardTeamLead";
 import DashboardMember from "./pages/DashboardMember";
 import DashboardFinance from "./pages/DashboardFinance";
 import DashboardClient from "./pages/DashboardClient";
+import OwnerAnalytics from "./pages/owner/OwnerAnalytics";
+import OwnerProjects from "./pages/owner/OwnerProjects";
+import OwnerTeams from "./pages/owner/OwnerTeams";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminSecurity from "./pages/admin/AdminSecurity";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +35,11 @@ const App = () => (
           <Route path="/dashboard/member" element={<DashboardMember />} />
           <Route path="/dashboard/finance" element={<DashboardFinance />} />
           <Route path="/dashboard/client" element={<DashboardClient />} />
+          <Route path="/analytics" element={<OwnerAnalytics />} />
+          <Route path="/projects" element={<OwnerProjects />} />
+          <Route path="/teams" element={<OwnerTeams />} />
+          <Route path="/users" element={<AdminUsers />} />
+          <Route path="/security" element={<AdminSecurity />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
