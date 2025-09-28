@@ -83,7 +83,14 @@ const OwnerOverview = () => {
   ];
 
   const [widgets, setWidgets] = useState(initialWidgets);
+  const [isMobile, setIsMobile] = useState(false);
 
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -103,19 +110,22 @@ const OwnerOverview = () => {
   };
 
   return (
-    <main className="flex-1 px-6 py-8 bg-background">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <main className="flex-1 px-4 sm:px-6 py-4 sm:py-8 bg-background">
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={!isMobile ? handleDragEnd : undefined}>
             <SortableContext items={widgets.map(w => w.id)} strategy={rectSortingStrategy}>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
                     {widgets.map(widget => (
                         <SortableItem key={widget.id} id={widget.id}>
-                            <Card className="hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing">
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">{widget.title}</CardTitle>
+                            <Card className={cn(
+                              "hover:shadow-md transition-shadow",
+                              !isMobile && "cursor-grab active:cursor-grabbing"
+                            )}>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+                                    <CardTitle className="text-xs sm:text-sm font-medium">{widget.title}</CardTitle>
                                     {widget.icon}
                                 </CardHeader>
-                                <CardContent>
-                                    <div className="text-2xl font-bold">{widget.value}</div>
+                                <CardContent className="p-4 sm:p-6 pt-0">
+                                    <div className="text-xl sm:text-2xl font-bold">{widget.value}</div>
                                     <p className="text-xs text-muted-foreground">{widget.subtext}</p>
                                 </CardContent>
                             </Card>
@@ -126,14 +136,14 @@ const OwnerOverview = () => {
         </DndContext>
 
       {/* --- The rest of the page remains the same --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        <Card className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mb-6 sm:mb-8">
+        <Card className="lg:col-span-2 order-2 lg:order-1">
           <CardHeader>
-            <CardTitle>Revenue vs. Profit</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">Revenue vs. Profit</CardTitle>
             <CardDescription>Last 6 months performance</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer className="h-80 w-full" config={{}}>
+            <ChartContainer className="h-60 sm:h-80 w-full" config={{}}>
               <ComposedChart data={chartData}>
                 <CartesianGrid vertical={false} />
                 <XAxis dataKey="month" tickLine={false} tickMargin={10} />
@@ -146,15 +156,18 @@ const OwnerOverview = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="order-1 lg:order-2">
           <CardHeader>
-            <CardTitle>Goal Progress</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">Goal Progress</CardTitle>
             <CardDescription>Q4 2025 Company Goals</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 sm:space-y-6">
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium flex items-center"><Target className="w-4 h-4 mr-2 text-muted-foreground"/>Revenue Target</span>
+                <span className="text-xs sm:text-sm font-medium flex items-center">
+                  <Target className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-muted-foreground"/>
+                  Revenue Target
+                </span>
                 <span className="text-sm font-medium">{((totalRevenue / 350000) * 100).toFixed(0)}%</span>
               </div>
               <Progress value={parseFloat(((totalRevenue / 350000) * 100).toFixed(0))} />
@@ -184,21 +197,21 @@ const OwnerOverview = () => {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <Card className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        <Card className="lg:col-span-2 order-2 lg:order-1">
           <CardHeader>
-            <CardTitle>Department Performance</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">Department Performance</CardTitle>
             <CardDescription>Productivity and project overview</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 sm:space-y-4">
             {departments.map((item, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">{item.name}</p>
-                    <p className="text-sm text-muted-foreground">{item.projects} active projects</p>
+                    <p className="font-medium text-sm sm:text-base">{item.name}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{item.projects} active projects</p>
                   </div>
-                  <span className="text-lg font-semibold text-primary">{item.utilization}%</span>
+                  <span className="text-base sm:text-lg font-semibold text-primary">{item.utilization}%</span>
                 </div>
                 <Progress value={item.utilization} />
               </div>
@@ -206,28 +219,28 @@ const OwnerOverview = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="order-1 lg:order-2">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">Recent Activity</CardTitle>
             <CardDescription>Latest updates across the company</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {notifications.slice(0, 4).map((notification, index) => (
                 <div key={notification.id}>
                   <div className="flex items-start space-x-3">
-                    <div className={`p-2 rounded-full ${notification.type === 'payment' ? 'bg-green-100' : 'bg-blue-100'}`}>
-                      {notification.type === 'payment' && <DollarSign className="w-4 h-4 text-green-600"/>}
-                      {notification.type === 'team' && <Users className="w-4 h-4 text-blue-600"/>}
-                      {notification.type === 'deadline' && <Clock className="w-4 h-4 text-amber-600"/>}
-                      {notification.type === 'expense' && <Briefcase className="w-4 h-4 text-purple-600"/>}
+                    <div className={`p-1.5 sm:p-2 rounded-full ${notification.type === 'payment' ? 'bg-green-100' : 'bg-blue-100'}`}>
+                      {notification.type === 'payment' && <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 text-green-600"/>}
+                      {notification.type === 'team' && <Users className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600"/>}
+                      {notification.type === 'deadline' && <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-amber-600"/>}
+                      {notification.type === 'expense' && <Briefcase className="w-3 h-3 sm:w-4 sm:h-4 text-purple-600"/>}
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{notification.title}</p>
+                      <p className="text-xs sm:text-sm font-medium">{notification.title}</p>
                       <p className="text-xs text-muted-foreground">{notification.message}</p>
                     </div>
                   </div>
-                  {index < notifications.slice(0, 4).length - 1 && <Separator className="my-4" />} 
+                  {index < notifications.slice(0, 4).length - 1 && <Separator className="my-3 sm:my-4" />} 
                 </div>
               ))}
             </div>

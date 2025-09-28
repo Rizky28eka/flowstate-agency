@@ -236,43 +236,58 @@ const SidebarMenu = ({ items, currentPath, onNavigate, isCollapsed }) => {
 
 export const RoleSidebar = ({ role, currentPath, onNavigate }: RoleSidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const config = roleConfigs[role];
   const IconComponent = config.icon;
+
+  // Check if mobile
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth < 768) {
+        setIsCollapsed(true);
+      }
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <div className={cn(
       "fixed top-0 left-0 z-50 flex flex-col h-screen bg-card border-r border-border transition-all duration-300",
-      isCollapsed ? "w-16" : "w-64"
+      isCollapsed ? "w-12 sm:w-16" : "w-56 sm:w-64"
     )}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border h-16">
+      <div className="flex items-center justify-between p-2 sm:p-4 border-b border-border h-14 sm:h-16">
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <IconComponent className="w-5 h-5 text-white" />
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+              <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <div>
-              <h2 className="font-semibold text-foreground">{config.title}</h2>
+            <div className="hidden sm:block">
+              <h2 className="font-semibold text-foreground text-sm sm:text-base">{config.title}</h2>
               <p className="text-xs text-muted-foreground">AgencyFlow</p>
             </div>
           </div>
         )}
         <Button
           variant="ghost"
-          size="sm"
+          size={isMobile ? "icon" : "sm"}
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="h-8 w-8 p-0"
+          className="h-6 w-6 sm:h-8 sm:w-8 p-0"
         >
           {isCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
           ) : (
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
           )}
         </Button>
       </div>
 
       {/* Navigation */}
-      <ScrollArea className="flex-1 px-2 py-4">
+      <ScrollArea className="flex-1 px-1 sm:px-2 py-2 sm:py-4">
         <SidebarMenu 
           items={config.items} 
           currentPath={currentPath} 
@@ -282,16 +297,16 @@ export const RoleSidebar = ({ role, currentPath, onNavigate }: RoleSidebarProps)
       </ScrollArea>
 
       {/* Footer */}
-      <div className="p-3 border-t border-border">
-        <Separator className="mb-3" />
+      <div className="p-2 sm:p-3 border-t border-border">
+        <Separator className="mb-2 sm:mb-3" />
         <Button
           variant="ghost"
           className={cn(
-            "w-full justify-start h-10 px-3 text-muted-foreground hover:text-foreground",
-            isCollapsed && "px-2"
+            "w-full justify-start h-8 sm:h-10 px-2 sm:px-3 text-muted-foreground hover:text-foreground",
+            isCollapsed && "px-1 sm:px-2"
           )}
         >
-          <LogOut className={cn("h-4 w-4", !isCollapsed && "mr-3")} />
+          <LogOut className={cn("h-3 w-3 sm:h-4 sm:w-4", !isCollapsed && "mr-2 sm:mr-3")} />
           {!isCollapsed && <span>Logout</span>}
         </Button>
       </div>

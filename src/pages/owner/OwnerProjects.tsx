@@ -30,23 +30,43 @@ const getPriorityColor = (priority) => {
 };
 
 const ProjectGridView = ({ projects }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
     {projects.map((project) => (
       <Link to={`/dashboard/owner/projects/${project.id}`} key={project.id}>
         <Card className="hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full">
           <CardHeader>
             <div className="flex items-start justify-between">
-              <div className="space-y-1"><CardTitle className="text-lg">{project.name}</CardTitle><CardDescription>{project.client}</CardDescription></div>
-              <Button variant="ghost" size="sm"><MoreHorizontal className="w-4 h-4" /></Button>
+              <div className="space-y-1 flex-1 min-w-0">
+                <CardTitle className="text-base sm:text-lg truncate">{project.name}</CardTitle>
+                <CardDescription className="truncate">{project.client}</CardDescription>
+              </div>
+              <Button variant="ghost" size="sm" className="shrink-0">
+                <MoreHorizontal className="w-4 h-4" />
+              </Button>
             </div>
-            <div className="flex space-x-2 pt-2"><Badge className={getStatusColor(project.status)}>{project.status}</Badge><Badge className={getPriorityColor(project.priority)}>{project.priority}</Badge></div>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Badge className={getStatusColor(project.status)}>{project.status}</Badge>
+              <Badge className={getPriorityColor(project.priority)}>{project.priority}</Badge>
+            </div>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-between">
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{project.description}</p>
-            <div className="space-y-4">
+            <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-3 sm:mb-4">{project.description}</p>
+            <div className="space-y-3 sm:space-y-4">
               <div className="space-y-2"><div className="flex justify-between text-sm"><span>Progress</span><span>{project.progress}%</span></div><Progress value={project.progress} /></div>
-              <div className="grid grid-cols-2 gap-4 text-sm"><div><p className="text-muted-foreground">Budget</p><p className="font-medium">{project.budget}</p></div><div><p className="text-muted-foreground">Spent</p><p className="font-medium">{project.spent}</p></div></div>
-              <div className="flex items-center justify-between text-sm text-muted-foreground"><div className="flex items-center space-x-2"><Users className="w-4 h-4" /><span>{project.team.length} members</span></div><div className="flex items-center space-x-2"><Calendar className="w-4 h-4" /><span>{new Date(project.endDate).toLocaleDateString()}</span></div></div>
+              <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
+                <div><p className="text-muted-foreground">Budget</p><p className="font-medium truncate">{project.budget}</p></div>
+                <div><p className="text-muted-foreground">Spent</p><p className="font-medium truncate">{project.spent}</p></div>
+              </div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs sm:text-sm text-muted-foreground">
+                <div className="flex items-center space-x-2">
+                  <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span>{project.team.length} members</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="truncate">{new Date(project.endDate).toLocaleDateString()}</span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -143,6 +163,14 @@ const OwnerProjects = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [viewMode, setViewMode] = useState("grid");
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const filteredProjects = useMemo(() => {
     return projects.filter(project => {
@@ -175,22 +203,110 @@ const OwnerProjects = () => {
   };
 
   return (
-    <main className="flex-1 px-6 py-8 bg-background">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Projects</CardTitle><FolderKanban className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{filteredProjects.length}</div><p className="text-xs text-muted-foreground">matching current filters</p></CardContent></Card>
-            <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Active Projects</CardTitle><Clock className="h-4 w-4 text-amber-600" /></CardHeader><CardContent><div className="text-2xl font-bold">{projects.filter(p => p.status === "In Progress").length}</div><p className="text-xs text-muted-foreground">In progress</p></CardContent></Card>
-            <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Value</CardTitle><DollarSign className="h-4 w-4 text-green-600" /></CardHeader><CardContent><div className="text-2xl font-bold">${projects.reduce((sum, p) => sum + parseFloat(p.budget.replace(/[^0-9.-]+/g,"")), 0).toLocaleString()}</div><p className="text-xs text-muted-foreground">Combined project value</p></CardContent></Card>
-            <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Team Utilization</CardTitle><Users className="h-4 w-4 text-blue-600" /></CardHeader><CardContent><div className="text-2xl font-bold">87%</div><p className="text-xs text-muted-foreground">Average across teams</p></CardContent></Card>
+    <main className="flex-1 px-4 sm:px-6 py-4 sm:py-8 bg-background">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium">Total Projects</CardTitle>
+                <FolderKanban className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-lg sm:text-2xl font-bold">{filteredProjects.length}</div>
+                <p className="text-xs text-muted-foreground">matching filters</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium">Active</CardTitle>
+                <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-amber-600" />
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-lg sm:text-2xl font-bold">{projects.filter(p => p.status === "In Progress").length}</div>
+                <p className="text-xs text-muted-foreground">In progress</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium">Total Value</CardTitle>
+                <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-lg sm:text-2xl font-bold">${projects.reduce((sum, p) => sum + parseFloat(p.budget.replace(/[^0-9.-]+/g,"")), 0).toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">Combined value</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium">Utilization</CardTitle>
+                <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-lg sm:text-2xl font-bold">87%</div>
+                <p className="text-xs text-muted-foreground">Team average</p>
+              </CardContent>
+            </Card>
         </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="relative flex-1"><Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" /><Input placeholder="Search by name, client, manager..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10"/></div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}><SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Filter by status" /></SelectTrigger><SelectContent><SelectItem value="all">All Status</SelectItem><SelectItem value="Planning">Planning</SelectItem><SelectItem value="In Progress">In Progress</SelectItem><SelectItem value="Review">Review</SelectItem><SelectItem value="Completed">Completed</SelectItem></SelectContent></Select>
-        <Dialog><DialogTrigger asChild><Button><Plus className="w-4 h-4 mr-2" />Create Project</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>Create New Project</DialogTitle><DialogDescription>Fill in the details below to create a new project.</DialogDescription></DialogHeader><CreateProjectForm onAddProject={handleAddProject} /></DialogContent></Dialog>
+      <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input 
+              placeholder={isMobile ? "Search projects..." : "Search by name, client, manager..."} 
+              value={searchTerm} 
+              onChange={(e) => setSearchTerm(e.target.value)} 
+              className="pl-10"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-48">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="Planning">Planning</SelectItem>
+              <SelectItem value="In Progress">In Progress</SelectItem>
+              <SelectItem value="Review">Review</SelectItem>
+              <SelectItem value="Completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="w-full sm:w-auto">
+              <Plus className="w-4 h-4 mr-2" />
+              Create Project
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Project</DialogTitle>
+              <DialogDescription>Fill in the details below to create a new project.</DialogDescription>
+            </DialogHeader>
+            <CreateProjectForm onAddProject={handleAddProject} />
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Tabs value={viewMode} onValueChange={setViewMode} className="space-y-6">
-        <TabsList><TabsTrigger value="grid"><LayoutGrid className="w-4 h-4 mr-2"/>Grid</TabsTrigger><TabsTrigger value="list"><List className="w-4 h-4 mr-2"/>List</TabsTrigger><TabsTrigger value="kanban"><Trello className="w-4 h-4 mr-2"/>Kanban</TabsTrigger><TabsTrigger value="timeline"><GanttChartSquare className="w-4 h-4 mr-2"/>Timeline</TabsTrigger></TabsList>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+          <TabsTrigger value="grid" className="text-xs sm:text-sm">
+            <LayoutGrid className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2"/>
+            <span className="hidden sm:inline">Grid</span>
+          </TabsTrigger>
+          <TabsTrigger value="list" className="text-xs sm:text-sm">
+            <List className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2"/>
+            <span className="hidden sm:inline">List</span>
+          </TabsTrigger>
+          <TabsTrigger value="kanban" className="text-xs sm:text-sm">
+            <Trello className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2"/>
+            <span className="hidden sm:inline">Kanban</span>
+          </TabsTrigger>
+          <TabsTrigger value="timeline" className="text-xs sm:text-sm">
+            <GanttChartSquare className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2"/>
+            <span className="hidden sm:inline">Timeline</span>
+          </TabsTrigger>
+        </TabsList>
         <TabsContent value={viewMode} className="mt-6">{renderView()}</TabsContent>
       </Tabs>
     </main>

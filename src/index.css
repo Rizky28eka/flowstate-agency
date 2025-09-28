@@ -190,15 +190,36 @@
   
   /* Typography Scale */
   .text-hero {
-    @apply text-5xl md:text-6xl font-bold leading-tight;
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight;
   }
   
   .text-section-title {
-    @apply text-3xl md:text-4xl font-bold;
+    @apply text-2xl sm:text-3xl md:text-4xl font-bold;
   }
   
   .text-feature-title {
-    @apply text-xl md:text-2xl font-semibold;
+    @apply text-lg sm:text-xl md:text-2xl font-semibold;
+  }
+  
+  /* Responsive utilities */
+  .responsive-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+  }
+  
+  .responsive-flex {
+    @apply flex flex-col sm:flex-row;
+  }
+  
+  .responsive-gap {
+    @apply gap-3 sm:gap-4 lg:gap-6;
+  }
+  
+  .responsive-padding {
+    @apply p-3 sm:p-4 lg:p-6;
+  }
+  
+  .responsive-text {
+    @apply text-sm sm:text-base;
   }
 }
 
@@ -213,5 +234,31 @@
 @keyframes fadeIn {
   to {
     opacity: 1;
+  }
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
+  .card-hover {
+    @apply hover:shadow-lg;
+  }
+  
+  .btn-hero {
+    @apply px-6 py-3 text-base;
+  }
+  
+  .btn-hero-outline {
+    @apply px-6 py-3 text-base;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .card-hover {
+    @apply active:shadow-lg;
+  }
+  
+  button {
+    @apply min-h-[44px];
   }
 }
