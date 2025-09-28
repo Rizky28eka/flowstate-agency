@@ -241,7 +241,7 @@ export const RoleSidebar = ({ role, currentPath, onNavigate }: RoleSidebarProps)
 
   return (
     <div className={cn(
-      "flex flex-col h-screen bg-card border-r border-border transition-all duration-300",
+      "fixed top-0 left-0 z-50 flex flex-col h-screen bg-card border-r border-border transition-all duration-300",
       isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}

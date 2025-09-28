@@ -14,12 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { AlertTriangle, Settings, Building2, Palette, Bell, CreditCard, Lock, Users, Upload, Check, X, Save, RefreshCw, Eye, EyeOff, Shield, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
-type BadgeVariant = "destructive" | "default" | "secondary" | "outline";
-
-const securityRoles: { id: string; role: string; description: string; color: BadgeVariant }[] = [
-
-// Enhanced Toast Component
+import { settings as initialSettings, securityRoles, permissionMatrix } from "@/lib/mock-data";
 const Toast = ({ message, type = "success", onClose }) => {
   useEffect(() => {
     const timer = setTimeout(onClose, 3000);
