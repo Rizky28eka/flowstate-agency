@@ -1,4 +1,4 @@
-import { FolderKanban, Users, DollarSign, MessageSquare, BarChart3, Shield } from "lucide-react";
+import { FolderKanban, Users, DollarSign, MessageSquare, ChartBar as BarChart3, Shield } from "lucide-react";
 
 const features = [
   {

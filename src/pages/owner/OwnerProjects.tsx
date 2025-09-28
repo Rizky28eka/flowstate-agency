@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FolderKanban, Search, Plus, Calendar, DollarSign, Users, MoreHorizontal, GanttChartSquare, LayoutGrid, List, Trello, Clock } from "lucide-react";
+import { FolderKanban, Search, Plus, Calendar, DollarSign, Users, MoveHorizontal as MoreHorizontal, SquareChartGantt as GanttChartSquare, LayoutGrid, List, Trello, Clock } from "lucide-react";
 import { projects as initialProjects, teamMembers, clients } from "@/lib/mock-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
