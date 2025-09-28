@@ -67,7 +67,7 @@ const OwnerAlerts = () => {
   };
 
   return (
-    <main className="flex-1 px-6 py-8 overflow-auto bg-muted/20">
+    <main className="flex-1 px-6 py-8 bg-background">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-3">

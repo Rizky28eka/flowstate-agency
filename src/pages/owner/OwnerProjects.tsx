@@ -51,7 +51,7 @@ const OwnerProjects = () => {
   });
 
   return (
-    <main className="flex-1 px-6 py-8 overflow-auto bg-muted/20">
+    <main className="flex-1 px-6 py-8 bg-background">
       {/* Project Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <Card>
@@ -141,7 +141,7 @@ const OwnerProjects = () => {
       </div>
 
       <Tabs defaultValue="grid" className="space-y-6">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-4 overflow-x-auto">
           <TabsTrigger value="grid">Grid View</TabsTrigger>
           <TabsTrigger value="list">List View</TabsTrigger>
           <TabsTrigger value="kanban">Kanban Board</TabsTrigger>

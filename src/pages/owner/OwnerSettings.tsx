@@ -10,7 +10,7 @@ import { settings } from "@/lib/mock-data";
 
 const OwnerSettings = () => {
   return (
-    <main className="flex-1 px-6 py-8 overflow-auto">
+    <main className="flex-1 px-6 py-8">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-3">
           <Settings className="w-8 h-8 text-primary" />

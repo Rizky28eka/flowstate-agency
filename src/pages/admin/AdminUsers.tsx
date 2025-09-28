@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { teamMembers } from "@/lib/mock-data";
+import { teamMembers, securityRoles } from "@/lib/mock-data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,14 +66,9 @@ const UserForm = ({ form, onSubmit }) => (
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="Creative Director">Creative Director</SelectItem>
-                <SelectItem value="Lead Developer">Lead Developer</SelectItem>
-                <SelectItem value="Strategy Lead">Strategy Lead</SelectItem>
-                <SelectItem value="Account Director">Account Director</SelectItem>
-                <SelectItem value="Senior Designer">Senior Designer</SelectItem>
-                <SelectItem value="Full Stack Developer">Full Stack Developer</SelectItem>
-                <SelectItem value="Marketing Manager">Marketing Manager</SelectItem>
-                <SelectItem value="UX Researcher">UX Researcher</SelectItem>
+                {securityRoles.map(role => (
+                  <SelectItem key={role.id} value={role.role}>{role.role}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <FormMessage />
@@ -120,6 +115,16 @@ const UserForm = ({ form, onSubmit }) => (
   </Form>
 );
 
+const roleIcons: { [key: string]: React.ElementType } = {
+  Crown,
+  Shield,
+  User,
+  Users,
+  Code,
+  DollarSign,
+  Handshake
+};
+
 const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
@@ -156,42 +161,9 @@ const AdminUsers = () => {
     setIsUserDialogOpen(false);
   };
 
-  const roleIcons = {
-    OWNER: Crown,
-    ADMIN: Shield,
-    PROJECT_MANAGER: User,
-    TEAM_LEAD: Users,
-    MEMBER: Code,
-    FINANCE: DollarSign,
-    CLIENT: Handshake
-  };
-
-  const roleMap: { [key: string]: string } = {
-    "Creative Director": "TEAM_LEAD",
-    "Lead Developer": "TEAM_LEAD",
-    "Strategy Lead": "TEAM_LEAD",
-    "Account Director": "PROJECT_MANAGER",
-    "Senior Designer": "MEMBER",
-    "Full Stack Developer": "MEMBER",
-    "Marketing Manager": "PROJECT_MANAGER",
-    "UX Researcher": "MEMBER",
-    "Owner": "OWNER",
-    "Admin": "ADMIN",
-    "Finance": "FINANCE",
-    "Client": "CLIENT",
-  };
-
   const getRoleColor = (role: string) => {
-    switch (role) {
-      case "OWNER": return "bg-purple-100 text-purple-800";
-      case "ADMIN": return "bg-red-100 text-red-800";
-      case "PROJECT_MANAGER": return "bg-blue-100 text-blue-800";
-      case "TEAM_LEAD": return "bg-green-100 text-green-800";
-      case "MEMBER": return "bg-gray-100 text-gray-800";
-      case "FINANCE": return "bg-amber-100 text-amber-800";
-      case "CLIENT": return "bg-teal-100 text-teal-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
+    const roleData = securityRoles.find(r => r.id === role);
+    return roleData ? roleData.color : "bg-gray-100 text-gray-800";
   };
 
   const getStatusColor = (status: string) => {
@@ -320,14 +292,9 @@ const AdminUsers = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="Creative Director">Creative Director</SelectItem>
-                <SelectItem value="Lead Developer">Lead Developer</SelectItem>
-                <SelectItem value="Strategy Lead">Strategy Lead</SelectItem>
-                <SelectItem value="Account Director">Account Director</SelectItem>
-                <SelectItem value="Senior Designer">Senior Designer</SelectItem>
-                <SelectItem value="Full Stack Developer">Full Stack Developer</SelectItem>
-                <SelectItem value="Marketing Manager">Marketing Manager</SelectItem>
-                <SelectItem value="UX Researcher">UX Researcher</SelectItem>
+                {securityRoles.map(role => (
+                  <SelectItem key={role.id} value={role.role}>{role.role}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -366,8 +333,8 @@ const AdminUsers = () => {
                   </thead>
                   <tbody>
                     {users.map((user) => {
-                      const userRole = roleMap[user.role] || "MEMBER";
-                      const RoleIcon = roleIcons[userRole as keyof typeof roleIcons] || User;
+                      const roleData = securityRoles.find(r => r.role === user.role);
+                      const RoleIcon = roleData ? roleIcons[roleData.icon as keyof typeof roleIcons] || User : User;
                       return (
                         <tr key={user.id} className="border-b hover:bg-muted/50">
                           <td className="p-3">
@@ -387,7 +354,7 @@ const AdminUsers = () => {
                           <td className="p-3">
                             <div className="flex items-center space-x-2">
                               <RoleIcon className="w-4 h-4" />
-                              <Badge className={getRoleColor(userRole)}>
+                              <Badge className={getRoleColor(roleData?.id)}>
                                 {user.role}
                               </Badge>
                             </div>

@@ -39,7 +39,7 @@ const OwnerProjectDetail = () => {
   };
 
   return (
-    <main className="flex-1 px-6 py-8 overflow-auto bg-muted/20">
+    <main className="flex-1 px-6 py-8 bg-background">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
         <div>

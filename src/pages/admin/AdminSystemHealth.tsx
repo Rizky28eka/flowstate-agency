@@ -1,24 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Activity, Server, Database, Zap, HardDrive, Wifi, Globe, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, Circle as XCircle } from "lucide-react";
+import { Activity, Server, Database, Zap, HardDrive, Wifi, Globe, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, XCircle } from "lucide-react";
+
+import { systemMetrics, services } from "@/lib/mock-data";
 
 const AdminSystemHealth = () => {
-  const systemMetrics = [
-    { name: "CPU Usage", value: 45, status: "healthy", icon: Zap },
-    { name: "Memory Usage", value: 68, status: "warning", icon: HardDrive },
-    { name: "Disk Space", value: 32, status: "healthy", icon: Database },
-    { name: "Network", value: 12, status: "healthy", icon: Wifi },
-  ];
-
-  const services = [
-    { name: "Web Server", status: "running", uptime: "99.9%", lastCheck: "2 min ago" },
-    { name: "Database", status: "running", uptime: "99.8%", lastCheck: "1 min ago" },
-    { name: "File Storage", status: "running", uptime: "100%", lastCheck: "30 sec ago" },
-    { name: "Email Service", status: "warning", uptime: "98.5%", lastCheck: "5 min ago" },
-    { name: "Backup Service", status: "running", uptime: "99.7%", lastCheck: "1 min ago" },
-  ];
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -36,6 +23,14 @@ const AdminSystemHealth = () => {
       case "critical": return "text-red-600";
       default: return "text-gray-600";
     }
+  };
+
+  const iconMap = {
+    "CPU Utilization": Server,
+    "Memory Usage": HardDrive,
+    "Database Connections": Database,
+    "API Response Time": Zap,
+    "Network Throughput": Wifi,
   };
 
   return (
@@ -97,7 +92,7 @@ const AdminSystemHealth = () => {
           <CardContent>
             <div className="space-y-6">
               {systemMetrics.map((metric) => {
-                const IconComponent = metric.icon;
+                const IconComponent = iconMap[metric.name as keyof typeof iconMap] || Activity;
                 return (
                   <div key={metric.name} className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -106,7 +101,7 @@ const AdminSystemHealth = () => {
                         <span className="font-medium">{metric.name}</span>
                       </div>
                       <span className={`font-bold ${getStatusColor(metric.status)}`}>
-                        {metric.value}%
+                        {metric.name === 'API Response Time' ? `${metric.value}ms` : `${metric.value}%`}
                       </span>
                     </div>
                     <Progress value={metric.value} className="h-2" />

@@ -33,7 +33,7 @@ const OwnerTeams = () => {
   const avgSatisfaction = (teamMembers.reduce((sum, member) => sum + member.rating, 0) / teamMembers.length).toFixed(1);
 
   return (
-    <main className="flex-1 px-6 py-8 overflow-auto bg-muted/20">
+    <main className="flex-1 px-6 py-8 bg-background">
       {/* Team Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <Card>

@@ -6,62 +6,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileText, Search, Download, Filter, Calendar } from "lucide-react";
 import { useState } from "react";
 
+import { auditLogs } from "@/lib/mock-data";
+
 const AdminAuditLogs = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [actionFilter, setActionFilter] = useState("all");
-
-  const auditLogs = [
-    {
-      id: "LOG-001",
-      timestamp: "2024-12-10T14:30:00Z",
-      user: "admin@agencyflow.com",
-      action: "User Created",
-      resource: "User: john.doe@example.com",
-      ip: "192.168.1.100",
-      userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-      status: "Success"
-    },
-    {
-      id: "LOG-002",
-      timestamp: "2024-12-10T14:25:00Z",
-      user: "sarah.wilson@agencyflow.com",
-      action: "Project Updated",
-      resource: "Project: TechCorp Brand Redesign",
-      ip: "10.0.0.15",
-      userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
-      status: "Success"
-    },
-    {
-      id: "LOG-003",
-      timestamp: "2024-12-10T14:20:00Z",
-      user: "unknown",
-      action: "Login Failed",
-      resource: "Authentication System",
-      ip: "203.0.113.45",
-      userAgent: "Mozilla/5.0 (X11; Linux x86_64)",
-      status: "Failed"
-    },
-    {
-      id: "LOG-004",
-      timestamp: "2024-12-10T14:15:00Z",
-      user: "mike.johnson@agencyflow.com",
-      action: "File Downloaded",
-      resource: "File: project-specs.pdf",
-      ip: "10.0.0.22",
-      userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-      status: "Success"
-    },
-    {
-      id: "LOG-005",
-      timestamp: "2024-12-10T14:10:00Z",
-      user: "admin@agencyflow.com",
-      action: "Permission Changed",
-      resource: "User: emma.davis@agencyflow.com",
-      ip: "192.168.1.100",
-      userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-      status: "Success"
-    }
-  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {

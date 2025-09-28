@@ -1135,6 +1135,182 @@ export const settings = {
   }
 };
 
+export const securityRoles = [
+  { id: "OWNER", role: "Owner", permissions: ["All Access"], users: 1, color: "bg-purple-100 text-purple-800", icon: "Crown" },
+  { id: "ADMIN", role: "Admin", permissions: ["User Management", "Security", "System"], users: 2, color: "bg-red-100 text-red-800", icon: "Shield" },
+  { id: "PROJECT_MANAGER", role: "Project Manager", permissions: ["Projects", "Team", "Clients"], users: 5, color: "bg-blue-100 text-blue-800", icon: "User" },
+  { id: "TEAM_LEAD", role: "Team Lead", permissions: ["Team", "Projects"], users: 4, color: "bg-green-100 text-green-800", icon: "Users" },
+  { id: "MEMBER", role: "Member", permissions: ["Tasks", "Projects"], users: 18, color: "bg-gray-100 text-gray-800", icon: "Code" },
+  { id: "FINANCE", role: "Finance", permissions: ["Finance", "Reports"], users: 2, color: "bg-amber-100 text-amber-800", icon: "DollarSign" },
+  { id: "CLIENT", role: "Client", permissions: ["Client Portal"], users: 8, color: "bg-teal-100 text-teal-800", icon: "Handshake" }
+];
+
+export const permissionMatrix = [
+  { permission: "User Management", owner: true, admin: true, pm: false, lead: false, member: false },
+  { permission: "Project Creation", owner: true, admin: true, pm: true, lead: false, member: false },
+  { permission: "Team Management", owner: true, admin: true, pm: true, lead: true, member: false },
+  { permission: "Financial Data", owner: true, admin: false, pm: false, lead: false, member: false },
+  { permission: "Client Portal", owner: true, admin: true, pm: true, lead: false, member: false },
+  { permission: "System Settings", owner: true, admin: true, pm: false, lead: false, member: false }
+];
+
+export const complianceData = [
+  { standard: "GDPR", status: "Compliant", score: "98%", color: "text-green-600" },
+  { standard: "SOC 2", status: "Compliant", score: "95%", color: "text-green-600" },
+  { standard: "ISO 27001", status: "In Progress", score: "87%", color: "text-amber-600" },
+  { standard: "HIPAA", status: "Not Applicable", score: "N/A", color: "text-gray-600" }
+];
+
+export const auditLogs = [
+  {
+    id: "LOG-001",
+    timestamp: "2024-11-28T14:35:10Z",
+    user: "sarah.wilson@agencyflow.com",
+    action: "User Login",
+    resource: "Authentication",
+    ip: "192.168.1.10",
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
+    status: "Success",
+  },
+  {
+    id: "LOG-002",
+    timestamp: "2024-11-28T14:30:00Z",
+    user: "system",
+    action: "Project Deadline Approaching",
+    resource: "Project PRJ-003",
+    ip: "127.0.0.1",
+    userAgent: "System Process",
+    status: "Success",
+  },
+  {
+    id: "LOG-003",
+    timestamp: "2024-11-28T13:05:00Z",
+    user: "mike.johnson@agencyflow.com",
+    action: "File Upload",
+    resource: "PRJ-005/assets/new_mockup.png",
+    ip: "10.0.0.54",
+    userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
+    status: "Success",
+  },
+  {
+    id: "LOG-004",
+    timestamp: "2024-11-28T11:15:00Z",
+    user: "unknown",
+    action: "Failed Login",
+    resource: "Authentication",
+    ip: "203.0.113.45",
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
+    status: "Failed",
+  },
+    {
+    id: "LOG-005",
+    timestamp: "2024-11-25T10:15:00Z",
+    user: "system",
+    action: "Invoice Payment Received",
+    resource: "Invoice INV-001",
+    ip: "127.0.0.1",
+    userAgent: "System Process",
+    status: "Success",
+  },
+];
+
+export const backupHistory = [
+  {
+    id: "BKP-001",
+    type: "Full System Backup",
+    timestamp: "2024-11-28T02:00:00Z",
+    size: "2.4 GB",
+    status: "Completed",
+    duration: "45 minutes",
+  },
+  {
+    id: "BKP-002",
+    type: "Incremental Backup",
+    timestamp: "2024-11-27T02:00:00Z",
+    size: "150 MB",
+    status: "Completed",
+    duration: "5 minutes",
+  },
+  {
+    id: "BKP-003",
+    type: "Incremental Backup",
+    timestamp: "2024-11-26T02:05:00Z",
+    size: "145 MB",
+    status: "Failed",
+    duration: "7 minutes",
+    error: "Connection to storage server failed.",
+  },
+  {
+    id: "BKP-004",
+    type: "Full System Backup",
+    timestamp: "2024-11-21T02:00:00Z",
+    size: "2.3 GB",
+    status: "Completed",
+    duration: "42 minutes",
+  },
+];
+
+export const systemMetrics = [
+  {
+    name: "CPU Utilization",
+    value: 78,
+    status: "warning",
+  },
+  {
+    name: "Memory Usage",
+    value: 62,
+    status: "healthy",
+  },
+  {
+    name: "Database Connections",
+    value: 92,
+    status: "critical",
+  },
+  {
+    name: "API Response Time",
+    value: 245, // in ms
+    status: "healthy",
+  },
+  {
+    name: "Network Throughput",
+    value: 85, // in %
+    status: "healthy",
+  },
+];
+
+export const services = [
+  {
+    name: "Authentication Service",
+    status: "running",
+    uptime: "99.99%",
+    lastCheck: "2 minutes ago",
+  },
+  {
+    name: "Project Management API",
+    status: "running",
+    uptime: "99.98%",
+    lastCheck: "1 minute ago",
+  },
+  {
+    name: "Notification Service",
+    status: "warning",
+    uptime: "99.80%",
+    lastCheck: "5 minutes ago",
+  },
+  {
+    name: "Billing & Invoicing",
+    status: "running",
+    uptime: "99.99%",
+    lastCheck: "3 minutes ago",
+  },
+  {
+    name: "Client Portal",
+    status: "error",
+    uptime: "98.50%",
+    lastCheck: "1 minute ago",
+  },
+];
+
 // Utility functions for data manipulation
 export const getProjectsByStatus = (status) => {
   return projects.filter(project => project.status === status);

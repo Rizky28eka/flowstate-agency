@@ -21,7 +21,7 @@ const OwnerOverview = () => {
     profit: item.profit,
   }));
   return (
-    <main className="flex-1 px-6 py-8 overflow-auto bg-muted/20">
+    <main className="flex-1 px-6 py-8 bg-background">
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card className="hover:shadow-md transition-shadow">

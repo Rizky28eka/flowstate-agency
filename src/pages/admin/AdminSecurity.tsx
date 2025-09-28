@@ -6,50 +6,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Shield, Lock, Key, TriangleAlert as AlertTriangle, Eye, Download, Settings, Users, Globe, Server, Database, Wifi } from "lucide-react";
+import { notifications, securityRoles, permissionMatrix, complianceData } from "@/lib/mock-data";
+
 const AdminSecurity = () => {
 
-  const securityEvents = [
-    {
-      id: 1,
-      type: "login_failure",
-      severity: "high",
-      message: "Multiple failed login attempts detected",
-      user: "unknown",
-      ip: "192.168.1.100",
-      timestamp: "2024-12-10T10:30:00Z",
-      status: "blocked"
-    },
-    {
-      id: 2,
-      type: "permission_change",
-      severity: "medium",
-      message: "User role permissions modified",
-      user: "admin@agencyflow.com",
-      ip: "10.0.0.5",
-      timestamp: "2024-12-10T09:15:00Z",
-      status: "approved"
-    },
-    {
-      id: 3,
-      type: "data_access",
-      severity: "low",
-      message: "Bulk data export performed",
-      user: "sarah.wilson@agencyflow.com",
-      ip: "10.0.0.12",
-      timestamp: "2024-12-10T08:45:00Z",
-      status: "completed"
-    },
-    {
-      id: 4,
-      type: "system_access",
-      severity: "high",
-      message: "Administrative system access from new location",
-      user: "admin@agencyflow.com",
-      ip: "203.0.113.45",
-      timestamp: "2024-12-09T22:30:00Z",
-      status: "investigating"
-    }
-  ];
+  const securityEvents = notifications.map(notification => ({
+    id: notification.id,
+    type: notification.type,
+    severity: notification.priority,
+    message: notification.message,
+    user: notification.employeeId ? `user-${notification.employeeId}@agencyflow.com` : 'system',
+    ip: '192.168.1.1',
+    timestamp: notification.timestamp,
+    status: notification.read ? 'approved' : 'investigating',
+  }));
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -235,15 +205,7 @@ const AdminSecurity = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {[
-                    { role: "Owner", permissions: ["All Access"], users: 1, color: "bg-purple-100 text-purple-800" },
-                    { role: "Admin", permissions: ["User Management", "Security", "System"], users: 2, color: "bg-red-100 text-red-800" },
-                    { role: "Project Manager", permissions: ["Projects", "Team", "Clients"], users: 5, color: "bg-blue-100 text-blue-800" },
-                    { role: "Team Lead", permissions: ["Team", "Projects"], users: 4, color: "bg-green-100 text-green-800" },
-                    { role: "Member", permissions: ["Tasks", "Projects"], users: 18, color: "bg-gray-100 text-gray-800" },
-                    { role: "Finance", permissions: ["Finance", "Reports"], users: 2, color: "bg-amber-100 text-amber-800" },
-                    { role: "Client", permissions: ["Client Portal"], users: 8, color: "bg-teal-100 text-teal-800" }
-                  ].map((role, index) => (
+                  {securityRoles.map((role, index) => (
                     <div key={index} className="border rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <Badge className={role.color}>{role.role}</Badge>
@@ -284,14 +246,7 @@ const AdminSecurity = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {[
-                        { permission: "User Management", owner: true, admin: true, pm: false, lead: false, member: false },
-                        { permission: "Project Creation", owner: true, admin: true, pm: true, lead: false, member: false },
-                        { permission: "Team Management", owner: true, admin: true, pm: true, lead: true, member: false },
-                        { permission: "Financial Data", owner: true, admin: false, pm: false, lead: false, member: false },
-                        { permission: "Client Portal", owner: true, admin: true, pm: true, lead: false, member: false },
-                        { permission: "System Settings", owner: true, admin: true, pm: false, lead: false, member: false }
-                      ].map((row, index) => (
+                      {permissionMatrix.map((row, index) => (
                         <tr key={index} className="border-b">
                           <td className="p-2 font-medium">{row.permission}</td>
                           <td className="text-center p-2">
@@ -492,12 +447,7 @@ const AdminSecurity = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {[
-                    { standard: "GDPR", status: "Compliant", score: "98%", color: "text-green-600" },
-                    { standard: "SOC 2", status: "Compliant", score: "95%", color: "text-green-600" },
-                    { standard: "ISO 27001", status: "In Progress", score: "87%", color: "text-amber-600" },
-                    { standard: "HIPAA", status: "Not Applicable", score: "N/A", color: "text-gray-600" }
-                  ].map((compliance, index) => (
+                  {complianceData.map((compliance, index) => (
                     <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
                         <p className="font-medium">{compliance.standard}</p>

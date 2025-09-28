@@ -5,82 +5,14 @@ import { Progress } from "@/components/ui/progress";
 import { DollarSign, Users, TrendingUp, Target, Edit, CheckCircle, MessageSquare } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { goals } from "@/lib/mock-data";
 
-const goals = [
-  {
-    id: "1",
-    title: "Increase Quarterly Revenue by 15%",
-    metric: "Revenue",
-    target: 350000,
-    current: 310000,
-    owner: "Sales Team",
-    status: "On Track",
-    icon: DollarSign,
-    milestones: [
-        { id: 1, description: "Secure 3 new enterprise clients", completed: true },
-        { id: 2, description: "Launch new product feature", completed: false },
-        { id: 3, description: "Expand into new market segment", completed: false },
-    ],
-    comments: [
-        { id: 1, author: "John Doe", date: "2025-09-20", text: "Sales team is pushing hard, expect to hit target by end of month." },
-        { id: 2, author: "Jane Smith", date: "2025-09-15", text: "Need to re-evaluate marketing spend for new feature launch." },
-    ]
-  },
-  {
-    id: "2",
-    title: "Achieve 95% Client Retention Rate",
-    metric: "Retention Rate",
-    target: 95,
-    current: 94,
-    owner: "Account Management",
-    status: "On Track",
-    icon: Users,
-    milestones: [
-        { id: 1, description: "Implement new client feedback system", completed: true },
-        { id: 2, description: "Conduct quarterly client check-ins", completed: true },
-        { id: 3, description: "Develop personalized retention strategies", completed: false },
-    ],
-    comments: [
-        { id: 1, author: "Emily White", date: "2025-09-22", text: "Client feedback system is showing positive results." },
-    ]
-  },
-  {
-    id: "3",
-    title: "Improve Profit Margin to 50%",
-    metric: "Profit Margin",
-    target: 50,
-    current: 48.2,
-    owner: "Finance Department",
-    status: "At Risk",
-    icon: TrendingUp,
-    milestones: [
-        { id: 1, description: "Optimize operational costs", completed: false },
-        { id: 2, description: "Negotiate better vendor contracts", completed: false },
-    ],
-    comments: [
-        { id: 1, author: "David Green", date: "2025-09-25", text: "Operational costs are still high, need to review Q3 spending." },
-    ]
-  },
-  {
-    id: "4",
-    title: "Launch 5 New Key Projects",
-    metric: "Projects Launched",
-    target: 5,
-    current: 4,
-    owner: "Project Management",
-    status: "On Track",
-    icon: Target,
-    milestones: [
-        { id: 1, description: "Finalize project proposals", completed: true },
-        { id: 2, description: "Allocate resources for new projects", completed: true },
-        { id: 3, description: "Kick-off meeting for Project Alpha", completed: true },
-        { id: 4, description: "Kick-off meeting for Project Beta", completed: false },
-    ],
-    comments: [
-        { id: 1, author: "Sarah Brown", date: "2025-09-18", text: "Project Beta kick-off delayed due to resource availability." },
-    ]
-  },
-];
+const iconMap = {
+  DollarSign,
+  Users,
+  TrendingUp,
+  Target,
+};
 
 const getStatusColor = (status) => {
     if (status === "On Track") return "text-green-500";
@@ -94,14 +26,14 @@ const OwnerGoalDetail = () => {
   const goal = goals.find(g => g.id === goalId);
 
   if (!goal) {
-    return <main className="flex-1 px-6 py-8 overflow-auto bg-muted/20">Goal not found.</main>;
+    return <main className="flex-1 px-6 py-8 bg-background">Goal not found.</main>;
   }
 
   const progress = (goal.current / goal.target) * 100;
-  const Icon = goal.icon;
+  const Icon = iconMap[goal.icon as keyof typeof iconMap] || Target;
 
   return (
-    <main className="flex-1 px-6 py-8 overflow-auto bg-muted/20">
+    <main className="flex-1 px-6 py-8 bg-background">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-3">
           <Icon className="w-8 h-8 text-primary" />

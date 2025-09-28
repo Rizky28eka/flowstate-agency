@@ -2,7 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, Send, Plus, Hash, Users, Bell, Badge } from "lucide-react";
+import { MessageSquare, Send, Plus, Hash, Users, Bell } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { teamMembers } from "@/lib/mock-data";
 
 

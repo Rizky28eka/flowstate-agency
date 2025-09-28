@@ -4,42 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { HardDrive, Download, Upload, Calendar, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, Database, FileText } from "lucide-react";
 
+import { backupHistory } from "@/lib/mock-data";
+
 const AdminBackup = () => {
-  const backupHistory = [
-    {
-      id: "BKP-001",
-      type: "Full Backup",
-      timestamp: "2024-12-10T02:00:00Z",
-      size: "2.4 GB",
-      status: "Completed",
-      duration: "45 minutes"
-    },
-    {
-      id: "BKP-002",
-      type: "Incremental",
-      timestamp: "2024-12-09T02:00:00Z",
-      size: "156 MB",
-      status: "Completed",
-      duration: "8 minutes"
-    },
-    {
-      id: "BKP-003",
-      type: "Database Only",
-      timestamp: "2024-12-08T14:30:00Z",
-      size: "89 MB",
-      status: "Completed",
-      duration: "3 minutes"
-    },
-    {
-      id: "BKP-004",
-      type: "Full Backup",
-      timestamp: "2024-12-07T02:00:00Z",
-      size: "2.3 GB",
-      status: "Failed",
-      duration: "N/A",
-      error: "Storage quota exceeded"
-    }
-  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {

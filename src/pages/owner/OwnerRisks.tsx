@@ -48,7 +48,7 @@ const OwnerRisks = () => {
     team: teamHealthRisks,
   };
   return (
-    <main className="flex-1 px-6 py-8 overflow-auto bg-muted/20">
+    <main className="flex-1 px-6 py-8 bg-background">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-3">
           <TriangleAlert className="w-8 h-8 text-primary" />

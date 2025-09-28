@@ -23,7 +23,7 @@ const OwnerAnalytics = () => {
   const [timeRange, setTimeRange] = useState("30d");
 
   return (
-    <main className="flex-1 px-6 py-8 overflow-auto">
+    <main className="flex-1 px-6 py-8">
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>

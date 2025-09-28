@@ -18,7 +18,7 @@ const OwnerReports = () => {
   const [dateRange, setDateRange] = useState("q3-2024");
 
   return (
-    <main className="flex-1 px-6 py-8 overflow-auto">
+    <main className="flex-1 px-6 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-3">

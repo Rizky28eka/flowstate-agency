@@ -1,8 +1,21 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, MessageSquare, Download, Clock, CircleCheck as CheckCircle, Calendar } from "lucide-react";
+import { Eye, MessageSquare, Download, Clock, CircleCheck as CheckCircle } from "lucide-react";
+import { projects, notifications } from "@/lib/mock-data";
 
 const ClientDashboard = () => {
+  // Assuming a logged-in client, we'll filter for a specific client ID
+  const clientId = "CLI-001"; // Example: TechCorp Inc.
+  const clientProjects = projects.filter(p => p.clientId === clientId);
+  const clientProjectIds = clientProjects.map(p => p.id);
+  const recentUpdates = notifications.filter(
+    (n) => n.projectId && clientProjectIds.includes(n.projectId)
+  );
+
+  const activeProjects = clientProjects.filter((p) => p.status === "In Progress").length;
+  const completedProjects = clientProjects.filter((p) => p.status === "Completed").length;
+  const pendingReviews = clientProjects.filter((p) => p.status === "Review").length;
+
   return (
     <>
       {/* Project Overview */}
@@ -13,7 +26,7 @@ const ClientDashboard = () => {
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
+            <div className="text-2xl font-bold">{activeProjects}</div>
             <p className="text-xs text-muted-foreground">In development</p>
           </CardContent>
         </Card>
@@ -24,7 +37,7 @@ const ClientDashboard = () => {
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">{completedProjects}</div>
             <p className="text-xs text-muted-foreground">This year</p>
           </CardContent>
         </Card>
@@ -35,7 +48,7 @@ const ClientDashboard = () => {
             <Clock className="h-4 w-4 text-amber-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2</div>
+            <div className="text-2xl font-bold">{pendingReviews}</div>
             <p className="text-xs text-muted-foreground">Awaiting feedback</p>
           </CardContent>
         </Card>
@@ -61,22 +74,24 @@ const ClientDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[
-                { name: "Website Redesign", status: "In Progress", progress: 75, phase: "Development", nextDelivery: "Dec 15" },
-                { name: "Brand Identity", status: "Review", progress: 90, phase: "Final Review", nextDelivery: "Dec 12" },
-                { name: "Mobile App UI", status: "Design", progress: 45, phase: "Wireframes", nextDelivery: "Dec 20" }
-              ].map((project, index) => (
+              {clientProjects.map((project, index) => (
                 <div key={index} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <h4 className="font-medium">{project.name}</h4>
-                      <p className="text-sm text-muted-foreground">Current phase: {project.phase}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Current phase: {project.status}
+                      </p>
                     </div>
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      project.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
-                      project.status === 'Review' ? 'bg-amber-100 text-amber-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${
+                        project.status === "In Progress"
+                          ? "bg-blue-100 text-blue-800"
+                          : project.status === "Review"
+                          ? "bg-amber-100 text-amber-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
                       {project.status}
                     </span>
                   </div>
@@ -86,15 +101,19 @@ const ClientDashboard = () => {
                       <span>{project.progress}%</span>
                     </div>
                     <div className="w-full bg-secondary rounded-full h-2">
-                      <div 
-                        className="bg-primary h-2 rounded-full" 
+                      <div
+                        className="bg-primary h-2 rounded-full"
                         style={{ width: `${project.progress}%` }}
                       ></div>
                     </div>
-                    <p className="text-xs text-muted-foreground">Next delivery: {project.nextDelivery}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Next delivery: {new Date(project.endDate).toLocaleDateString()}
+                    </p>
                   </div>
                   <div className="flex space-x-2 mt-3">
-                    <Button variant="outline" size="sm">View Details</Button>
+                    <Button variant="outline" size="sm">
+                      View Details
+                    </Button>
                     <Button variant="ghost" size="sm">Leave Feedback</Button>
                   </div>
                 </div>
@@ -111,40 +130,22 @@ const ClientDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[
-                { 
-                  title: "Website wireframes completed", 
-                  project: "Website Redesign", 
-                  time: "2 hours ago", 
-                  type: "delivery",
-                  hasFile: true 
-                },
-                { 
-                  title: "Brand logo concepts ready for review", 
-                  project: "Brand Identity", 
-                  time: "1 day ago", 
-                  type: "review",
-                  hasFile: true 
-                },
-                { 
-                  title: "Project kickoff meeting scheduled", 
-                  project: "Mobile App UI", 
-                  time: "2 days ago", 
-                  type: "meeting",
-                  hasFile: false 
-                }
-              ].map((update, index) => (
+              {recentUpdates.map((update, index) => (
                 <div key={index} className="border rounded-lg p-3">
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h4 className="font-medium text-sm">{update.title}</h4>
-                      <p className="text-xs text-muted-foreground">{update.project}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {projects.find((p) => p.id === update.projectId)?.name}
+                      </p>
                     </div>
-                    <span className="text-xs text-muted-foreground">{update.time}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(update.timestamp).toLocaleDateString()}
+                    </span>
                   </div>
                   <div className="flex space-x-2">
                     <Button variant="ghost" size="sm">View</Button>
-                    {update.hasFile && (
+                    {update.type === "payment" && (
                       <Button variant="ghost" size="sm">
                         <Download className="w-3 h-3 mr-1" />
                         Download
