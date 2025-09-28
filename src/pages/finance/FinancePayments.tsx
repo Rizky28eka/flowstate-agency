@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, CreditCard, Plus, CheckCircle, Clock, AlertTriangle } from "lucide-react";
+import { DollarSign, CreditCard, Plus, CircleCheck as CheckCircle, Clock, TriangleAlert as AlertTriangle } from "lucide-react";
 
 const FinancePayments = () => {
   const payments = [

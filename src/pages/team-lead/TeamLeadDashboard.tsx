@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Users, Target, TrendingUp, Calendar, Award, Clock, CheckCircle } from "lucide-react";
+import { Users, Target, TrendingUp, Calendar, Award, Clock, CircleCheck as CheckCircle } from "lucide-react";
 import { teamMembers, projects } from "@/lib/mock-data";
 
 const TeamLeadDashboard = () => {

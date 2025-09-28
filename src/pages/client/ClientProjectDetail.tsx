@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar, Users, MessageSquare, Download, CheckCircle, Clock } from "lucide-react";
+import { Calendar, Users, MessageSquare, Download, CircleCheck as CheckCircle, Clock } from "lucide-react";
 
 const ClientProjectDetail = () => {
   const { id } = useParams();

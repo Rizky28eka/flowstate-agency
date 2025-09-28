@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { PieChart, Plus, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
+import { ChartPie as PieChart, Plus, TrendingUp, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle } from "lucide-react";
 import { departments } from "@/lib/mock-data";
 
 const FinanceBudgets = () => {

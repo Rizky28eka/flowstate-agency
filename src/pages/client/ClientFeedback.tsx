@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Plus, Star, MessageSquare, ThumbsUp, ThumbsDown } from "lucide-react";
+import { CircleCheck as CheckCircle, Plus, Star, MessageSquare, ThumbsUp, ThumbsDown } from "lucide-react";
 
 const ClientFeedback = () => {
   const feedbackRequests = [

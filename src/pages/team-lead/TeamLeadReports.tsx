@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Download, FileText, TrendingUp, Users, Clock } from "lucide-react";
+import { ChartBar as BarChart3, Download, FileText, TrendingUp, Users, Clock } from "lucide-react";
 import { teamMembers } from "@/lib/mock-data";
 
 const TeamLeadReports = () => {

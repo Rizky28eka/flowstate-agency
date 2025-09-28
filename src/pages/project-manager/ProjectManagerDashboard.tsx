@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { FolderKanban, Users, Calendar, Clock, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
+import { FolderKanban, Users, Calendar, Clock, TrendingUp, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle } from "lucide-react";
 import { projects, tasks, teamMembers } from "@/lib/mock-data";
 
 const ProjectManagerDashboard = () => {

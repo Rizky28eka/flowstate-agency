@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, Clock, FolderKanban, TrendingUp, Calendar, Award } from "lucide-react";
+import { CircleCheck as CheckCircle, Clock, FolderKanban, TrendingUp, Calendar, Award } from "lucide-react";
 import { tasks, projects, timeEntries } from "@/lib/mock-data";
 
 const MemberDashboard = () => {

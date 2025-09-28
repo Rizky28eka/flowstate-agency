@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { HardDrive, Download, Upload, Calendar, CheckCircle, AlertTriangle, Database, FileText } from "lucide-react";
+import { HardDrive, Download, Upload, Calendar, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, Database, FileText } from "lucide-react";
 
 const AdminBackup = () => {
   const backupHistory = [

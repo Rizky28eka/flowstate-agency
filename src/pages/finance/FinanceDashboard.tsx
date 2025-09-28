@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, TrendingUp, Receipt, CreditCard, AlertTriangle, Calendar } from "lucide-react";
+import { DollarSign, TrendingUp, Receipt, CreditCard, TriangleAlert as AlertTriangle, Calendar } from "lucide-react";
 import { invoices, expenses, monthlyRevenueData } from "@/lib/mock-data";
 
 const FinanceDashboard = () => {

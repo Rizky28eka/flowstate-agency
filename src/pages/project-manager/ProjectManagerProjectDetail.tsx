@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Edit, CheckCircle, Plus, Calendar, Users, DollarSign } from "lucide-react";
+import { CreditCard as Edit, CircleCheck as CheckCircle, Plus, Calendar, Users, DollarSign } from "lucide-react";
 
 const ProjectManagerProjectDetail = () => {
   const { id } = useParams();

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Plus, Phone, Mail, Clock, CheckCircle, AlertTriangle } from "lucide-react";
+import { MessageSquare, Plus, Phone, Mail, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle } from "lucide-react";
 
 const ClientSupport = () => {
   const supportTickets = [

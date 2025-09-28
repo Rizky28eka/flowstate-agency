@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Download, Calendar, Calculator, AlertTriangle, CheckCircle } from "lucide-react";
+import { FileText, Download, Calendar, Calculator, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle } from "lucide-react";
 
 const FinanceTaxes = () => {
   const taxPeriods = [

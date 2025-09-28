@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Activity, Server, Database, Zap, HardDrive, Wifi, Globe, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
+import { Activity, Server, Database, Zap, HardDrive, Wifi, Globe, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, Circle as XCircle } from "lucide-react";
 
 const AdminSystemHealth = () => {
   const systemMetrics = [

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Download, FileText, TrendingUp, Calendar } from "lucide-react";
+import { ChartBar as BarChart3, Download, FileText, TrendingUp, Calendar } from "lucide-react";
 
 const ProjectManagerReports = () => {
   const reports = [

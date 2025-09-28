@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Target, Users, Calendar, TrendingUp, Plus, AlertTriangle } from "lucide-react";
+import { Target, Users, Calendar, TrendingUp, Plus, TriangleAlert as AlertTriangle } from "lucide-react";
 import { teamMembers, projects } from "@/lib/mock-data";
 
 const ProjectManagerResources = () => {

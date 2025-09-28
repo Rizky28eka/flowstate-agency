@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Edit, Mail, Phone, MapPin, Calendar, Award, Settings } from "lucide-react";
+import { User, CreditCard as Edit, Mail, Phone, MapPin, Calendar, Award, Settings } from "lucide-react";
 import { teamMembers } from "@/lib/mock-data";
 
 const MemberProfile = () => {

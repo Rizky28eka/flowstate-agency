@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, MessageSquare, Download, Clock, CheckCircle, Calendar } from "lucide-react";
+import { Eye, MessageSquare, Download, Clock, CircleCheck as CheckCircle, Calendar } from "lucide-react";
 
 const ClientDashboard = () => {
   return (
