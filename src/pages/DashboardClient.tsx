@@ -1,57 +1,38 @@
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import { RoleSidebar } from "@/components/RoleSidebar";
-import { Handshake, Menu } from "lucide-react";
+import { Handshake } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 
 const DashboardClient = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar (desktop only) */}
-      <div className="hidden md:block">
-        <RoleSidebar
-          role="CLIENT"
-          currentPath={location.pathname}
-          onNavigate={navigate}
-        />
-      </div>
+  const handleSignOut = () => {
+    // In a real app, you would clear auth tokens here
+    console.log("Signing out...");
+    navigate("/");
+  };
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
+  return (
+    <SidebarProvider>
+      <RoleSidebar
+        role="CLIENT"
+        currentPath={location.pathname}
+        onNavigate={navigate}
+        onSignOut={handleSignOut}
+      />
+      <SidebarInset>
         <header className="border-b bg-card sticky top-0 z-20">
           <div className="px-4 md:px-6 py-4">
-            <div className="flex items-center justify-between">
-              {/* Left section */}
-              <div className="flex items-center space-x-3">
-                {/* Sidebar trigger for mobile */}
-                <div className="md:hidden">
-                  <Sheet>
-                    <SheetTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="mr-2"
-                      >
-                        <Menu className="w-6 h-6" />
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent side="left" className="p-0">
-                      <RoleSidebar
-                        role="CLIENT"
-                        currentPath={location.pathname}
-                        onNavigate={navigate}
-                      />
-                    </SheetContent>
-                  </Sheet>
-                </div>
-
-                <Handshake className="w-8 h-8 text-primary" />
-                <div>
-                  <h1 className="text-xl md:text-2xl font-bold text-foreground">
+            <div className="flex items-center justify-between gap-4">
+              <div className="md:hidden">
+                <SidebarTrigger />
+              </div>
+              <div className="flex items-center space-x-3 flex-1 min-w-0">
+                <Handshake className="w-8 h-8 text-primary shrink-0" />
+                <div className="min-w-0">
+                  <h1 className="text-xl md:text-2xl font-bold text-foreground truncate">
                     Client Portal
                   </h1>
                   <p className="text-xs md:text-sm text-muted-foreground">
@@ -60,7 +41,6 @@ const DashboardClient = () => {
                 </div>
               </div>
 
-              {/* Right section */}
               <div className="flex space-x-2">
                 <Button variant="outline" size="sm" className="md:size-default">
                   New Request
@@ -73,12 +53,11 @@ const DashboardClient = () => {
           </div>
         </header>
 
-        {/* Main Content */}
-        <main className="flex-1 px-4 md:px-6 py-6 md:py-8 overflow-auto">
+        <main className="p-4 sm:p-6">
           <Outlet />
         </main>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 };
 

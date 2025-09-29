@@ -2,30 +2,37 @@ import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import { RoleSidebar } from "@/components/RoleSidebar";
 import { DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 
 const DashboardFinance = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const handleSignOut = () => {
+    // In a real app, you would clear auth tokens here
+    console.log("Signing out...");
+    navigate("/");
+  };
+
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
+    <SidebarProvider>
       <RoleSidebar 
         role="FINANCE" 
         currentPath={location.pathname}
         onNavigate={navigate}
+        onSignOut={handleSignOut}
       />
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="border-b bg-card">
-          <div className="px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <DollarSign className="w-8 h-8 text-primary" />
-                <div>
-                  <h1 className="text-2xl font-bold text-foreground">Finance Dashboard</h1>
+      <SidebarInset>
+        <header className="border-b bg-card sticky top-0 z-20">
+          <div className="px-4 sm:px-6 py-3 sm:py-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="md:hidden">
+                <SidebarTrigger />
+              </div>
+              <div className="flex items-center space-x-3 flex-1 min-w-0">
+                <DollarSign className="w-8 h-8 text-primary shrink-0" />
+                <div className="min-w-0">
+                  <h1 className="text-2xl font-bold text-foreground truncate">Finance Dashboard</h1>
                   <p className="text-sm text-muted-foreground">Financial management & reporting</p>
                 </div>
               </div>
@@ -37,12 +44,11 @@ const DashboardFinance = () => {
           </div>
         </header>
 
-        {/* Main Content */}
-        <main className="flex-1 px-6 py-8 overflow-auto">
+        <main className="p-4 sm:p-6">
           <Outlet />
         </main>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 };
 

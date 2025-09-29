@@ -41,12 +41,20 @@ import OwnerCommunication from "./pages/owner/OwnerCommunication";
 import OwnerOverview from "./pages/owner/OwnerOverview";
 import OwnerTeamDetail from "./pages/owner/OwnerTeamDetail";
 import OwnerRiskDetail from "./pages/owner/OwnerRiskDetail";
+import OwnerAlerts from "./pages/owner/OwnerAlerts";
 
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSecurity from "./pages/admin/AdminSecurity";
 import AdminSystemHealth from "./pages/admin/AdminSystemHealth";
 import AdminAuditLogs from "./pages/admin/AdminAuditLogs";
 import AdminBackup from "./pages/admin/AdminBackup";
+import AdminRoles from "./pages/admin/AdminRoles";
+import AdminRoleDetail from "./pages/admin/AdminRoleDetail";
+import AdminIntegrations from "./pages/admin/AdminIntegrations";
+import AdminIntegrationDetail from "./pages/admin/AdminIntegrationDetail";
+import AdminApiKeys from "./pages/admin/AdminApiKeys";
+import AdminOrganizationSettings from "./pages/admin/AdminOrganizationSettings";
+import AdminSaaSAnalytics from "./pages/admin/AdminSaaSAnalytics";
 
 import ProjectManagerDashboard from "./pages/project-manager/ProjectManagerDashboard";
 import ProjectManagerProjects from "./pages/project-manager/ProjectManagerProjects";
@@ -135,6 +143,7 @@ const App = () => (
             <Route path="forecasting" element={<OwnerForecasting />} />
             <Route path="sales-pipeline" element={<OwnerSalesPipeline />} />
             <Route path="strategic-roadmap" element={<OwnerStrategicRoadmap />} />
+            <Route path="alerts" element={<OwnerAlerts />} />
           </Route>
 
           {/* Admin dashboard (with nested routes) */}
@@ -145,6 +154,13 @@ const App = () => (
             <Route path="system" element={<AdminSystemHealth />} />
             <Route path="audit" element={<AdminAuditLogs />} />
             <Route path="backup" element={<AdminBackup />} />
+            <Route path="roles" element={<AdminRoles />} />
+            <Route path="roles/:roleId" element={<AdminRoleDetail />} />
+            <Route path="integrations" element={<AdminIntegrations />} />
+            <Route path="integrations/:integrationId" element={<AdminIntegrationDetail />} />
+            <Route path="api-keys" element={<AdminApiKeys />} />
+            <Route path="organization-settings" element={<AdminOrganizationSettings />} />
+            <Route path="saas-analytics" element={<AdminSaaSAnalytics />} />
           </Route>
 
           {/* Other dashboards */}

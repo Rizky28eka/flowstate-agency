@@ -647,7 +647,8 @@ export const tasks = [
     estimatedHours: 8,
     actualHours: 0,
     tags: ["Development", "Database"],
-    parentId: "TSK-002"
+    parentId: "TSK-002",
+    dependsOn: ["TSK-005"]
 
   },
   {

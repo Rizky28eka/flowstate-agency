@@ -5,11 +5,21 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CircleCheck as CheckCircle, Search, Plus, Clock, Calendar, Flag } from "lucide-react";
 import { useState } from "react";
-import { tasks } from "@/lib/mock-data";
+import { tasks as initialTasks } from "@/lib/mock-data";
+import { Task } from "@/types";
+import { TaskItem } from "@/components/TaskItem";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { CreateTaskForm } from "@/components/CreateTaskForm";
 
 const MemberTasks = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [tasks, setTasks] = useState(initialTasks);
+
   const myTasks = tasks.filter(t => t.assignedTo === "Sarah Wilson" || t.assignedTo === "Mike Johnson");
+
+  const onAddTask = (task: Task) => {
+    setTasks(prevTasks => [...prevTasks, task]);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -34,10 +44,20 @@ const MemberTasks = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">My Tasks</h2>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
-          Create Task
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Create Task
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Task</DialogTitle>
+            </DialogHeader>
+            <CreateTaskForm onAddTask={onAddTask} />
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Task Stats */}
@@ -114,39 +134,8 @@ const MemberTasks = () => {
           </div>
 
           <div className="space-y-4">
-            {myTasks.map((task) => (
-              <Card key={task.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h4 className="font-semibold">{task.title}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
-                      <span className={`text-sm font-medium ${getPriorityColor(task.priority)}`}>
-                        {task.priority}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="w-3 h-3" />
-                        <span>Due: {task.dueDate}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-3 h-3" />
-                        <span>{task.estimatedHours}h estimated</span>
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      {task.status === "Completed" ? "View" : "Work on Task"}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+            {myTasks.filter(t => !t.parentId).map((task) => (
+              <TaskItem key={task.id} task={task} allTasks={myTasks} />
             ))}
           </div>
         </TabsContent>
@@ -162,27 +151,10 @@ const MemberTasks = () => {
                     "review": "In Review",
                     "completed": "Completed"
                   };
-                  return task.status === statusMap[status];
+                  return task.status === statusMap[status] && !task.parentId;
                 })
                 .map((task) => (
-                  <Card key={task.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                          <h4 className="font-semibold">{task.title}</h4>
-                          <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
-                        </div>
-                        <span className={`text-sm font-medium ${getPriorityColor(task.priority)}`}>
-                          {task.priority}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>Due: {task.dueDate}</span>
-                        <span>{task.estimatedHours}h estimated</span>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <TaskItem key={task.id} task={task} allTasks={myTasks} />
                 ))}
             </div>
           </TabsContent>

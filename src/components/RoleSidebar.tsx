@@ -1,47 +1,183 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Crown, Shield, User, Users, Code, DollarSign, Handshake, LayoutDashboard, FolderKanban, MessageSquare, Calendar, Settings, ChartBar as BarChart3, FileText, Clock, Target, CreditCard, Receipt, TrendingUp, Eye, CircleCheck as CheckCircle2, Download, Building2, UserCheck, TriangleAlert as AlertTriangle, Lock, Briefcase, ChartPie as PieChart, ChevronLeft, ChevronRight, LogOut, Bell, Plug, Activity, Database, HardDrive, Zap, Folder, Presentation, Headphones, UserCog, ChevronsUpDown } from "lucide-react";
+import {
+  Crown,
+  Shield,
+  User,
+  Users,
+  Code,
+  DollarSign,
+  Handshake,
+  LayoutDashboard,
+  FolderKanban,
+  MessageSquare,
+  Calendar,
+  Settings,
+  BarChart3,
+  FileText,
+  Clock,
+  Target,
+  CreditCard,
+  Receipt,
+  TrendingUp,
+  Eye,
+  CheckCircle2,
+  Download,
+  Building2,
+  UserCheck,
+  AlertTriangle,
+  Lock,
+  Briefcase,
+  PieChart,
+  ChevronLeft,
+  ChevronRight,
+  LogOut,
+  Bell,
+  Plug,
+  Activity,
+  HardDrive,
+  Zap,
+  Presentation,
+  ChevronsUpDown,
+  Home,
+  Bookmark,
+  HelpCircle,
+  Sun,
+  Moon,
+  Star,
+  KeyRound,
+} from "lucide-react";
+import {
+  Sidebar,
+  SidebarProvider,
+  SidebarInset,
+  SidebarHeader,
+  SidebarContent,
+  SidebarFooter,
+  SidebarMenu,
+  SidebarMenuItem as UiSidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
+  useSidebar,
+} from "@/components/ui/sidebar";
 
+// Type definitions
 interface SidebarItem {
   id: string;
   label: string;
-  icon: React.FC<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string }>;
   href?: string;
-  badge?: string;
+  badge?: string | number;
+  badgeVariant?: "default" | "secondary" | "destructive" | "outline";
   children?: SidebarItem[];
+  isNew?: boolean;
+  description?: string;
 }
+
+interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  role: string;
+  department?: string;
+  status: "online" | "away" | "busy" | "offline";
+}
+
+type UserRole =
+  | "OWNER"
+  | "ADMIN"
+  | "PROJECT_MANAGER"
+  | "TEAM_LEAD"
+  | "MEMBER"
+  | "FINANCE"
+  | "CLIENT";
 
 interface RoleSidebarProps {
-  role: 'OWNER' | 'ADMIN' | 'PROJECT_MANAGER' | 'TEAM_LEAD' | 'MEMBER' | 'FINANCE' | 'CLIENT';
+  role: UserRole;
   currentPath?: string;
   onNavigate?: (path: string) => void;
+  userProfile?: UserProfile;
+  notifications?: number;
+  theme?: "light" | "dark";
+  onThemeToggle?: () => void;
+  onSignOut?: () => void;
 }
 
-const roleConfigs = {
+interface RoleConfig {
+  title: string;
+
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+  items: SidebarItem[];
+}
+
+// Role configurations
+const roleConfigs: Record<UserRole, RoleConfig> = {
   OWNER: {
-    title: "Owner Dashboard",
+    title: "AgencyFlow",
+
     icon: Crown,
+    color: "from-purple-600 to-purple-800",
     items: [
-      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/owner" },
+      {
+        id: "dashboard",
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        href: "/dashboard/owner",
+      },
       {
         id: "strategy",
         label: "Strategy & Growth",
         icon: Presentation,
         children: [
-          { id: "analytics", label: "Business Analytics", icon: BarChart3, href: "/dashboard/owner/analytics" },
-          { id: "kpi-dashboard", label: "KPI Dashboard", icon: BarChart3, href: "/dashboard/owner/kpi-dashboard" },
-          { id: "goals", label: "Company Goals", icon: Target, href: "/dashboard/owner/goals" },
-          { id: "strategic-roadmap", label: "Strategic Roadmap", icon: Presentation, href: "/dashboard/owner/strategic-roadmap" },
-          { id: "forecasting", label: "Forecasting", icon: TrendingUp, href: "/dashboard/owner/forecasting" },
-          { id: "sales-pipeline", label: "Sales Pipeline", icon: Briefcase, href: "/dashboard/owner/sales-pipeline" },
+          {
+            id: "analytics",
+            label: "Analytics",
+            icon: BarChart3,
+            href: "/dashboard/owner/analytics",
+          },
+          {
+            id: "kpi-dashboard",
+            label: "KPI Dashboard",
+            icon: LayoutDashboard,
+            href: "/dashboard/owner/kpi-dashboard",
+          },
+          {
+            id: "goals",
+            label: "Goals",
+            icon: Star,
+            href: "/dashboard/owner/goals",
+          },
+          {
+            id: "forecasting",
+            label: "Forecasting",
+            icon: TrendingUp,
+            href: "/dashboard/owner/forecasting",
+          },
+          {
+            id: "roadmap",
+            label: "Strategic Roadmap",
+            icon: Presentation,
+            href: "/dashboard/owner/strategic-roadmap",
+          },
         ],
       },
       {
@@ -49,10 +185,33 @@ const roleConfigs = {
         label: "Operations",
         icon: Zap,
         children: [
-          { id: "projects", label: "All Projects", icon: FolderKanban, href: "/dashboard/owner/projects", badge: "47" },
-          { id: "risks", label: "Risk Management", icon: AlertTriangle, href: "/dashboard/owner/risks" },
-          { id: "contract-management", label: "Contract Management", icon: FileText, href: "/dashboard/owner/contract-management" },
-          { id: "integrations", label: "Integrations", icon: Plug, href: "/dashboard/owner/integrations" },
+          {
+            id: "projects",
+            label: "Projects",
+            icon: FolderKanban,
+            href: "/dashboard/owner/projects",
+            badge: 47,
+          },
+          {
+            id: "risks",
+            label: "Risks",
+            icon: AlertTriangle,
+            href: "/dashboard/owner/risks",
+            badge: 3,
+            badgeVariant: "destructive",
+          },
+          {
+            id: "resource-allocation",
+            label: "Resource Allocation",
+            icon: Target,
+            href: "/dashboard/owner/resource-allocation",
+          },
+          {
+            id: "profitability",
+            label: "Profitability",
+            icon: PieChart,
+            href: "/dashboard/owner/profitability",
+          },
         ],
       },
       {
@@ -60,9 +219,18 @@ const roleConfigs = {
         label: "Team",
         icon: Users,
         children: [
-          { id: "teams", label: "Team Management", icon: Users, href: "/dashboard/owner/teams" },
-          { id: "resource-allocation", label: "Resource Allocation", icon: Users, href: "/dashboard/owner/resource-allocation" },
-          { id: "communication", label: "Communication", icon: MessageSquare, href: "/dashboard/owner/communication" },
+          {
+            id: "team-management",
+            label: "Team Management",
+            icon: Users,
+            href: "/dashboard/owner/teams",
+          },
+          {
+            id: "communication",
+            label: "Communication",
+            icon: MessageSquare,
+            href: "/dashboard/owner/communication",
+          },
         ],
       },
       {
@@ -70,246 +238,802 @@ const roleConfigs = {
         label: "Finance",
         icon: DollarSign,
         children: [
-          { id: "finances", label: "Financial Overview", icon: DollarSign, href: "/dashboard/owner/finances" },
-          { id: "profitability", label: "Profitability Analysis", icon: PieChart, href: "/dashboard/owner/profitability" },
+          {
+            id: "financial-overview",
+            label: "Overview",
+            icon: DollarSign,
+            href: "/dashboard/owner/finances",
+          },
+          {
+            id: "contract-management",
+            label: "Contracts",
+            icon: FileText,
+            href: "/dashboard/owner/contract-management",
+          },
         ],
       },
       {
         id: "clients-reports",
         label: "Clients & Reports",
-        icon: FileText,
+        icon: Handshake,
         children: [
-          { id: "clients", label: "Client Relations", icon: Handshake, href: "/dashboard/owner/clients" },
-          { id: "reports", label: "Executive Reports", icon: FileText, href: "/dashboard/owner/reports" },
+          {
+            id: "clients",
+            label: "Clients",
+            icon: Building2,
+            href: "/dashboard/owner/clients",
+          },
+          {
+            id: "reports",
+            label: "Reports",
+            icon: FileText,
+            href: "/dashboard/owner/reports",
+          },
+          {
+            id: "sales-pipeline",
+            label: "Sales Pipeline",
+            icon: TrendingUp,
+            href: "/dashboard/owner/sales-pipeline",
+          },
         ],
       },
-      { id: "settings", label: "Company Settings", icon: Settings, href: "/dashboard/owner/settings" },
-    ]
+      {
+        id: "company-settings",
+        label: "Company Settings",
+        icon: Settings,
+        children: [
+          {
+            id: "settings",
+            label: "Settings",
+            icon: Settings,
+            href: "/dashboard/owner/settings",
+          },
+          {
+            id: "integrations",
+            label: "Integrations",
+            icon: Plug,
+            href: "/dashboard/owner/integrations",
+          },
+          {
+            id: "alerts",
+            label: "Alerts",
+            icon: Bell,
+            href: "/dashboard/owner/alerts",
+          },
+        ],
+      },
+    ],
   },
   ADMIN: {
-    title: "Admin Dashboard",
+    title: "System Administration",
+
     icon: Shield,
+    color: "from-red-600 to-red-800",
     items: [
-      { id: "users", label: "User Management", icon: UserCheck, href: "/dashboard/admin/users" },
-      { id: "security", label: "Security & Permissions", icon: Lock, href: "/dashboard/admin/security" },
-      { id: "system", label: "System Health", icon: Activity, href: "/dashboard/admin/system" },
-      { id: "audit", label: "Audit Logs", icon: FileText, href: "/dashboard/admin/audit" },
-      { id: "backup", label: "Backup & Recovery", icon: HardDrive, href: "/dashboard/admin/backup" },
-    ]
+      {
+        id: "dashboard",
+        label: "Admin Dashboard",
+        icon: LayoutDashboard,
+        href: "/dashboard/admin",
+      },
+      {
+        id: "saas-analytics",
+        label: "SaaS Analytics",
+        icon: BarChart3,
+        href: "/dashboard/admin/saas-analytics",
+      },
+      {
+        id: "users",
+        label: "User Management",
+        icon: UserCheck,
+        href: "/dashboard/admin/users",
+        badge: 156,
+      },
+      {
+        id: "roles",
+        label: "Roles & Permissions",
+        icon: Users,
+        href: "/dashboard/admin/roles",
+      },
+      {
+        id: "security",
+        label: "Security Center",
+        icon: Lock,
+        href: "/dashboard/admin/security",
+        badge: 2,
+        badgeVariant: "destructive",
+      },
+      {
+        id: "organization",
+        label: "Organization Settings",
+        icon: Building2,
+        href: "/dashboard/admin/organization-settings",
+      },
+      {
+        id: "health",
+        label: "System Health",
+        icon: Activity,
+        href: "/dashboard/admin/system",
+      },
+      {
+        id: "audit",
+        label: "Audit Trails",
+        icon: FileText,
+        href: "/dashboard/admin/audit",
+      },
+      {
+        id: "backup",
+        label: "Backup & Recovery",
+        icon: HardDrive,
+        href: "/dashboard/admin/backup",
+      },
+      {
+        id: "integrations",
+        label: "Integrations",
+        icon: Plug,
+        href: "/dashboard/admin/integrations",
+      },
+      {
+        id: "api",
+        label: "API Management",
+        icon: KeyRound,
+        href: "/dashboard/admin/api-keys",
+      },
+    ],
   },
   PROJECT_MANAGER: {
-    title: "Project Manager",
-    icon: User,
+    title: "Project Management",
+
+    icon: Briefcase,
+    color: "from-blue-600 to-blue-800",
     items: [
-      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/project-manager" },
-      { id: "projects", label: "My Projects", icon: FolderKanban, href: "/dashboard/project-manager/projects", badge: "12" },
-      { id: "calendar", label: "Project Calendar", icon: Calendar, href: "/dashboard/project-manager/calendar" },
-      { id: "team", label: "Team Performance", icon: Users, href: "/dashboard/project-manager/team" },
-      { id: "resources", label: "Resource Planning", icon: Target, href: "/dashboard/project-manager/resources" },
-      { id: "reports", label: "Project Reports", icon: BarChart3, href: "/dashboard/project-manager/reports" },
-      { id: "clients", label: "Client Communication", icon: MessageSquare, href: "/dashboard/project-manager/clients" },
-      { id: "templates", label: "Project Templates", icon: FileText, href: "/dashboard/project-manager/templates" }
-    ]
+      {
+        id: "dashboard",
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        href: "/dashboard/project-manager",
+      },
+      {
+        id: "projects",
+        label: "Projects",
+        icon: FolderKanban,
+        href: "/dashboard/project-manager/projects",
+        badge: 12,
+      },
+      {
+        id: "calendar",
+        label: "Calendar",
+        icon: Calendar,
+        href: "/dashboard/project-manager/calendar",
+      },
+      {
+        id: "team",
+        label: "Team",
+        icon: Users,
+        href: "/dashboard/project-manager/team",
+      },
+      {
+        id: "resources",
+        label: "Resources",
+        icon: Target,
+        href: "/dashboard/project-manager/resources",
+      },
+      {
+        id: "clients",
+        label: "Clients",
+        icon: MessageSquare,
+        href: "/dashboard/project-manager/clients",
+        badge: 3,
+      },
+      {
+        id: "reports",
+        label: "Reports",
+        icon: BarChart3,
+        href: "/dashboard/project-manager/reports",
+      },
+      {
+        id: "templates",
+        label: "Templates",
+        icon: FileText,
+        href: "/dashboard/project-manager/templates",
+      },
+    ],
   },
   TEAM_LEAD: {
-    title: "Team Lead",
+    title: "Team Leadership",
+
     icon: Users,
+    color: "from-green-600 to-green-800",
     items: [
-      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/team-lead" },
-      { id: "team", label: "My Team", icon: Users, href: "/dashboard/team-lead/team", badge: "8" },
-      { id: "goals", label: "Team Goals", icon: Target, href: "/dashboard/team-lead/goals" },
-      { id: "performance", label: "Performance Review", icon: TrendingUp, href: "/dashboard/team-lead/performance" },
-      { id: "meetings", label: "Team Meetings", icon: Calendar, href: "/dashboard/team-lead/meetings" },
-      { id: "communication", label: "Team Chat", icon: MessageSquare, href: "/dashboard/team-lead/communication", badge: "5" },
-      { id: "resources", label: "Resources & Tools", icon: Briefcase, href: "/dashboard/team-lead/resources" },
-      { id: "reports", label: "Team Reports", icon: BarChart3, href: "/dashboard/team-lead/reports" }
-    ]
+      {
+        id: "dashboard",
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        href: "/dashboard/team-lead",
+      },
+      {
+        id: "team",
+        label: "My Team",
+        icon: Users,
+        href: "/dashboard/team-lead/team",
+        badge: 8,
+      },
+      {
+        id: "goals",
+        label: "Goals",
+        icon: Target,
+        href: "/dashboard/team-lead/goals",
+      },
+      {
+        id: "performance",
+        label: "Performance",
+        icon: TrendingUp,
+        href: "/dashboard/team-lead/performance",
+      },
+      {
+        id: "meetings",
+        label: "Meetings",
+        icon: Calendar,
+        href: "/dashboard/team-lead/meetings",
+      },
+      {
+        id: "communication",
+        label: "Communication",
+        icon: MessageSquare,
+        href: "/dashboard/team-lead/communication",
+        badge: 5,
+      },
+      {
+        id: "resources",
+        label: "Resources",
+        icon: Briefcase,
+        href: "/dashboard/team-lead/resources",
+      },
+      {
+        id: "reports",
+        label: "Reports",
+        icon: BarChart3,
+        href: "/dashboard/team-lead/reports",
+      },
+    ],
   },
   MEMBER: {
-    title: "Member",
+    title: "My Workspace",
+
     icon: Code,
+    color: "from-indigo-600 to-indigo-800",
     items: [
-      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/member" },
-      { id: "tasks", label: "My Tasks", icon: CheckCircle2, href: "/dashboard/member/tasks", badge: "7" },
-      { id: "projects", label: "My Projects", icon: FolderKanban, href: "/dashboard/member/projects" },
-      { id: "timesheet", label: "Time Tracking", icon: Clock, href: "/dashboard/member/timesheet" },
-      { id: "calendar", label: "My Calendar", icon: Calendar, href: "/dashboard/member/calendar" },
-      { id: "resources", label: "Resources", icon: FileText, href: "/dashboard/member/resources" },
-      { id: "communication", label: "Team Chat", icon: MessageSquare, href: "/dashboard/member/communication" },
-      { id: "profile", label: "My Profile", icon: User, href: "/dashboard/member/profile" }
-    ]
+      {
+        id: "dashboard",
+        label: "Dashboard",
+        icon: Home,
+        href: "/dashboard/member",
+      },
+      {
+        id: "tasks",
+        label: "My Tasks",
+        icon: CheckCircle2,
+        href: "/dashboard/member/tasks",
+        badge: 7,
+        badgeVariant: "secondary",
+      },
+      {
+        id: "projects",
+        label: "My Projects",
+        icon: FolderKanban,
+        href: "/dashboard/member/projects",
+      },
+      {
+        id: "timesheet",
+        label: "Timesheet",
+        icon: Clock,
+        href: "/dashboard/member/timesheet",
+      },
+      {
+        id: "calendar",
+        label: "Calendar",
+        icon: Calendar,
+        href: "/dashboard/member/calendar",
+      },
+      {
+        id: "communication",
+        label: "Communication",
+        icon: MessageSquare,
+        href: "/dashboard/member/communication",
+        badge: 3,
+      },
+      {
+        id: "resources",
+        label: "Resources",
+        icon: Bookmark,
+        href: "/dashboard/member/resources",
+      },
+      {
+        id: "profile",
+        label: "My Profile",
+        icon: User,
+        href: "/dashboard/member/profile",
+      },
+    ],
   },
   FINANCE: {
-    title: "Finance",
+    title: "Financial Management",
+
     icon: DollarSign,
+    color: "from-emerald-600 to-emerald-800",
     items: [
-      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/finance" },
-      { id: "invoices", label: "Invoices", icon: Receipt, href: "/dashboard/finance/invoices", badge: "7" },
-      { id: "expenses", label: "Expense Tracking", icon: CreditCard, href: "/dashboard/finance/expenses" },
-      { id: "revenue", label: "Revenue Analytics", icon: TrendingUp, href: "/dashboard/finance/revenue" },
-      { id: "budgets", label: "Budget Planning", icon: PieChart, href: "/dashboard/finance/budgets" },
-      { id: "reports", label: "Financial Reports", icon: BarChart3, href: "/dashboard/finance/reports" },
-      { id: "payments", label: "Payment Processing", icon: DollarSign, href: "/dashboard/finance/payments" },
-      { id: "taxes", label: "Tax Management", icon: FileText, href: "/dashboard/finance/taxes" }
-    ]
+      {
+        id: "dashboard",
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        href: "/dashboard/finance",
+      },
+      {
+        id: "invoices",
+        label: "Invoices",
+        icon: Receipt,
+        href: "/dashboard/finance/invoices",
+        badge: 7,
+        badgeVariant: "secondary",
+      },
+      {
+        id: "expenses",
+        label: "Expenses",
+        icon: CreditCard,
+        href: "/dashboard/finance/expenses",
+      },
+      {
+        id: "revenue",
+        label: "Revenue",
+        icon: TrendingUp,
+        href: "/dashboard/finance/revenue",
+      },
+      {
+        id: "budgets",
+        label: "Budgets",
+        icon: PieChart,
+        href: "/dashboard/finance/budgets",
+      },
+      {
+        id: "reports",
+        label: "Reports",
+        icon: FileText,
+        href: "/dashboard/finance/reports",
+      },
+      {
+        id: "payments",
+        label: "Payments",
+        icon: DollarSign,
+        href: "/dashboard/finance/payments",
+      },
+      {
+        id: "taxes",
+        label: "Taxes",
+        icon: Shield,
+        href: "/dashboard/finance/taxes",
+      },
+    ],
   },
   CLIENT: {
     title: "Client Portal",
+
     icon: Handshake,
+    color: "from-orange-600 to-orange-800",
     items: [
-      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/client" },
-      { id: "projects", label: "My Projects", icon: Eye, href: "/dashboard/client/projects", badge: "3" },
-      { id: "messages", label: "Messages", icon: MessageSquare, href: "/dashboard/client/messages", badge: "5" },
-      { id: "files", label: "Project Files", icon: Download, href: "/dashboard/client/files" },
-      { id: "invoices", label: "Invoices & Billing", icon: Receipt, href: "/dashboard/client/invoices" },
-      { id: "calendar", label: "Meetings", icon: Calendar, href: "/dashboard/client/calendar" },
-      { id: "feedback", label: "Feedback & Reviews", icon: CheckCircle2, href: "/dashboard/client/feedback" },
-      { id: "support", label: "Support", icon: MessageSquare, href: "/dashboard/client/support" }
-    ]
-  }
+      {
+        id: "dashboard",
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        href: "/dashboard/client",
+      },
+      {
+        id: "projects",
+        label: "Projects",
+        icon: Eye,
+        href: "/dashboard/client/projects",
+        badge: 3,
+      },
+      {
+        id: "messages",
+        label: "Messages",
+        icon: MessageSquare,
+        href: "/dashboard/client/messages",
+        badge: 5,
+        badgeVariant: "default",
+      },
+      {
+        id: "files",
+        label: "Files",
+        icon: Download,
+        href: "/dashboard/client/files",
+      },
+      {
+        id: "invoices",
+        label: "Invoices",
+        icon: Receipt,
+        href: "/dashboard/client/invoices",
+      },
+      {
+        id: "calendar",
+        label: "Calendar",
+        icon: Calendar,
+        href: "/dashboard/client/calendar",
+      },
+      {
+        id: "feedback",
+        label: "Feedback",
+        icon: Star,
+        href: "/dashboard/client/feedback",
+      },
+      {
+        id: "support",
+        label: "Support",
+        icon: HelpCircle,
+        href: "/dashboard/client/support",
+      },
+    ],
+  },
 };
 
-const SidebarMenu = ({ items, currentPath, onNavigate, isCollapsed }) => {
-  const isActive = (href: string) => currentPath === href;
+// Individual sidebar menu item component
+const SidebarMenuItem = ({
+  item,
+  onNavigate,
+  currentPath,
+}: {
+  item: SidebarItem;
+  onNavigate?: (path: string) => void;
+  currentPath?: string;
+}) => {
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+  const [isOpen, setIsOpen] = useState(false);
+  const ItemIcon = item.icon;
 
-  const handleItemClick = (item: SidebarItem) => {
+  // Check if current item is active based on path
+  const isActive = item.href === currentPath;
+
+  // Check if any child item is active
+  const hasActiveChild = useMemo(() => {
+    if (!item.children) return false;
+    return item.children.some((child) => child.href === currentPath);
+  }, [item.children, currentPath]);
+
+  // Auto-expand parent if child is active
+  useEffect(() => {
+    if (hasActiveChild) {
+      setIsOpen(true);
+    }
+  }, [hasActiveChild]);
+
+  const handleClick = useCallback(() => {
     if (item.href && onNavigate) {
       onNavigate(item.href);
     }
-  };
+  }, [item.href, onNavigate]);
 
-  return (
-    <nav className="space-y-1">
-      {items.map((item) => {
-        const ItemIcon = item.icon;
-        
-        if (!isCollapsed && item.children && item.children.length > 0) {
-          const isChildActive = item.children.some(child => child.href && isActive(child.href));
-          return (
-            <Collapsible key={item.id} defaultOpen={isChildActive}>
-              <CollapsibleTrigger asChild>
-                <Button
-                  variant={isChildActive ? "secondary" : "ghost"}
-                  className={cn("w-full justify-start h-10 px-3")}
-                >
-                  <ItemIcon className={cn("h-4 w-4 mr-3")} />
-                  <span className="flex-1 text-left">{item.label}</span>
-                  <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="pl-7 pt-1 space-y-1">
-                <SidebarMenu items={item.children} currentPath={currentPath} onNavigate={onNavigate} isCollapsed={isCollapsed} />
-              </CollapsibleContent>
-            </Collapsible>
-          );
-        }
+  // Tooltip content for collapsed sidebar
+  const tooltipContent = (
+    <div className="flex flex-col p-1">
+      <span className="font-medium">{item.label}</span>
+      {item.description && (
+        <span className="text-xs text-muted-foreground mt-1">
+          {item.description}
+        </span>
+      )}
+    </div>
+  );
 
-        const active = item.href ? isActive(item.href) : false;
-        return (
-          <Button
-            key={item.id}
-            variant={active ? "secondary" : "ghost"}
-            className={cn(
-              "w-full justify-start h-10 px-3",
-              active && "bg-primary/10 text-primary border-primary/20",
-              isCollapsed && "px-2"
-            )}
-            onClick={() => handleItemClick(item)}
-          >
-            <ItemIcon className={cn("h-4 w-4", !isCollapsed && "mr-3")} />
-            {!isCollapsed && (
-              <>
-                <span className="flex-1 text-left">{item.label}</span>
-                {item.badge && (
-                  <span className="ml-auto bg-primary/20 text-primary text-xs px-2 py-0.5 rounded-full">
-                    {item.badge}
-                  </span>
+  // Handle items with children (collapsible)
+  if (item.children && item.children.length > 0) {
+    return (
+      <UiSidebarMenuItem className="px-2">
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton
+              isActive={hasActiveChild}
+              tooltip={{ children: tooltipContent, side: "right" }}
+              className="w-full"
+            >
+              <ItemIcon
+                className={cn(
+                  "h-4 w-4 shrink-0",
+                  hasActiveChild && "text-primary"
                 )}
-              </>
-            )}
-          </Button>
-        );
-      })}
-    </nav>
+              />
+              <span className="truncate flex-1 text-left">{item.label}</span>
+              {item.badge && (
+                <Badge
+                  variant={item.badgeVariant || "default"}
+                  className="h-5 min-w-[1.25rem] px-1.5"
+                >
+                  {item.badge}
+                </Badge>
+              )}
+              {!isCollapsed && (
+                <ChevronsUpDown
+                  className={cn(
+                    "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                    isOpen && "rotate-180"
+                  )}
+                />
+              )}
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              {item.children.map((child) => (
+                <SidebarMenuSubItem key={child.id}>
+                  <SidebarMenuSubButton
+                    href={child.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (onNavigate && child.href) onNavigate(child.href);
+                    }}
+                    isActive={child.href === currentPath}
+                  >
+                    {child.label}
+                    {child.badge && (
+                      <Badge
+                        variant={child.badgeVariant || "default"}
+                        className="ml-auto h-5 min-w-[1.25rem] px-1.5"
+                      >
+                        {child.badge}
+                      </Badge>
+                    )}
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              ))}
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </Collapsible>
+      </UiSidebarMenuItem>
+    );
+  }
+
+  // Handle simple menu items
+  return (
+    <UiSidebarMenuItem className="px-2">
+      <SidebarMenuButton
+        isActive={isActive}
+        onClick={handleClick}
+        tooltip={{ children: tooltipContent, side: "right" }}
+        className="w-full"
+      >
+        <ItemIcon
+          className={cn("h-4 w-4 shrink-0", isActive && "text-primary")}
+        />
+        <span className="truncate flex-1 text-left">{item.label}</span>
+        {item.badge && (
+          <Badge
+            variant={item.badgeVariant || "default"}
+            className="h-5 min-w-[1.25rem] px-1.5"
+          >
+            {item.badge}
+          </Badge>
+        )}
+      </SidebarMenuButton>
+    </UiSidebarMenuItem>
   );
 };
 
-export const RoleSidebar = ({ role, currentPath, onNavigate }: RoleSidebarProps) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const config = roleConfigs[role];
-  const IconComponent = config.icon;
+// User profile section component
+const UserProfileSection = ({
+  userProfile,
+  isCollapsed,
+  notifications = 0,
+}: {
+  userProfile?: UserProfile;
+  isCollapsed: boolean;
+  notifications?: number;
+}) => {
+  if (!userProfile) return null;
 
-  // Check if mobile
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth < 768) {
-        setIsCollapsed(true);
-      }
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  const statusColors = {
+    online: "bg-green-500",
+    away: "bg-yellow-500",
+    busy: "bg-red-500",
+    offline: "bg-gray-500",
+  };
 
+  // Collapsed profile view with tooltip
+  if (isCollapsed) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="relative flex justify-center p-2">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={userProfile.avatar} alt={userProfile.name} />
+                <AvatarFallback>{userProfile.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              {/* Status indicator */}
+              <div
+                className={cn(
+                  "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-sidebar",
+                  statusColors[userProfile.status]
+                )}
+              />
+              {/* Notification badge */}
+              {notifications > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-xs"
+                >
+                  {notifications > 9 ? "9+" : notifications}
+                </Badge>
+              )}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <div className="flex flex-col">
+              <span className="font-medium">{userProfile.name}</span>
+              <span className="text-xs text-muted-foreground">
+                {userProfile.role}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {userProfile.email}
+              </span>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  // Expanded profile view
   return (
-    <div className={cn(
-      "fixed top-0 left-0 z-50 flex flex-col h-screen bg-card border-r border-border transition-all duration-300",
-      isCollapsed ? "w-12 sm:w-16" : "w-56 sm:w-64"
-    )}>
-      {/* Header */}
-      <div className="flex items-center justify-between p-2 sm:p-4 border-b border-border h-14 sm:h-16">
-        {!isCollapsed && (
-          <div className="flex items-center space-x-3">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-            </div>
-            <div className="hidden sm:block">
-              <h2 className="font-semibold text-foreground text-sm sm:text-base">{config.title}</h2>
-              <p className="text-xs text-muted-foreground">AgencyFlow</p>
-            </div>
+    <div className="p-3">
+      <div className="flex items-center space-x-3">
+        <div className="relative">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={userProfile.avatar} alt={userProfile.name} />
+            <AvatarFallback>{userProfile.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          {/* Status indicator */}
+          <div
+            className={cn(
+              "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-sidebar",
+              statusColors[userProfile.status]
+            )}
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-sidebar-foreground truncate">
+              {userProfile.name}
+            </p>
+            {/* Notification badge */}
+            {notifications > 0 && (
+              <Badge
+                variant="destructive"
+                className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
+              >
+                {notifications > 9 ? "9+" : notifications}
+              </Badge>
+            )}
           </div>
-        )}
-        <Button
-          variant="ghost"
-          size={isMobile ? "icon" : "sm"}
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="h-6 w-6 sm:h-8 sm:w-8 p-0"
-        >
-          {isCollapsed ? (
-            <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
-          ) : (
-            <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+          <p className="text-xs text-muted-foreground truncate">
+            {userProfile.role}
+          </p>
+          {userProfile.department && (
+            <p className="text-xs text-muted-foreground truncate">
+              {userProfile.department}
+            </p>
           )}
-        </Button>
-      </div>
-
-      {/* Navigation */}
-      <ScrollArea className="flex-1 px-1 sm:px-2 py-2 sm:py-4">
-        <SidebarMenu 
-          items={config.items} 
-          currentPath={currentPath} 
-          onNavigate={onNavigate}
-          isCollapsed={isCollapsed}
-        />
-      </ScrollArea>
-
-      {/* Footer */}
-      <div className="p-2 sm:p-3 border-t border-border">
-        <Separator className="mb-2 sm:mb-3" />
-        <Button
-          variant="ghost"
-          className={cn(
-            "w-full justify-start h-8 sm:h-10 px-2 sm:px-3 text-muted-foreground hover:text-foreground",
-            isCollapsed && "px-1 sm:px-2"
-          )}
-        >
-          <LogOut className={cn("h-3 w-3 sm:h-4 sm:w-4", !isCollapsed && "mr-2 sm:mr-3")} />
-          {!isCollapsed && <span>Logout</span>}
-        </Button>
+        </div>
       </div>
     </div>
+  );
+};
+
+// Main sidebar component
+export const RoleSidebar = ({
+  role,
+  currentPath,
+  onNavigate,
+  userProfile,
+  notifications = 0,
+  theme = "light",
+  onThemeToggle,
+  onSignOut,
+}: RoleSidebarProps) => {
+  const config = roleConfigs[role];
+  const IconComponent = config.icon;
+  const { state, toggleSidebar } = useSidebar();
+  const isCollapsed = state === "collapsed";
+
+  return (
+    <Sidebar collapsible="icon">
+      {/* Header section with logo and title */}
+      <SidebarHeader className="p-4 h-16 flex items-center justify-between border-b">
+        <div className={cn("flex items-center gap-3", isCollapsed && "hidden")}>
+          <div
+            className={cn(
+              "w-10 h-10 bg-gradient-to-r rounded-xl flex items-center justify-center shadow-lg",
+              config.color
+            )}
+          >
+            <IconComponent className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-foreground text-base leading-tight">
+              {config.title}
+            </h2>
+          </div>
+        </div>
+        {/* Collapse/expand toggle */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
+        </Button>
+      </SidebarHeader>
+
+      {/* Navigation menu */}
+      <ScrollArea className="flex-1">
+        <SidebarContent>
+          <SidebarMenu>
+            {config.items.map((item) => (
+              <SidebarMenuItem
+                key={item.id}
+                item={item}
+                onNavigate={onNavigate}
+                currentPath={currentPath}
+              />
+            ))}
+          </SidebarMenu>
+        </SidebarContent>
+      </ScrollArea>
+
+      {/* Footer with user profile and actions */}
+      <SidebarFooter className="p-0 border-t">
+        <UserProfileSection
+          userProfile={userProfile}
+          isCollapsed={isCollapsed}
+          notifications={notifications}
+        />
+
+        {/* Action buttons */}
+        <div className="p-3 border-t space-y-1">
+          {/* Theme toggle button (only show when expanded and callback exists) */}
+          {!isCollapsed && onThemeToggle && (
+            <Button
+              variant="ghost"
+              className="w-full justify-start h-9 px-3"
+              onClick={onThemeToggle}
+            >
+              {theme === "light" ? (
+                <Moon className="h-4 w-4 mr-3" />
+              ) : (
+                <Sun className="h-4 w-4 mr-3" />
+              )}
+              <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
+            </Button>
+          )}
+
+          {/* Sign out button */}
+          <Button
+            variant="ghost"
+            onClick={onSignOut}
+            className={cn(
+              "w-full justify-start h-9 transition-colors hover:text-destructive",
+              isCollapsed ? "justify-center px-2" : "px-3"
+            )}
+            aria-label="Sign out"
+          >
+            <LogOut className={cn("h-4 w-4", !isCollapsed && "mr-3")} />
+            {!isCollapsed && <span>Sign Out</span>}
+          </Button>
+        </div>
+      </SidebarFooter>
+    </Sidebar>
   );
 };
