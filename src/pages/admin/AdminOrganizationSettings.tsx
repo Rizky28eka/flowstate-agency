@@ -50,10 +50,10 @@ const AdminOrganizationSettings = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Organization Settings</h1>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Organization Settings</h1>
           <p className="text-muted-foreground">
             Manage your company's global settings and preferences.
           </p>
@@ -63,15 +63,15 @@ const AdminOrganizationSettings = () => {
         </Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
         {/* Column 1: General Settings */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>General</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">General</CardTitle>
             <CardDescription>Update your organization's basic information.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
+          <CardContent className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <Label htmlFor="organizationName">Organization Name</Label>
               <Input 
                 id="organizationName"
@@ -103,42 +103,20 @@ const AdminOrganizationSettings = () => {
         {/* Column 2: Localization */}
         <Card>
           <CardHeader>
-            <CardTitle>Localization</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">Logo & Branding</CardTitle>
             <CardDescription>Set default time, currency, and date formats.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="timezone">Timezone</Label>
-              <Select value={settings.timezone} onValueChange={(value) => handleSelectChange('timezone', value)}>
-                <SelectTrigger id="timezone">
-                  <SelectValue placeholder="Select timezone" />
-                </SelectTrigger>
-                <SelectContent>
-                  {TIMEZONE_OPTIONS.map(tz => <SelectItem key={tz} value={tz}>{tz}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="currency">Currency</Label>
-              <Select value={settings.currency} onValueChange={(value) => handleSelectChange('currency', value)}>
-                <SelectTrigger id="currency">
-                  <SelectValue placeholder="Select currency" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCY_OPTIONS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="dateFormat">Date Format</Label>
-              <Select value={settings.dateFormat} onValueChange={(value) => handleSelectChange('dateFormat', value)}>
-                <SelectTrigger id="dateFormat">
-                  <SelectValue placeholder="Select date format" />
-                </SelectTrigger>
-                <SelectContent>
-                  {DATE_FORMAT_OPTIONS.map(df => <SelectItem key={df} value={df}>{df}</SelectItem>)}
-                </SelectContent>
-              </Select>
+          <CardContent className="space-y-4 sm:space-y-6">
+            <div className="flex flex-col items-center space-y-4">
+              <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-2 border-gray-200">
+                <AvatarImage src={settings.logoUrl} alt="Company Logo" />
+                <AvatarFallback className="text-lg font-bold">
+                  {settings.organizationName.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
+              </Avatar>
+              <Button variant="outline" className="w-full sm:w-auto">
+                Upload Logo
+              </Button>
             </div>
           </CardContent>
         </Card>

@@ -70,25 +70,25 @@ const AdminIntegrationDetail = () => {
   const Icon = iconMap[integration.id] || (() => <div className="w-10 h-10 bg-secondary rounded-lg" />);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <Button variant="outline" size="icon" onClick={() => navigate('/dashboard/admin/integrations')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <Icon className="w-10 h-10" />
+        <Icon className="w-8 h-8 sm:w-10 sm:h-10" />
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{integration.name}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">{integration.name}</h1>
           <p className="text-muted-foreground">Manage the {integration.name} integration.</p>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Configuration</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Configuration</CardTitle>
           <CardDescription>Enable or disable the integration and provide necessary credentials.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center justify-between rounded-lg border p-4">
+        <CardContent className="space-y-4 sm:space-y-6">
+          <div className="flex items-center justify-between rounded-lg border p-3 sm:p-4 gap-4">
             <div>
               <h3 className="font-medium">Enable Integration</h3>
               <p className="text-sm text-muted-foreground">
@@ -121,7 +121,7 @@ const AdminIntegrationDetail = () => {
         </CardContent>
       </Card>
 
-      <div className="flex justify-end gap-2 mt-6">
+      <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4 sm:mt-6">
         <Button variant="outline" onClick={() => navigate('/dashboard/admin/integrations')}>Cancel</Button>
         <Button onClick={handleSave}>Save Changes</Button>
       </div>

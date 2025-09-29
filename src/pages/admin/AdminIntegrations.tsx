@@ -83,16 +83,36 @@ const AdminIntegrations = () => {
     : MOCK_INTEGRATIONS.filter(i => i.category === activeTab);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Integration Marketplace</h1>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Integration Marketplace</h1>
         <p className="text-muted-foreground">
           Connect third-party apps to extend the functionality of Flowstate.
         </p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-7">
+        <div className="overflow-x-auto">
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-7 min-w-max">
+            <TabsTrigger value="all" className="text-xs sm:text-sm">All</TabsTrigger>
+            {categories.map(category => (
+              <TabsTrigger key={category} value={category} className="text-xs sm:text-sm">{category}</TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
+        <TabsContent value={activeTab} className="mt-4 sm:mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {filteredIntegrations.map(integration => (
+              <IntegrationCard key={integration.id} integration={integration} />
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default AdminIntegrations;
           <TabsTrigger value="all">All</TabsTrigger>
           {categories.map(category => (
             <TabsTrigger key={category} value={category}>{category}</TabsTrigger>

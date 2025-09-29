@@ -75,13 +75,13 @@ const AdminRoleDetail = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <Button variant="outline" size="icon" onClick={() => navigate('/dashboard/admin/roles')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
             {isNewRole ? 'Create New Role' : `Edit Role: ${role.name}`}
           </h1>
           <p className="text-muted-foreground">
@@ -90,11 +90,11 @@ const AdminRoleDetail = () => {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-1 space-y-6">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-1 space-y-4 sm:space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Role Details</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">Role Details</CardTitle>
               <CardDescription>Name and description for this role.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -123,7 +123,7 @@ const AdminRoleDetail = () => {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Permissions</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">Permissions</CardTitle>
               <CardDescription>Grant access to specific features.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -134,10 +134,10 @@ const AdminRoleDetail = () => {
                 return (
                   <div key={groupName} className="space-y-4">
                     <div>
-                      <div className="flex items-center justify-between p-3 bg-muted rounded-t-lg border-b">
-                        <h3 className="font-semibold">{groupName}</h3>
+                      <div className="flex items-center justify-between p-2 sm:p-3 bg-muted rounded-t-lg border-b">
+                        <h3 className="font-semibold text-sm sm:text-base">{groupName}</h3>
                         <div className="flex items-center space-x-2">
-                          <Label htmlFor={`select-all-${groupName}`} className="text-sm font-normal">Select All</Label>
+                          <Label htmlFor={`select-all-${groupName}`} className="text-xs sm:text-sm font-normal">Select All</Label>
                           <Checkbox 
                             id={`select-all-${groupName}`}
                             checked={allInGroupSelected}
@@ -145,7 +145,7 @@ const AdminRoleDetail = () => {
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 border border-t-0 rounded-b-lg">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 p-3 sm:p-4 border border-t-0 rounded-b-lg">
                         {permissions.map(permission => (
                           <div key={permission} className="flex items-center space-x-2">
                             <Checkbox 
@@ -153,7 +153,7 @@ const AdminRoleDetail = () => {
                               checked={role.permissions.includes(permission)}
                               onCheckedChange={(checked) => handlePermissionChange(permission, !!checked)}
                             />
-                            <Label htmlFor={permission} className="font-normal text-sm leading-snug">
+                            <Label htmlFor={permission} className="font-normal text-xs sm:text-sm leading-snug">
                               {permission.replace(/:/g, ' ')}
                             </Label>
                           </div>
@@ -168,7 +168,7 @@ const AdminRoleDetail = () => {
         </div>
       </div>
 
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-col sm:flex-row justify-end gap-2">
         <Button variant="outline" onClick={() => navigate('/dashboard/admin/roles')}>Cancel</Button>
         <Button onClick={handleSave}>Save Changes</Button>
       </div>

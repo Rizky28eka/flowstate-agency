@@ -103,14 +103,80 @@ const AdminComplianceCenter = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Compliance & Data Governance</h1>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Compliance & Data Governance</h1>
         <p className="text-muted-foreground">Manage data retention policies and data subject requests (GDPR, CCPA).</p>
       </div>
 
       <Tabs defaultValue="overview">
-        <TabsList className="grid w-full grid-cols-3">
+        <div className="overflow-x-auto">
+          <TabsList className="grid w-full grid-cols-3 min-w-max">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+            <TabsTrigger value="retention" className="text-xs sm:text-sm">Data Retention</TabsTrigger>
+            <TabsTrigger value="requests" className="text-xs sm:text-sm">Subject Requests</TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="overview" className="mt-4 sm:mt-6">
+          <Card>
+            <CardHeader><CardTitle className="text-lg sm:text-xl">Compliance Overview</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-3 sm:p-4 border rounded-lg">
+                <p className="font-medium text-sm sm:text-base">GDPR Status</p>
+                <Badge className="bg-green-500 text-white">Compliant</Badge>
+              </div>
+              <div className="flex items-center justify-between p-3 sm:p-4 border rounded-lg">
+                <p className="font-medium text-sm sm:text-base">CCPA Status</p>
+                <Badge className="bg-green-500 text-white">Compliant</Badge>
+              </div>
+              <p className="text-xs sm:text-sm text-muted-foreground pt-4">This overview provides a summary of the platform's compliance status. Manage specific policies and requests in their respective tabs.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="retention" className="mt-4 sm:mt-6">
+          <Card>
+            <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <CardTitle className="text-lg sm:text-xl">Data Retention Policies</CardTitle>
+                <CardDescription>Automated rules for data anonymization and deletion.</CardDescription>
+              </div>
+              <Button className="w-full sm:w-auto"><PlusCircle className="h-4 w-4 mr-2"/>New Policy</Button>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader><TableRow><TableHead className="text-xs sm:text-sm">Data Type</TableHead><TableHead className="hidden md:table-cell text-xs sm:text-sm">Period</TableHead><TableHead className="hidden md:table-cell text-xs sm:text-sm">Action</TableHead><TableHead className="text-xs sm:text-sm">Is Active</TableHead><TableHead className="text-xs sm:text-sm"><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
+                  <TableBody>{policies.map(p => <RetentionPolicyRow key={p.id} policy={p} onToggle={handlePolicyToggle} />)}</TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="requests" className="mt-4 sm:mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg sm:text-xl">Data Subject Requests</CardTitle>
+              <CardDescription>Manage data export and deletion requests from your users.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader><TableRow><TableHead className="text-xs sm:text-sm">Request</TableHead><TableHead className="text-xs sm:text-sm">User</TableHead><TableHead className="hidden md:table-cell text-xs sm:text-sm">Date</TableHead><TableHead className="text-xs sm:text-sm">Status</TableHead><TableHead className="text-right text-xs sm:text-sm">Actions</TableHead></TableRow></TableHeader>
+                  <TableBody>{requests.map(r => <DataSubjectRequestRow key={r.id} request={r} onStatusChange={handleRequestStatusChange} />)}</TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default AdminComplianceCenter;
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="retention">Data Retention</TabsTrigger>
           <TabsTrigger value="requests">Subject Requests</TabsTrigger>

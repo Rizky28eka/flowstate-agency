@@ -210,9 +210,9 @@ const AdminApiKeys = () => {
   };
 
   return (
-    <div className="space-y-6 p-2 sm:p-4">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
             API Management
@@ -237,12 +237,12 @@ const AdminApiKeys = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Token</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden md:table-cell">Created</TableHead>
-                  <TableHead className="hidden md:table-cell">Last Used</TableHead>
-                  <TableHead>
+                  <TableHead className="text-xs sm:text-sm">Name</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Token</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Status</TableHead>
+                  <TableHead className="hidden md:table-cell text-xs sm:text-sm">Created</TableHead>
+                  <TableHead className="hidden md:table-cell text-xs sm:text-sm">Last Used</TableHead>
+                  <TableHead className="text-xs sm:text-sm">
                     <span className="sr-only">Actions</span>
                   </TableHead>
                 </TableRow>
@@ -253,32 +253,33 @@ const AdminApiKeys = () => {
                     key={key.id}
                     className={key.status === "revoked" ? "text-muted-foreground" : ""}
                   >
-                    <TableCell className="font-medium">{key.name}</TableCell>
-                    <TableCell>
-                      <code className="font-mono text-sm">{key.truncatedToken}</code>
+                    <TableCell className="font-medium p-2 sm:p-4 text-sm">{key.name}</TableCell>
+                    <TableCell className="p-2 sm:p-4">
+                      <code className="font-mono text-xs sm:text-sm">{key.truncatedToken}</code>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="p-2 sm:p-4">
                       <Badge
                         variant={key.status === "active" ? "default" : "destructive"}
-                        className="capitalize"
+                        className="capitalize text-xs"
                       >
                         {key.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">{key.createdDate}</TableCell>
-                    <TableCell className="hidden md:table-cell">
+                    <TableCell className="hidden md:table-cell p-2 sm:p-4 text-sm">{key.createdDate}</TableCell>
+                    <TableCell className="hidden md:table-cell p-2 sm:p-4 text-sm">
                       {key.lastUsedDate || "Never"}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="p-2 sm:p-4">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
                             aria-haspopup="true"
-                            size="icon"
+                            size="sm"
                             variant="ghost"
                             disabled={key.status === "revoked"}
+                            className="h-8 w-8 p-0"
                           >
-                            <MoreHorizontal className="h-4 w-4" />
+                            <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
                             <span className="sr-only">Toggle menu</span>
                           </Button>
                         </DropdownMenuTrigger>

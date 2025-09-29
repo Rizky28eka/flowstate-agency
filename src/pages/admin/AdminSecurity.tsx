@@ -90,76 +90,80 @@ const AdminSecurity = () => {
   const severities: IncidentSeverity[] = ['Low', 'Medium', 'High', 'Critical'];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Security Center</h1>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Security Center</h1>
           <p className="text-muted-foreground">Monitor and respond to security incidents.</p>
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-3 sm:gap-6 grid-cols-1 sm:grid-cols-3">
         {kpiData.map(kpi => (
           <Card key={kpi.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">{kpi.title}</CardTitle>
               <kpi.icon className={cn("h-4 w-4 text-muted-foreground", kpi.value > 0 && "text-destructive")} />
             </CardHeader>
-            <CardContent>
-              <div className={cn("text-2xl font-bold", kpi.value > 0 && "text-destructive")}>{kpi.value}</div>
+            <CardContent className="p-3 sm:p-6 pt-0">
+              <div className={cn("text-lg sm:text-2xl font-bold", kpi.value > 0 && "text-destructive")}>{kpi.value}</div>
             </CardContent>
           </Card>
         ))}
       </div>
 
       <Card>
-        <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <CardHeader className="flex flex-col gap-4">
           <div>
-            <CardTitle>All Incidents</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">All Incidents</CardTitle>
             <CardDescription>A log of all detected security events. Click a row to investigate.</CardDescription>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
             <Input 
               placeholder="Search incidents..." 
-              className="w-full md:w-auto flex-grow"
+              className="w-full"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="All Statuses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                {statuses.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Select value={severityFilter} onValueChange={setSeverityFilter}>
-              <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="All Severities" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Severities</SelectItem>
-                {severities.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-[160px]">
+                  <SelectValue placeholder="All Statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  {statuses.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={severityFilter} onValueChange={setSeverityFilter}>
+                <SelectTrigger className="w-full sm:w-[160px]">
+                  <SelectValue placeholder="All Severities" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Severities</SelectItem>
+                  {severities.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Severity</TableHead>
-                <TableHead>Incident</TableHead>
-                <TableHead className="hidden md:table-cell">Status</TableHead>
-                <TableHead className="hidden lg:table-cell">Type</TableHead>
-                <TableHead className="hidden sm:table-cell text-right">Timestamp</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredIncidents.map(i => <IncidentRow key={i.id} incident={i} />)}
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs sm:text-sm">Severity</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Incident</TableHead>
+                  <TableHead className="hidden md:table-cell text-xs sm:text-sm">Status</TableHead>
+                  <TableHead className="hidden lg:table-cell text-xs sm:text-sm">Type</TableHead>
+                  <TableHead className="hidden sm:table-cell text-right text-xs sm:text-sm">Timestamp</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredIncidents.map(i => <IncidentRow key={i.id} incident={i} />)}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

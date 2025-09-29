@@ -79,27 +79,27 @@ const OwnerAutomationBuilder = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <Button variant="outline" size="icon" onClick={() => navigate('/dashboard/admin/automations')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
               {isNewRule ? 'Create Automation Rule' : 'Edit Automation Rule'}
             </h1>
             <p className="text-muted-foreground">Define a trigger and a corresponding action.</p>
           </div>
         </div>
-        <Button onClick={handleSave}>Save Rule</Button>
+        <Button onClick={handleSave} className="w-full sm:w-auto">Save Rule</Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
         {/* --- TRIGGER CARD --- */}
         <Card>
           <CardHeader>
-            <CardTitle>WHEN: The Trigger</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">WHEN: The Trigger</CardTitle>
             <CardDescription>This is the event that starts the automation.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -129,7 +129,7 @@ const OwnerAutomationBuilder = () => {
         {/* --- ACTION CARD --- */}
         <Card>
           <CardHeader>
-            <CardTitle>THEN: The Action</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">THEN: The Action</CardTitle>
             <CardDescription>This is what happens when the trigger fires.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -161,7 +161,7 @@ const OwnerAutomationBuilder = () => {
               </div>
             ))}
             {selectedTrigger && (
-              <div className="text-xs text-muted-foreground space-y-1 pt-2">
+              <div className="text-xs text-muted-foreground space-y-1 pt-2 hidden sm:block">
                 <p className="flex items-center"><Variable className="h-3 w-3 mr-1.5"/> Available variables:</p>
                 <div className="flex flex-wrap gap-x-2">
                   {selectedTrigger.outputVariables.map(v => <code key={v.id} className="font-mono bg-muted px-1 py-0.5 rounded">{v.id}</code>)}
@@ -174,7 +174,7 @@ const OwnerAutomationBuilder = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Rule Details</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Rule Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">

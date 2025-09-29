@@ -69,26 +69,26 @@ const AdminSecurityIncidentDetail = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <Button variant="outline" size="icon" onClick={() => navigate('/dashboard/admin/security')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight">{incident.title}</h1>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">{incident.title}</h1>
             <Badge variant={severityVariant[incident.severity]} className="text-base">{incident.severity}</Badge>
           </div>
           <p className="text-muted-foreground">{incident.description}</p>
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
         {/* Left Column: Investigation Feed */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Investigation Feed</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">Investigation Feed</CardTitle>
               <CardDescription>Log updates, add notes, and track the investigation process.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -98,20 +98,20 @@ const AdminSecurityIncidentDetail = () => {
               </div>
             </CardContent>
           </Card>
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {incident.activity.map(item => <IncidentActivityItem key={item.id} item={item} />)}
           </div>
         </div>
 
         {/* Right Column: Details & Actions */}
-        <div className="lg:col-span-1 space-y-6">
+        <div className="lg:col-span-1 space-y-4 sm:space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Status & Actions</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">Status & Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Change Incident Status</Label>
+                <Label className="text-sm sm:text-base">Change Incident Status</Label>
                 <Select value={currentStatus} onValueChange={(value) => setCurrentStatus(value as IncidentStatus)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Set status" />
@@ -127,15 +127,21 @@ const AdminSecurityIncidentDetail = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Incident Details</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">Incident Details</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex justify-between"> <span className="text-muted-foreground flex items-center"><ShieldAlert className="h-4 w-4 mr-2"/>Type</span> <span className="font-medium">{incident.type}</span> </div>
-              <div className="flex justify-between"> <span className="text-muted-foreground flex items-center"><Clock className="h-4 w-4 mr-2"/>Detected</span> <span className="font-medium">{new Date(incident.timestamp).toLocaleString()}</span> </div>
+            <CardContent className="space-y-3 text-xs sm:text-sm">
+              <div className="flex flex-col sm:flex-row justify-between gap-1 sm:gap-0"> 
+                <span className="text-muted-foreground flex items-center"><ShieldAlert className="h-4 w-4 mr-2"/>Type</span> 
+                <span className="font-medium">{incident.type}</span> 
+              </div>
+              <div className="flex flex-col sm:flex-row justify-between gap-1 sm:gap-0"> 
+                <span className="text-muted-foreground flex items-center"><Clock className="h-4 w-4 mr-2"/>Detected</span> 
+                <span className="font-medium text-xs sm:text-sm">{new Date(incident.timestamp).toLocaleString()}</span> 
+              </div>
               {Object.entries(incident.details).map(([key, value]) => (
-                <div key={key} className="flex justify-between"> 
+                <div key={key} className="flex flex-col sm:flex-row justify-between gap-1 sm:gap-0"> 
                   <span className="text-muted-foreground capitalize flex items-center"><User className="h-4 w-4 mr-2"/>{key.replace('_', ' ')}</span> 
-                  <span className="font-mono text-xs">{value}</span> 
+                  <span className="font-mono text-xs break-all">{value}</span> 
                 </div>
               ))}
             </CardContent>
@@ -143,13 +149,13 @@ const AdminSecurityIncidentDetail = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Recommended Actions</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">Recommended Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {incident.recommendations.map((rec, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <ListChecks className="h-4 w-4 mt-1 text-primary shrink-0" />
-                  <p className="text-sm text-muted-foreground">{rec}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{rec}</p>
                 </div>
               ))}
             </CardContent>

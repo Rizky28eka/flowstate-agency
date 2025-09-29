@@ -94,27 +94,27 @@ const AdminAutomations = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Workflow Automations</h1>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Workflow Automations</h1>
           <p className="text-muted-foreground">Automate repetitive tasks and streamline your processes.</p>
         </div>
-        <Button onClick={() => alert('Navigate to new rule page')}>
+        <Button onClick={() => alert('Navigate to new rule page')} className="w-full sm:w-auto">
           <PlusCircle className="h-4 w-4 mr-2" />
           Create New Rule
         </Button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-3 sm:gap-6 grid-cols-1 sm:grid-cols-2">
         {kpiData.map(kpi => (
           <Card key={kpi.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
-              <kpi.icon className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">{kpi.title}</CardTitle>
+              <kpi.icon className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{kpi.value}</div>
+            <CardContent className="p-3 sm:p-6 pt-0">
+              <div className="text-lg sm:text-2xl font-bold">{kpi.value}</div>
             </CardContent>
           </Card>
         ))}
@@ -122,24 +122,26 @@ const AdminAutomations = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Automation Rules</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Automation Rules</CardTitle>
           <CardDescription>Manage all the automation rules for your organization.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Rule</TableHead>
-                <TableHead className="hidden md:table-cell">Trigger</TableHead>
-                <TableHead className="hidden md:table-cell">Action</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead><span className="sr-only">Actions</span></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rules.map(rule => <AutomationRow key={rule.id} rule={rule} onToggle={handleToggle} />)}
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs sm:text-sm">Rule</TableHead>
+                  <TableHead className="hidden md:table-cell text-xs sm:text-sm">Trigger</TableHead>
+                  <TableHead className="hidden md:table-cell text-xs sm:text-sm">Action</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Status</TableHead>
+                  <TableHead className="text-xs sm:text-sm"><span className="sr-only">Actions</span></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {rules.map(rule => <AutomationRow key={rule.id} rule={rule} onToggle={handleToggle} />)}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

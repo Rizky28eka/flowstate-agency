@@ -187,12 +187,12 @@ const AdminUsers = () => {
   };
 
   return (
-    <>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">User Management</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold">User Management</h2>
         <Dialog open={isUserDialogOpen} onOpenChange={setIsUserDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => {
+            <Button className="w-full sm:w-auto" onClick={() => {
               setEditingUser(null);
               form.reset();
               setIsUserDialogOpen(true);
@@ -214,25 +214,25 @@ const AdminUsers = () => {
       </div>
 
       {/* User Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium">Total Users</CardTitle>
+            <UserCheck className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{users.length}</div>
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="text-lg sm:text-2xl font-bold">{users.length}</div>
             <p className="text-xs text-muted-foreground">+2 this month</p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-            <Users className="h-4 w-4 text-green-600" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium">Active Users</CardTitle>
+            <Users className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="text-lg sm:text-2xl font-bold">
               {users.filter(u => u.status === "Active").length}
             </div>
             <p className="text-xs text-muted-foreground">Currently online</p>
@@ -240,12 +240,12 @@ const AdminUsers = () => {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Team Members</CardTitle>
-            <Code className="h-4 w-4 text-blue-600" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium">Team Members</CardTitle>
+            <Code className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="text-lg sm:text-2xl font-bold">
               {users.filter(u => u.role !== "Client").length}
             </div>
             <p className="text-xs text-muted-foreground">Internal staff</p>
@@ -253,12 +253,12 @@ const AdminUsers = () => {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Client Users</CardTitle>
-            <Handshake className="h-4 w-4 text-teal-600" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium">Client Users</CardTitle>
+            <Handshake className="h-3 w-3 sm:h-4 sm:w-4 text-teal-600" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="text-lg sm:text-2xl font-bold">
               {users.filter(u => u.role === "Client").length}
             </div>
             <p className="text-xs text-muted-foreground">External clients</p>
@@ -266,7 +266,7 @@ const AdminUsers = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="users" className="space-y-6">
+      <Tabs defaultValue="users" className="space-y-4 sm:space-y-6">
         <TabsList>
           <TabsTrigger value="users">All Users</TabsTrigger>
           <TabsTrigger value="roles">Roles & Permissions</TabsTrigger>
@@ -274,9 +274,9 @@ const AdminUsers = () => {
           <TabsTrigger value="security">Security</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="users" className="space-y-6">
+        <TabsContent value="users" className="space-y-4 sm:space-y-6">
           {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
@@ -286,35 +286,37 @@ const AdminUsers = () => {
                 className="pl-10"
               />
             </div>
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                {securityRoles.map(role => (
-                  <SelectItem key={role.id} value={role.role}>{role.role}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Inactive">Inactive</SelectItem>
-                <SelectItem value="Suspended">Suspended</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger className="w-full sm:w-48">
+                  <SelectValue placeholder="Filter by role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Roles</SelectItem>
+                  {securityRoles.map(role => (
+                    <SelectItem key={role.id} value={role.role}>{role.role}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-48">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Inactive">Inactive</SelectItem>
+                  <SelectItem value="Suspended">Suspended</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Users Table */}
           <Card>
             <CardHeader>
-              <CardTitle>User Directory</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">User Directory</CardTitle>
               <CardDescription>Manage all user accounts and their access levels</CardDescription>
             </CardHeader>
             <CardContent>
@@ -322,13 +324,13 @@ const AdminUsers = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-3">User</th>
-                      <th className="text-left p-3">Role</th>
-                      <th className="text-left p-3">Department</th>
-                      <th className="text-left p-3">Status</th>
-                      <th className="text-left p-3">Last Login</th>
-                      <th className="text-left p-3">Projects</th>
-                      <th className="text-left p-3">Actions</th>
+                      <th className="text-left p-2 sm:p-3 text-xs sm:text-sm">User</th>
+                      <th className="text-left p-2 sm:p-3 text-xs sm:text-sm">Role</th>
+                      <th className="text-left p-2 sm:p-3 text-xs sm:text-sm hidden md:table-cell">Department</th>
+                      <th className="text-left p-2 sm:p-3 text-xs sm:text-sm">Status</th>
+                      <th className="text-left p-2 sm:p-3 text-xs sm:text-sm hidden lg:table-cell">Last Login</th>
+                      <th className="text-left p-2 sm:p-3 text-xs sm:text-sm hidden sm:table-cell">Projects</th>
+                      <th className="text-left p-2 sm:p-3 text-xs sm:text-sm">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -337,47 +339,47 @@ const AdminUsers = () => {
                       const RoleIcon = roleData && (roleData as any).icon ? (roleData as any).icon : User;
                       return (
                         <tr key={user.id} className="border-b hover:bg-muted/50">
-                          <td className="p-3">
-                            <div className="flex items-center space-x-3">
-                              <Avatar className="w-10 h-10">
+                          <td className="p-2 sm:p-3">
+                            <div className="flex items-center space-x-2 sm:space-x-3">
+                              <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
                                 <AvatarImage src={user.avatar} alt={user.name} />
                                 <AvatarFallback>
                                   {user.name.split(' ').map(n => n[0]).join('')}
                                 </AvatarFallback>
                               </Avatar>
-                              <div>
-                                <p className="font-medium">{user.name}</p>
-                                <p className="text-sm text-muted-foreground">{user.email}</p>
+                              <div className="min-w-0">
+                                <p className="font-medium text-sm sm:text-base truncate">{user.name}</p>
+                                <p className="text-xs sm:text-sm text-muted-foreground truncate">{user.email}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="p-3">
-                            <div className="flex items-center space-x-2">
-                              <RoleIcon className="w-4 h-4" />
+                          <td className="p-2 sm:p-3">
+                            <div className="flex items-center space-x-1 sm:space-x-2">
+                              <RoleIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                               <Badge className={getRoleColor(roleData?.id)}>
                                 {user.role}
                               </Badge>
                             </div>
                           </td>
-                          <td className="p-3">{user.department}</td>
-                          <td className="p-3">
+                          <td className="p-2 sm:p-3 hidden md:table-cell">{user.department}</td>
+                          <td className="p-2 sm:p-3">
                             <Badge className={getStatusColor(user.status)}>
                               {user.status}
                             </Badge>
                           </td>
-                          <td className="p-3 text-sm text-muted-foreground">
+                          <td className="p-2 sm:p-3 text-xs sm:text-sm text-muted-foreground hidden lg:table-cell">
                             {formatLastLogin(user.joinDate)} {/* Using joinDate as lastLogin is not available in teamMembers */}
                           </td>
-                          <td className="p-3">{user.projects}</td>
-                          <td className="p-3">
+                          <td className="p-2 sm:p-3 hidden sm:table-cell">{user.projects}</td>
+                          <td className="p-2 sm:p-3">
                             <div className="flex space-x-1">
-                              <Button variant="ghost" size="sm" onClick={() => handleEditUser(user)}>
-                                <Edit className="w-4 h-4" />
+                              <Button variant="ghost" size="sm" onClick={() => handleEditUser(user)} className="h-8 w-8 p-0">
+                                <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
                               </Button>
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                  <Button variant="ghost" size="sm">
-                                    <Trash2 className="w-4 h-4" />
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                                   </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
@@ -405,14 +407,14 @@ const AdminUsers = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="roles" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <TabsContent value="roles" className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {Object.entries(roleIcons).map(([role, Icon]) => (
               <Card key={role}>
                 <CardHeader>
                   <div className="flex items-center space-x-3">
                     <Icon className="w-6 h-6 text-primary" />
-                    <CardTitle className="text-lg">{role.replace('_', ' ')}</CardTitle>
+                    <CardTitle className="text-base sm:text-lg">{role.replace('_', ' ')}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -445,27 +447,27 @@ const AdminUsers = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="activity" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value="activity" className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Recent User Activity</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Recent User Activity</CardTitle>
                 <CardDescription>Latest user actions and login activity</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {users.slice(0, 6).map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <Avatar className="w-8 h-8">
+                    <div key={user.id} className="flex items-center justify-between p-2 sm:p-3 border rounded-lg">
+                      <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
+                        <Avatar className="w-6 h-6 sm:w-8 sm:h-8 shrink-0">
                           <AvatarImage src={user.avatar} alt={user.name} />
                           <AvatarFallback className="text-xs">
                             {user.name.split(' ').map(n => n[0]).join('')}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <p className="font-medium text-sm">{user.name}</p>
-                          <p className="text-xs text-muted-foreground">
+                        <div className="min-w-0">
+                          <p className="font-medium text-xs sm:text-sm truncate">{user.name}</p>
+                          <p className="text-xs text-muted-foreground truncate">
                             Joined: {new Date(user.joinDate).toLocaleDateString()}
                           </p>
                         </div>
@@ -481,29 +483,29 @@ const AdminUsers = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Login Statistics</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Login Statistics</CardTitle>
                 <CardDescription>User engagement and activity metrics</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center p-3 border rounded-lg">
-                    <span>Daily Active Users</span>
+                  <div className="flex justify-between items-center p-2 sm:p-3 border rounded-lg">
+                    <span className="text-sm sm:text-base">Daily Active Users</span>
                     <span className="font-bold text-green-600">
                       {users.filter(u => u.status === "Active").length}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-3 border rounded-lg">
-                    <span>Weekly Active Users</span>
+                  <div className="flex justify-between items-center p-2 sm:p-3 border rounded-lg">
+                    <span className="text-sm sm:text-base">Weekly Active Users</span>
                     <span className="font-bold text-blue-600">
                       {users.filter(u => u.status === "Active").length + 2} 
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-3 border rounded-lg">
-                    <span>Average Session Duration</span>
+                  <div className="flex justify-between items-center p-2 sm:p-3 border rounded-lg">
+                    <span className="text-sm sm:text-base">Average Session Duration</span>
                     <span className="font-bold">4.2 hours</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 border rounded-lg">
-                    <span>Failed Login Attempts</span>
+                  <div className="flex justify-between items-center p-2 sm:p-3 border rounded-lg">
+                    <span className="text-sm sm:text-base">Failed Login Attempts</span>
                     <span className="font-bold text-red-600">3</span>
                   </div>
                 </div>
@@ -512,11 +514,11 @@ const AdminUsers = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="security" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value="security" className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Security Settings</CardTitle>
                 <CardDescription>Global security policies and configurations</CardDescription>
               </CardHeader>
               <CardContent>
@@ -555,34 +557,34 @@ const AdminUsers = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Security Alerts</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Security Alerts</CardTitle>
                 <CardDescription>Recent security events and notifications</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex items-start space-x-3 p-3 border border-red-200 rounded-lg bg-red-50">
-                    <Shield className="w-5 h-5 text-red-600 mt-0.5" />
+                  <div className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 border border-red-200 rounded-lg bg-red-50">
+                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 mt-0.5 shrink-0" />
                     <div>
-                      <p className="font-medium text-red-800">Failed Login Attempts</p>
-                      <p className="text-sm text-red-600">3 failed attempts from IP 192.168.1.100</p>
+                      <p className="font-medium text-red-800 text-sm sm:text-base">Failed Login Attempts</p>
+                      <p className="text-xs sm:text-sm text-red-600">3 failed attempts from IP 192.168.1.100</p>
                       <p className="text-xs text-red-500">2 hours ago</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start space-x-3 p-3 border border-amber-200 rounded-lg bg-amber-50">
-                    <UserCheck className="w-5 h-5 text-amber-600 mt-0.5" />
+                  <div className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 border border-amber-200 rounded-lg bg-amber-50">
+                    <UserCheck className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 mt-0.5 shrink-0" />
                     <div>
-                      <p className="font-medium text-amber-800">New User Registration</p>
-                      <p className="text-sm text-amber-600">Pending approval for new client user</p>
+                      <p className="font-medium text-amber-800 text-sm sm:text-base">New User Registration</p>
+                      <p className="text-xs sm:text-sm text-amber-600">Pending approval for new client user</p>
                       <p className="text-xs text-amber-500">5 hours ago</p>
                     </div>
                   </div>
 
-                  <div className="flex items-start space-x-3 p-3 border border-blue-200 rounded-lg bg-blue-50">
-                    <Lock className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <div className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 border border-blue-200 rounded-lg bg-blue-50">
+                    <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-0.5 shrink-0" />
                     <div>
-                      <p className="font-medium text-blue-800">Password Changed</p>
-                      <p className="text-sm text-blue-600">User Sarah Wilson updated password</p>
+                      <p className="font-medium text-blue-800 text-sm sm:text-base">Password Changed</p>
+                      <p className="text-xs sm:text-sm text-blue-600">User Sarah Wilson updated password</p>
                       <p className="text-xs text-blue-500">1 day ago</p>
                     </div>
                   </div>
@@ -592,7 +594,7 @@ const AdminUsers = () => {
           </div>
         </TabsContent>
       </Tabs>
-    </>
+    </div>
   );
 };
 

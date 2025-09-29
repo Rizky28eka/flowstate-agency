@@ -106,15 +106,15 @@ const AdminAuditLogs = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Audit Logs</h1>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Audit Logs</h1>
         <p className="text-muted-foreground">Track important activities and changes within the system.</p>
       </div>
 
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input 
@@ -129,7 +129,7 @@ const AdminAuditLogs = () => {
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "w-[280px] justify-start text-left font-normal",
+                    "w-full sm:w-[280px] justify-start text-left font-normal",
                     !dateRange && "text-muted-foreground"
                   )}
                 >
@@ -159,32 +159,34 @@ const AdminAuditLogs = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Timestamp</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Action</TableHead>
-                <TableHead className="hidden md:table-cell">Resource</TableHead>
-                <TableHead className="hidden sm:table-cell">IP Address</TableHead>
-                <TableHead className="text-right">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredLogs.map((log) => (
-                <TableRow key={log.id} onClick={() => handleRowClick(log)} className="cursor-pointer">
-                  <TableCell>{new Date(log.timestamp).toLocaleString()}</TableCell>
-                  <TableCell className="font-medium">{log.user}</TableCell>
-                  <TableCell><Badge variant="outline">{log.action}</Badge></TableCell>
-                  <TableCell className="hidden md:table-cell">{log.resource}</TableCell>
-                  <TableCell className="hidden sm:table-cell font-mono">{log.ip}</TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant={log.status === 'Success' ? 'default' : 'destructive'}>{log.status}</Badge>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs sm:text-sm">Timestamp</TableHead>
+                  <TableHead className="text-xs sm:text-sm">User</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Action</TableHead>
+                  <TableHead className="hidden md:table-cell text-xs sm:text-sm">Resource</TableHead>
+                  <TableHead className="hidden sm:table-cell text-xs sm:text-sm">IP Address</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm">Status</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredLogs.map((log) => (
+                  <TableRow key={log.id} onClick={() => handleRowClick(log)} className="cursor-pointer">
+                    <TableCell className="p-2 sm:p-4 text-xs sm:text-sm">{new Date(log.timestamp).toLocaleString()}</TableCell>
+                    <TableCell className="font-medium p-2 sm:p-4 text-xs sm:text-sm">{log.user}</TableCell>
+                    <TableCell className="p-2 sm:p-4"><Badge variant="outline" className="text-xs">{log.action}</Badge></TableCell>
+                    <TableCell className="hidden md:table-cell p-2 sm:p-4 text-xs sm:text-sm">{log.resource}</TableCell>
+                    <TableCell className="hidden sm:table-cell font-mono p-2 sm:p-4 text-xs">{log.ip}</TableCell>
+                    <TableCell className="text-right p-2 sm:p-4">
+                      <Badge variant={log.status === 'Success' ? 'default' : 'destructive'} className="text-xs">{log.status}</Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
       <EventInspectorSheet log={selectedLog} isOpen={isSheetOpen} onOpenChange={setIsSheetOpen} />

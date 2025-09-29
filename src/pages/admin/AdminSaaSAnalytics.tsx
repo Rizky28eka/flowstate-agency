@@ -53,29 +53,29 @@ const iconMap = {
 
 const AdminSaaSAnalytics = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">SaaS Analytics Dashboard</h1>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">SaaS Analytics Dashboard</h1>
         <p className="text-muted-foreground">
           An overview of your platform's business performance.
         </p>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-6 grid-cols-2 lg:grid-cols-4">
         {MOCK_SAAS_METRICS.map((metric) => {
           const Icon = iconMap[metric.id as keyof typeof iconMap] || CircleDot;
           const ChangeIcon = metric.changeType === 'increase' ? TrendingUp : TrendingDown;
           return (
             <Card key={metric.id}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{metric.label}</CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium">{metric.label}</CardTitle>
+                <Icon className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{metric.value}</div>
-                <p className="text-xs text-muted-foreground flex items-center">
-                  <ChangeIcon className={`h-3 w-3 mr-1 ${metric.changeType === 'increase' ? 'text-green-500' : 'text-red-500'}`} />
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-lg sm:text-2xl font-bold">{metric.value}</div>
+                <p className="text-xs text-muted-foreground flex items-center flex-wrap">
+                  <ChangeIcon className={`h-3 w-3 mr-1 shrink-0 ${metric.changeType === 'increase' ? 'text-green-500' : 'text-red-500'}`} />
                   {metric.change}
                 </p>
               </CardContent>
@@ -84,15 +84,15 @@ const AdminSaaSAnalytics = () => {
         })}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
         {/* MRR Growth Chart */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>MRR Growth (YTD)</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">MRR Growth (YTD)</CardTitle>
             <CardDescription>Monthly Recurring Revenue growth for the current year.</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={{}} className="h-[300px] w-full">
+            <ChartContainer config={{}} className="h-[250px] sm:h-[300px] w-full">
               <BarChart data={MOCK_MONTHLY_GROWTH.filter(d => d.mrr > 0)} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
@@ -107,11 +107,11 @@ const AdminSaaSAnalytics = () => {
         {/* Plan Distribution Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Plan Distribution</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">Plan Distribution</CardTitle>
             <CardDescription>Number of customers per subscription plan.</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={{}} className="h-[300px] w-full">
+            <ChartContainer config={{}} className="h-[250px] sm:h-[300px] w-full">
               <PieChart>
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Pie data={MOCK_PLAN_DISTRIBUTION} dataKey="customerCount" nameKey="planName" cx="50%" cy="50%" outerRadius={100} label>
@@ -128,32 +128,34 @@ const AdminSaaSAnalytics = () => {
       {/* Recent Activity Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Recent Activity</CardTitle>
           <CardDescription>Latest signups, upgrades, and cancellations.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Type</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Time</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {MOCK_RECENT_ACTIVITY.map((activity) => (
-                <TableRow key={activity.id}>
-                  <TableCell>
-                    <Badge variant={activity.type === 'New Signup' ? 'default' : (activity.type === 'Plan Upgrade' ? 'secondary' : 'destructive')}>
-                      {activity.type}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{activity.description}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{activity.timestamp}</TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs sm:text-sm">Type</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Description</TableHead>
+                  <TableHead className="text-right text-xs sm:text-sm">Time</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {MOCK_RECENT_ACTIVITY.map((activity) => (
+                  <TableRow key={activity.id}>
+                    <TableCell className="p-2 sm:p-4">
+                      <Badge variant={activity.type === 'New Signup' ? 'default' : (activity.type === 'Plan Upgrade' ? 'secondary' : 'destructive')} className="text-xs">
+                        {activity.type}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="p-2 sm:p-4 text-sm">{activity.description}</TableCell>
+                    <TableCell className="text-right text-muted-foreground p-2 sm:p-4 text-xs sm:text-sm">{activity.timestamp}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
