@@ -1,186 +1,147 @@
-import { useParams } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar, Users, MessageSquare, Download, CircleCheck as CheckCircle, Clock } from "lucide-react";
+import { useMemo, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getClientProjectDetails, ClientProjectDetails } from '@/lib/client-project-detail';
+import { Button } from '@/components/ui/button';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ArrowLeft, CheckCircle2, Circle, File as FileIcon, Download } from 'lucide-react';
+
+// Helper to format currency
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
+};
 
 const ClientProjectDetail = () => {
-  const { id } = useParams();
-  
-  // Mock project data for client view
-  const project = {
-    id: "PRJ-001",
-    name: "Website Redesign",
-    description: "Complete website overhaul with modern design and improved user experience",
-    status: "In Progress",
-    progress: 75,
-    startDate: "2024-10-15",
-    endDate: "2024-12-15",
-    manager: "Sarah Wilson",
-    team: [
-      { name: "Sarah Wilson", role: "Project Manager", avatar: "/api/placeholder/40/40" },
-      { name: "Lisa Chen", role: "UI/UX Designer", avatar: "/api/placeholder/40/40" },
-      { name: "Mike Johnson", role: "Developer", avatar: "/api/placeholder/40/40" },
-      { name: "Alex Thompson", role: "Developer", avatar: "/api/placeholder/40/40" }
-    ],
-    phase: "Development",
-    deliverables: [
-      { name: "Wireframes", status: "Completed", date: "2024-11-01" },
-      { name: "Visual Designs", status: "Completed", date: "2024-11-15" },
-      { name: "Frontend Development", status: "In Progress", date: "2024-12-10" },
-      { name: "Backend Integration", status: "Pending", date: "2024-12-20" },
-      { name: "Testing & QA", status: "Pending", date: "2024-12-25" }
-    ]
-  };
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Completed": return "bg-green-100 text-green-800";
-      case "In Progress": return "bg-blue-100 text-blue-800";
-      case "Pending": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
+  const project = useMemo(() => 
+    id ? getClientProjectDetails(id) : null
+  , [id]);
+
+  useEffect(() => {
+    if (!project) {
+      // navigate('/dashboard/client/projects');
     }
-  };
+  }, [project, navigate]);
+
+  if (!project) {
+    return <div>Loading project details...</div>;
+  }
 
   return (
-    <>
-      <div className="flex items-center justify-between mb-8">
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <Button variant="outline" size="icon" onClick={() => navigate('/dashboard/client/projects')}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <div>
-          <h1 className="text-3xl font-bold">{project.name}</h1>
-          <p className="text-muted-foreground mt-1">{project.description}</p>
-          <Badge className="mt-2 bg-blue-100 text-blue-800">{project.status}</Badge>
-        </div>
-        <div className="flex space-x-2">
-          <Button variant="outline">
-            <MessageSquare className="w-4 h-4 mr-2" />
-            Message Team
-          </Button>
-          <Button>
-            <Download className="w-4 h-4 mr-2" />
-            Download Files
-          </Button>
+          <h1 className="text-2xl font-bold tracking-tight">{project.name}</h1>
+          <p className="text-muted-foreground">Project Details & Progress</p>
         </div>
       </div>
 
-      {/* Project Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Overall Progress</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold mb-2">{project.progress}%</div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Project Overview</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 grid-cols-3 text-sm">
+            <div><span className="font-medium">Status:</span> <Badge>{project.status}</Badge></div>
+            <div><span className="font-medium">Start Date:</span> {project.startDate}</div>
+            <div><span className="font-medium">End Date:</span> {project.endDate}</div>
+          </div>
+          <div className="space-y-1">
+            <div className="flex justify-between text-sm"><span>Overall Progress</span><span>{project.progress}%</span></div>
             <Progress value={project.progress} />
-            <p className="text-xs text-muted-foreground mt-2">Current phase: {project.phase}</p>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Timeline</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1">
-              <p className="text-sm"><strong>Started:</strong> {new Date(project.startDate).toLocaleDateString()}</p>
-              <p className="text-sm"><strong>Due:</strong> {new Date(project.endDate).toLocaleDateString()}</p>
-              <p className="text-xs text-muted-foreground">
-                {Math.ceil((new Date(project.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days remaining
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+      <Tabs defaultValue="tasks">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="tasks">Tasks & Progress</TabsTrigger>
+          <TabsTrigger value="files">Files</TabsTrigger>
+          <TabsTrigger value="invoices">Invoices</TabsTrigger>
+        </TabsList>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Project Team</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex -space-x-2">
-              {project.team.slice(0, 4).map((member, index) => (
-                <Avatar key={index} className="w-8 h-8 border-2 border-white">
-                  <AvatarImage src={member.avatar} alt={member.name} />
-                  <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                </Avatar>
-              ))}
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">{project.team.length} team members</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Deliverables */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Project Deliverables</CardTitle>
-            <CardDescription>Key milestones and deliverables</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {project.deliverables.map((deliverable, index) => (
-                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    {deliverable.status === "Completed" ? (
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                    ) : deliverable.status === "In Progress" ? (
-                      <Clock className="w-5 h-5 text-blue-600" />
-                    ) : (
-                      <Clock className="w-5 h-5 text-gray-400" />
-                    )}
-                    <div>
-                      <p className="font-medium">{deliverable.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {deliverable.status === "Completed" ? "Completed" : "Due"}: {new Date(deliverable.date).toLocaleDateString()}
-                      </p>
-                    </div>
+        <TabsContent value="tasks" className="mt-6">
+          <Card>
+            <CardHeader><CardTitle>Tasks & Milestones</CardTitle></CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {project.tasks.map(task => (
+                  <div key={task.id} className="flex items-center gap-3 p-3 border rounded-md">
+                    {task.isCompleted ? <CheckCircle2 className="h-5 w-5 text-green-500" /> : <Circle className="h-5 w-5 text-muted-foreground"/>}
+                    <span className="flex-1 font-medium text-sm">{task.title}</span>
+                    <Badge variant="outline">{task.status}</Badge>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge className={getStatusColor(deliverable.status)}>{deliverable.status}</Badge>
-                    {deliverable.status === "Completed" && (
-                      <Button variant="outline" size="sm">
-                        <Download className="w-3 h-3" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-        {/* Team & Communication */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Project Team</CardTitle>
-            <CardDescription>Your dedicated project team</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {project.team.map((member, index) => (
-                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src={member.avatar} alt={member.name} />
-                      <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{member.name}</p>
-                      <p className="text-sm text-muted-foreground">{member.role}</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <MessageSquare className="w-3 h-3 mr-1" />
-                    Message
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </>
+        <TabsContent value="files" className="mt-6">
+          <Card>
+            <CardHeader><CardTitle>Shared Files</CardTitle></CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Type</TableHead><TableHead>Size</TableHead><TableHead>Date</TableHead><TableHead className="text-right">Action</TableHead></TableRow></TableHeader>
+                <TableBody>
+                  {project.files.map(file => (
+                    <TableRow key={file.id}>
+                      <TableCell className="font-medium flex items-center gap-2"><FileIcon className="h-4 w-4"/>{file.name}</TableCell>
+                      <TableCell>{file.type}</TableCell>
+                      <TableCell>{file.size}</TableCell>
+                      <TableCell>{file.uploadDate}</TableCell>
+                      <TableCell className="text-right"><Button variant="ghost" size="icon"><Download className="h-4 w-4"/></Button></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="invoices" className="mt-6">
+          <Card>
+            <CardHeader><CardTitle>Project Invoices</CardTitle></CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader><TableRow><TableHead>Invoice #</TableHead><TableHead>Status</TableHead><TableHead>Due Date</TableHead><TableHead className="text-right">Amount</TableHead></TableRow></TableHeader>
+                <TableBody>
+                  {project.invoices.map(inv => (
+                    <TableRow key={inv.id} className="cursor-pointer" onClick={() => navigate('/dashboard/client/invoices')}>
+                      <TableCell className="font-medium">{inv.invoiceNumber}</TableCell>
+                      <TableCell><Badge variant={inv.status === 'Paid' ? 'default' : 'destructive'}>{inv.status}</Badge></TableCell>
+                      <TableCell>{inv.dueDate}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(inv.amount)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

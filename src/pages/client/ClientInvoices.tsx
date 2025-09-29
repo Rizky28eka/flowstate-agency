@@ -1,138 +1,150 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Receipt, Download, Eye, CreditCard, Calendar, DollarSign } from "lucide-react";
-import { invoices } from "@/lib/mock-data";
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { invoices } from '@/lib/mock-data';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { DollarSign, FileWarning, FileCheck2 } from 'lucide-react';
 
-const ClientInvoices = () => {
-  const clientInvoices = invoices.filter(inv => inv.clientName === "TechCorp Inc." || inv.clientName === "FinanceApp Ltd.");
+// Helper to format currency
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
+};
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Paid": return "bg-green-100 text-green-800";
-      case "Pending": return "bg-amber-100 text-amber-800";
-      case "Draft": return "bg-blue-100 text-blue-800";
-      case "Overdue": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
+const InvoiceRow = ({ invoice }: { invoice: (typeof invoices)[0] }) => {
+  const navigate = useNavigate();
+  
+  const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+    'Paid': 'default',
+    'Pending': 'secondary',
+    'Overdue': 'destructive',
+    'Draft': 'outline',
   };
 
-  const totalBilled = clientInvoices.reduce((sum, inv) => sum + inv.amount, 0);
-  const totalPaid = clientInvoices.filter(inv => inv.status === "Paid").reduce((sum, inv) => sum + inv.amount, 0);
-  const totalOutstanding = clientInvoices.filter(inv => inv.status === "Pending").reduce((sum, inv) => sum + inv.amount, 0);
+  return (
+    <TableRow 
+      className="cursor-pointer"
+      onClick={() => navigate(`/dashboard/client/invoices/${invoice.id}`)}
+    >
+      <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
+      <TableCell className="hidden sm:table-cell">{invoice.projectName}</TableCell>
+      <TableCell className="hidden md:table-cell">{invoice.issueDate}</TableCell>
+      <TableCell className="hidden md:table-cell">{invoice.dueDate}</TableCell>
+      <TableCell><Badge variant={statusVariant[invoice.status] || 'outline'}>{invoice.status}</Badge></TableCell>
+      <TableCell className="text-right font-medium">{formatCurrency(invoice.amount)}</TableCell>
+    </TableRow>
+  );
+};
+
+const ClientInvoices = () => {
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  // Assume logged-in client is 'TechCorp Inc.' (CLI-001) for demo
+  const currentClientId = 'CLI-001';
+  const clientInvoices = useMemo(() => 
+    invoices.filter(inv => inv.clientId === currentClientId)
+  , [currentClientId]);
+
+  const filteredInvoices = useMemo(() => {
+    if (statusFilter === 'all') return clientInvoices;
+    return clientInvoices.filter(inv => inv.status === statusFilter);
+  }, [clientInvoices, statusFilter]);
+
+  const invoiceStats = useMemo(() => {
+    const totalBilled = clientInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+    const amountDue = clientInvoices
+      .filter(inv => inv.status === 'Pending' || inv.status === 'Overdue')
+      .reduce((sum, inv) => sum + inv.amount, 0);
+    const overdueCount = clientInvoices.filter(inv => inv.status === 'Overdue').length;
+    return { totalBilled, amountDue, overdueCount };
+  }, [clientInvoices]);
+
+  const kpiData = [
+    { title: 'Total Billed', value: formatCurrency(invoiceStats.totalBilled), icon: DollarSign },
+    { title: 'Amount Due', value: formatCurrency(invoiceStats.amountDue), icon: FileWarning },
+    { title: 'Paid Invoices', value: clientInvoices.filter(i => i.status === 'Paid').length, icon: FileCheck2 },
+  ];
+
+  const invoiceStatuses = ['Paid', 'Pending', 'Overdue', 'Draft'];
 
   return (
-    <>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Invoices & Billing</h2>
-        <Button variant="outline">
-          <CreditCard className="w-4 h-4 mr-2" />
-          Payment Methods
-        </Button>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">My Invoices</h1>
+        <p className="text-muted-foreground">Review your billing history and make payments.</p>
       </div>
 
-      {/* Invoice Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Billed</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${totalBilled.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">All time</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Paid</CardTitle>
-            <Receipt className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">${totalPaid.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">{clientInvoices.filter(inv => inv.status === "Paid").length} invoices</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Outstanding</CardTitle>
-            <Receipt className="h-4 w-4 text-amber-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-amber-600">${totalOutstanding.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">{clientInvoices.filter(inv => inv.status === "Pending").length} pending</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Next Payment</CardTitle>
-            <Calendar className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Dec 20</div>
-            <p className="text-xs text-muted-foreground">$12,600 due</p>
-          </CardContent>
-        </Card>
+      <div className="grid gap-6 md:grid-cols-3">
+        {kpiData.map(kpi => (
+          <Card key={kpi.title}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+              <kpi.icon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{kpi.value}</div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Invoices Table */}
       <Card>
-        <CardHeader>
-          <CardTitle>Invoice History</CardTitle>
-          <CardDescription>All invoices for your projects</CardDescription>
+        <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <CardTitle>Invoice History</CardTitle>
+            <CardDescription>Click an invoice to view details or make a payment.</CardDescription>
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full md:w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              {invoiceStatuses.map(status => (
+                <SelectItem key={status} value={status}>{status}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-3 font-medium">Invoice #</th>
-                  <th className="text-left p-3 font-medium">Project</th>
-                  <th className="text-left p-3 font-medium">Amount</th>
-                  <th className="text-left p-3 font-medium">Status</th>
-                  <th className="text-left p-3 font-medium">Issue Date</th>
-                  <th className="text-left p-3 font-medium">Due Date</th>
-                  <th className="text-right p-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {clientInvoices.map((invoice) => (
-                  <tr key={invoice.id} className="border-b hover:bg-muted/50">
-                    <td className="p-3 font-medium">{invoice.invoiceNumber}</td>
-                    <td className="p-3">{invoice.projectName}</td>
-                    <td className="p-3 font-medium">${invoice.amount.toLocaleString()}</td>
-                    <td className="p-3">
-                      <Badge className={getStatusColor(invoice.status)}>{invoice.status}</Badge>
-                    </td>
-                    <td className="p-3">{new Date(invoice.issueDate).toLocaleDateString()}</td>
-                    <td className="p-3">{new Date(invoice.dueDate).toLocaleDateString()}</td>
-                    <td className="p-3 text-right">
-                      <div className="flex space-x-1 justify-end">
-                        <Button variant="ghost" size="sm">
-                          <Eye className="w-3 h-3" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Download className="w-3 h-3" />
-                        </Button>
-                        {invoice.status === "Pending" && (
-                          <Button size="sm">
-                            <CreditCard className="w-3 h-3 mr-1" />
-                            Pay
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Invoice #</TableHead>
+                <TableHead className="hidden sm:table-cell">Project</TableHead>
+                <TableHead className="hidden md:table-cell">Issued</TableHead>
+                <TableHead className="hidden md:table-cell">Due</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredInvoices.map(inv => <InvoiceRow key={inv.id} invoice={inv} />)}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 };
 

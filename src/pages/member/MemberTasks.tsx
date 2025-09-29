@@ -1,166 +1,180 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CircleCheck as CheckCircle, Search, Plus, Clock, Calendar, Flag } from "lucide-react";
-import { useState } from "react";
-import { tasks as initialTasks } from "@/lib/mock-data";
-import { Task } from "@/types";
-import { TaskItem } from "@/components/TaskItem";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CreateTaskForm } from "@/components/CreateTaskForm";
+import { useState, useMemo } from 'react';
+import { tasks, teamMembers } from '@/lib/mock-data';
+import { getTaskDetails, TaskDetails, SubTask, TaskComment } from '@/lib/task-detail';
+import { Button } from '@/components/ui/button';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetDescription, 
+  SheetHeader, 
+  SheetTitle 
+} from '@/components/ui/sheet';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
+import { Search, Paperclip, MessageSquare, CheckSquare } from 'lucide-react';
+
+const TaskDetailSheet = ({ task, isOpen, onOpenChange }: { task: TaskDetails | null, isOpen: boolean, onOpenChange: (open: boolean) => void }) => {
+  if (!task) return null;
+
+  return (
+    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+      <SheetContent className="sm:max-w-2xl w-[90vw] flex flex-col">
+        <SheetHeader className="p-6">
+          <SheetTitle className="text-2xl">{task.title}</SheetTitle>
+          <SheetDescription>In project: {task.projectId}</SheetDescription>
+        </SheetHeader>
+        <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6">
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            <div><span className="font-medium">Due Date:</span> <span className="text-muted-foreground">{task.dueDate}</span></div>
+            <div><span className="font-medium">Priority:</span> <Badge variant={task.priority === 'High' ? 'destructive' : 'secondary'}>{task.priority}</Badge></div>
+            <div><span className="font-medium">Status:</span> <Badge variant="outline">{task.status}</Badge></div>
+          </div>
+          <Separator />
+          
+          {task.subTasks.length > 0 && (
+            <Card>
+              <CardHeader><CardTitle className="flex items-center"><CheckSquare className="h-5 w-5 mr-2"/>Sub-Tasks</CardTitle></CardHeader>
+              <CardContent className="space-y-2">
+                {task.subTasks.map(sub => (
+                  <div key={sub.id} className="flex items-center gap-3">
+                    <Checkbox id={`sub-${sub.id}`} defaultChecked={sub.isCompleted} />
+                    <label htmlFor={`sub-${sub.id}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{sub.title}</label>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {task.attachments.length > 0 && (
+            <Card>
+              <CardHeader><CardTitle className="flex items-center"><Paperclip className="h-5 w-5 mr-2"/>Attachments</CardTitle></CardHeader>
+              <CardContent className="space-y-3">
+                {task.attachments.map(att => (
+                  <div key={att.id} className="flex items-center justify-between p-2 border rounded-md">
+                    <p className="text-sm font-medium">{att.fileName}</p>
+                    <Button variant="outline" size="sm">Download</Button>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          <Card>
+            <CardHeader><CardTitle className="flex items-center"><MessageSquare className="h-5 w-5 mr-2"/>Comments</CardTitle></CardHeader>
+            <CardContent className="space-y-6">
+              {task.comments.map(comment => (
+                <div key={comment.id} className="flex items-start gap-4">
+                  <Avatar className="h-9 w-9"><AvatarImage src={comment.avatar} /><AvatarFallback>{comment.author.charAt(0)}</AvatarFallback></Avatar>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="font-semibold text-sm">{comment.author}</p>
+                      <p className="text-xs text-muted-foreground">{comment.timestamp}</p>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{comment.text}</p>
+                  </div>
+                </div>
+              ))}
+              <div className="flex items-start gap-4">
+                <Avatar className="h-9 w-9"><AvatarFallback>You</AvatarFallback></Avatar>
+                <div className="flex-1">
+                  <Textarea placeholder="Write a comment..." />
+                  <Button className="mt-2">Post Comment</Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+};
 
 const MemberTasks = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [tasks, setTasks] = useState(initialTasks);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTask, setSelectedTask] = useState<TaskDetails | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const myTasks = tasks.filter(t => t.assignedTo === "Sarah Wilson" || t.assignedTo === "Mike Johnson");
+  // Assuming the logged-in member is 'Sarah Wilson' for demo purposes
+  const currentUser = 'Sarah Wilson';
+  const memberTasks = useMemo(() => tasks.filter(t => t.assignedTo === currentUser), [currentUser]);
 
-  const onAddTask = (task: Task) => {
-    setTasks(prevTasks => [...prevTasks, task]);
-  };
+  const filteredTasks = useMemo(() => {
+    return memberTasks.filter(t => t.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  }, [memberTasks, searchTerm]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Completed": return "bg-green-100 text-green-800";
-      case "In Progress": return "bg-blue-100 text-blue-800";
-      case "In Review": return "bg-purple-100 text-purple-800";
-      case "To Do": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "High": return "text-red-600";
-      case "Medium": return "text-amber-600";
-      case "Low": return "text-green-600";
-      default: return "text-gray-600";
-    }
+  const handleTaskClick = (taskId: string) => {
+    const details = getTaskDetails(taskId);
+    setSelectedTask(details);
+    setIsSheetOpen(true);
   };
 
   return (
-    <>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">My Tasks</h2>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Task
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Task</DialogTitle>
-            </DialogHeader>
-            <CreateTaskForm onAddTask={onAddTask} />
-          </DialogContent>
-        </Dialog>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">My Tasks</h1>
+          <p className="text-muted-foreground">All tasks assigned to you.</p>
+        </div>
       </div>
 
-      {/* Task Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{myTasks.length}</div>
-            <p className="text-xs text-muted-foreground">Assigned to you</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {myTasks.filter(t => t.status === "Completed").length}
-            </div>
-            <p className="text-xs text-muted-foreground">This month</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-            <Clock className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {myTasks.filter(t => t.status === "In Progress").length}
-            </div>
-            <p className="text-xs text-muted-foreground">Currently working</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overdue</CardTitle>
-            <Flag className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {myTasks.filter(t => new Date(t.dueDate) < new Date() && t.status !== "Completed").length}
-            </div>
-            <p className="text-xs text-muted-foreground">Need attention</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="all" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="all">All Tasks</TabsTrigger>
-          <TabsTrigger value="todo">To Do</TabsTrigger>
-          <TabsTrigger value="progress">In Progress</TabsTrigger>
-          <TabsTrigger value="review">In Review</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all">
-          <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Search tasks..."
+      <Card>
+        <CardHeader>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input 
+              placeholder="Search tasks..." 
+              className="pl-8 w-full"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
             />
           </div>
-
-          <div className="space-y-4">
-            {myTasks.filter(t => !t.parentId).map((task) => (
-              <TaskItem key={task.id} task={task} allTasks={myTasks} />
-            ))}
-          </div>
-        </TabsContent>
-
-        {["todo", "progress", "review", "completed"].map((status) => (
-          <TabsContent key={status} value={status}>
-            <div className="space-y-4">
-              {myTasks
-                .filter(task => {
-                  const statusMap = {
-                    "todo": "To Do",
-                    "progress": "In Progress", 
-                    "review": "In Review",
-                    "completed": "Completed"
-                  };
-                  return task.status === statusMap[status] && !task.parentId;
-                })
-                .map((task) => (
-                  <TaskItem key={task.id} task={task} allTasks={myTasks} />
-                ))}
-            </div>
-          </TabsContent>
-        ))}
-      </Tabs>
-    </>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Task</TableHead>
+                <TableHead>Project</TableHead>
+                <TableHead>Due Date</TableHead>
+                <TableHead>Priority</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredTasks.map(task => (
+                <TableRow key={task.id} onClick={() => handleTaskClick(task.id)} className="cursor-pointer">
+                  <TableCell className="font-medium">{task.title}</TableCell>
+                  <TableCell>{task.projectId}</TableCell>
+                  <TableCell>{task.dueDate}</TableCell>
+                  <TableCell><Badge variant={task.priority === 'High' ? 'destructive' : 'secondary'}>{task.priority}</Badge></TableCell>
+                  <TableCell><Badge variant="outline">{task.status}</Badge></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      <TaskDetailSheet task={selectedTask} isOpen={isSheetOpen} onOpenChange={setIsSheetOpen} />
+    </div>
   );
 };
 

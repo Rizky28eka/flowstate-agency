@@ -1,211 +1,186 @@
+import { useEffect, useMemo } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getEmployeeProfile, EmployeeProfile } from '@/lib/employee-detail';
+import { Button } from '@/components/ui/button';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ArrowLeft, BarChart, CheckCircle2, DollarSign, Star, Phone, Mail, MapPin } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-import { useParams } from "react-router-dom";
-import { departments, teamMembers, projects } from "@/lib/mock-data";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Plus, Users, Briefcase, DollarSign, BarChart, Star, Percent } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Link } from "react-router-dom";
+// Helper to format currency
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
+};
 
 const OwnerTeamDetail = () => {
-  const { teamId } = useParams();
-  const team = departments.find(d => d.id === teamId);
-  const members = teamMembers.filter(m => m.departmentId === teamId);
-  // A simple way to associate projects with teams is to see if a team member is on the project
-  const teamProjectIds = new Set(teamMembers.filter(m => m.departmentId === teamId).map(m => m.id));
-  const teamProjects = projects.filter(p => p.team.some(memberName => members.some(m => m.name === memberName)));
+  const { teamId } = useParams<{ teamId: string }>();
+  const navigate = useNavigate();
 
+  const employee = useMemo(() => 
+    teamId ? getEmployeeProfile(parseInt(teamId, 10)) : null
+  , [teamId]);
 
-  if (!team) {
-    return <div className="p-8">Team not found.</div>;
+  useEffect(() => {
+    if (!employee) {
+      // navigate('/dashboard/owner/teams');
+    }
+  }, [employee, navigate]);
+
+  if (!employee) {
+    return <div>Loading employee profile...</div>;
   }
 
-  const budgetSpentPercentage = (parseFloat(team.spent.replace(/[^0-9.-]+/g,"")) / parseFloat(team.budget.replace(/[^0-9.-]+/g,""))) * 100;
+  const kpiData = [
+    { title: 'Avg. Utilization', value: `${employee.kpis.avgUtilization}%`, icon: BarChart },
+    { title: 'Completed Tasks', value: employee.kpis.completedTasks, icon: CheckCircle2 },
+    { title: 'Financial Contribution', value: formatCurrency(employee.kpis.financialContribution), icon: DollarSign },
+    { title: 'Avg. Project Rating', value: `${employee.kpis.avgProjectRating}/5.0`, icon: Star },
+  ];
 
   return (
-    <main className="flex-1 px-6 py-8 bg-background">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-8">
-        <div className="space-y-1">
-            <h1 className="text-3xl font-bold text-foreground">{team.name}</h1>
-            <p className="text-muted-foreground max-w-xl">{team.description}</p>
-            <p className="text-sm text-muted-foreground">Lead by <span className="font-semibold text-foreground">{team.lead}</span></p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" onClick={() => navigate('/dashboard/owner/teams')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <Avatar className="h-16 w-16">
+            <AvatarImage src={employee.avatar} alt={employee.name} />
+            <AvatarFallback>{employee.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+          </Avatar>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">{employee.name}</h1>
+            <p className="text-muted-foreground">{employee.role} | {employee.department}</p>
+          </div>
         </div>
-        <div className="flex space-x-2 mt-4 md:mt-0">
-            <Button variant="outline"><Edit className="w-4 h-4 mr-2"/> Edit Team</Button>
-            <Button variant="destructive"><Trash2 className="w-4 h-4 mr-2"/> Delete Team</Button>
-        </div>
-      </div>
-
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Team Size</CardTitle>
-            <Users className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{team.members} Members</div>
-            <p className="text-xs text-muted-foreground">{members.length} active members</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
-            <Briefcase className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{team.projects}</div>
-            <p className="text-xs text-muted-foreground">Projects currently managed</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Budget Utilization</CardTitle>
-            <DollarSign className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{team.spent}</div>
-            <p className="text-xs text-muted-foreground">of {team.budget} budget</p>
-            <Progress value={budgetSpentPercentage} className="mt-2 h-2" />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Team Satisfaction</CardTitle>
-            <Star className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{team.satisfaction} / 5.0</div>
-            <p className="text-xs text-muted-foreground">Based on internal surveys</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-            {/* Team Members */}
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>Team Members ({members.length})</CardTitle>
-                    <Button size="sm" variant="outline"><Plus className="w-4 h-4 mr-2"/>Add Member</Button>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Role</TableHead>
-                                <TableHead>Utilization</TableHead>
-                                <TableHead>Projects</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {members.map(member => (
-                                <TableRow key={member.id}>
-                                    <TableCell className="font-medium flex items-center space-x-3">
-                                        <Avatar className="w-8 h-8">
-                                            <AvatarImage src={member.avatar} />
-                                            <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                                        </Avatar>
-                                        <span>{member.name}</span>
-                                    </TableCell>
-                                    <TableCell>{member.role}</TableCell>
-                                    <TableCell>{member.utilization}%</TableCell>
-                                    <TableCell>{member.projects}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
-
-            {/* Associated Projects */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Associated Projects</CardTitle>
-                    <CardDescription>Projects this team is contributing to</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    {teamProjects.map(project => {
-                        const projectTeamMembers = members.filter(m => project.team.includes(m.name));
-                        return (
-                            <Card key={project.id} className="bg-muted/50">
-                                <CardHeader>
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <CardTitle className="text-lg">{project.name}</CardTitle>
-                                            <CardDescription>for {project.client}</CardDescription>
-                                        </div>
-                                        <Badge variant="secondary">{project.status}</Badge>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div>
-                                        <div className="flex justify-between text-sm mb-1">
-                                            <span>Progress</span>
-                                            <span className="font-semibold">{project.progress}%</span>
-                                        </div>
-                                        <Progress value={project.progress} />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4 text-sm">
-                                        <div>
-                                            <p className="text-muted-foreground">Project Manager</p>
-                                            <p className="font-medium">{project.manager}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-muted-foreground">Timeline</p>
-                                            <p className="font-medium">{new Date(project.endDate).toLocaleDateString()}</p>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <p className="text-muted-foreground text-sm">Team Contribution ({projectTeamMembers.length})</p>
-                                        <div className="flex items-center space-x-2 mt-2">
-                                            {projectTeamMembers.map(m => (
-                                                <Avatar key={m.id} className="w-8 h-8">
-                                                    <AvatarImage src={m.avatar} />
-                                                    <AvatarFallback>{m.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                                                </Avatar>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <Button size="sm" variant="outline" asChild className="mt-4">
-                                        <Link to={`/dashboard/owner/projects/${project.id}`}>View Full Project</Link>
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        )
-                    })}
-                </CardContent>
-            </Card>
-        </div>
-
-        <div className="space-y-8">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Team Performance</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Avg. Utilization</span>
-                        <span className="font-bold text-lg flex items-center">{team.utilization}% <Percent className="w-4 h-4 ml-1"/></span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Avg. Satisfaction</span>
-                        <span className="font-bold text-lg flex items-center">{team.satisfaction} <Star className="w-4 h-4 ml-1"/></span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">Completed Projects</span>
-                        <span className="font-bold text-lg flex items-center">{teamProjects.filter(p => p.status === 'Completed').length} <Briefcase className="w-4 h-4 ml-1"/></span>
-                    </div>
-                </CardContent>
-            </Card>
+        <div className="flex gap-2">
+          <Button variant="outline">Schedule Review</Button>
+          <Button>Edit Profile</Button>
         </div>
       </div>
-    </main>
+
+      {/* KPI Cards */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {kpiData.map(kpi => (
+          <Card key={kpi.title}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+              <kpi.icon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{kpi.value}</div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Details Tabs */}
+      <Tabs defaultValue="overview">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="performance">Performance</TabsTrigger>
+          <TabsTrigger value="projects">Project History</TabsTrigger>
+          <TabsTrigger value="tasks">Assigned Tasks</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="mt-6 grid gap-6 lg:grid-cols-3">
+          <Card className="lg:col-span-1">
+            <CardHeader><CardTitle>Contact & Info</CardTitle></CardHeader>
+            <CardContent className="space-y-4 text-sm">
+              <div className="flex items-center"><Mail className="h-4 w-4 mr-3 text-muted-foreground"/><span>{employee.email}</span></div>
+              <div className="flex items-center"><Phone className="h-4 w-4 mr-3 text-muted-foreground"/><span>{employee.phone}</span></div>
+              <div className="flex items-center"><MapPin className="h-4 w-4 mr-3 text-muted-foreground"/><span>{employee.location}</span></div>
+            </CardContent>
+          </Card>
+          <Card className="lg:col-span-2">
+            <CardHeader><CardTitle>Skills</CardTitle></CardHeader>
+            <CardContent className="flex flex-wrap gap-2">
+              {employee.skills.map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>)}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="performance" className="mt-6">
+          <Card>
+            <CardHeader><CardTitle>Performance Reviews</CardTitle></CardHeader>
+            <CardContent className="space-y-6">
+              {employee.performanceReviews.map(review => (
+                <div key={review.id} className="flex gap-4">
+                  <Avatar className="h-9 w-9">
+                    <AvatarFallback>{review.reviewer.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <p className="font-medium text-sm">{review.reviewer} <span className="text-muted-foreground font-normal">on {review.date}</span></p>
+                      <Badge>{review.rating}/5.0</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">{review.summary}</p>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="projects" className="mt-6">
+          <Card>
+            <CardHeader><CardTitle>Project History</CardTitle><CardDescription>All projects {employee.name} has contributed to.</CardDescription></CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader><TableRow><TableHead>Project</TableHead><TableHead>Status</TableHead><TableHead className="text-right">End Date</TableHead></TableRow></TableHeader>
+                <TableBody>
+                  {employee.projectHistory.map(p => (
+                    <TableRow key={p.projectId} className="cursor-pointer" onClick={() => navigate(`/dashboard/owner/projects/${p.projectId}`)}>
+                      <TableCell className="font-medium">{p.projectName}</TableCell>
+                      <TableCell><Badge variant={p.status === 'Completed' ? 'secondary' : 'default'}>{p.status}</Badge></TableCell>
+                      <TableCell className="text-right">{p.endDate}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="tasks" className="mt-6">
+          <Card>
+            <CardHeader><CardTitle>Assigned Tasks</CardTitle><CardDescription>All tasks assigned to {employee.name}.</CardDescription></CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader><TableRow><TableHead>Task</TableHead><TableHead>Project</TableHead><TableHead>Due Date</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+                <TableBody>
+                  {employee.assignedTasks.map(task => (
+                    <TableRow key={task.id}>
+                      <TableCell className="font-medium">{task.title}</TableCell>
+                      <TableCell>{task.projectId}</TableCell>
+                      <TableCell>{task.dueDate}</TableCell>
+                      <TableCell><Badge variant="outline">{task.status}</Badge></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

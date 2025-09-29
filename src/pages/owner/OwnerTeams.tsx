@@ -1,127 +1,170 @@
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { teamMembers, departments } from '@/lib/mock-data';
+import { Button } from '@/components/ui/button';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
+import { Users, Briefcase, BarChart, Search, PlusCircle } from 'lucide-react';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Users, Search, Plus, UserPlus, Mail, Phone, MapPin, Calendar, Award, TrendingUp, Clock, Target, BarChart3, CheckCircle } from "lucide-react";
-import { useState, useMemo } from "react";
-import { departments, teamMembers as initialTeamMembers } from "@/lib/mock-data";
-import { Progress } from "@/components/ui/progress";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-import { Link } from "react-router-dom";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+const TeamMemberRow = ({ member }: { member: (typeof teamMembers)[0] }) => {
+  const navigate = useNavigate();
 
-const HireMemberForm = ({ onAddMember }) => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [role, setRole] = useState('');
-    const [departmentId, setDepartmentId] = useState('');
-
-    const handleSubmit = () => {
-        if (!name || !email || !role || !departmentId) return;
-        const newMember = {
-            id: Math.max(...initialTeamMembers.map(m => m.id)) + 1,
-            name,
-            email,
-            role,
-            departmentId,
-            department: departments.find(d => d.id === departmentId)?.name || 'N/A',
-            status: 'Active',
-            joinDate: new Date().toISOString().split('T')[0],
-            utilization: 0,
-            projects: 0,
-            rating: 0,
-            skills: ['New Hire'],
-            avatar: '/api/placeholder/40/40',
-        };
-        onAddMember(newMember);
-    };
-
-    return (
-        <div className="grid gap-4 py-4">
-            <Input placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} />
-            <Input placeholder="Email Address" type="email" value={email} onChange={e => setEmail(e.target.value)} />
-            <Input placeholder="Role / Position" value={role} onChange={e => setRole(e.target.value)} />
-            <Select onValueChange={setDepartmentId}><SelectTrigger><SelectValue placeholder="Select a department" /></SelectTrigger><SelectContent>{departments.map(d => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}</SelectContent></Select>
-            <DialogFooter><DialogClose asChild><Button onClick={handleSubmit}>Hire Member</Button></DialogClose></DialogFooter>
+  return (
+    <TableRow 
+      className="cursor-pointer"
+      onClick={() => navigate(`/dashboard/owner/teams/${member.id}`)}
+    >
+      <TableCell>
+        <div className="flex items-center gap-3">
+          <Avatar className="h-9 w-9">
+            <AvatarImage src={member.avatar} alt={member.name} />
+            <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="font-medium">{member.name}</div>
+            <div className="text-xs text-muted-foreground hidden sm:table-cell">{member.email}</div>
+          </div>
         </div>
-    );
+      </TableCell>
+      <TableCell className="hidden md:table-cell">{member.department}</TableCell>
+      <TableCell className="hidden lg:table-cell">{member.role}</TableCell>
+      <TableCell className="hidden sm:table-cell">
+        <div className="flex items-center gap-2">
+          <Progress value={member.utilization} className="h-2 w-20" />
+          <span className="text-muted-foreground text-xs">{member.utilization}%</span>
+        </div>
+      </TableCell>
+      <TableCell className="hidden md:table-cell text-center">{member.projects}</TableCell>
+      <TableCell>
+        <Badge variant={member.status === 'Active' ? 'default' : 'secondary'}>{member.status}</Badge>
+      </TableCell>
+    </TableRow>
+  );
 };
 
 const OwnerTeams = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [teamMembers, setTeamMembers] = useState(initialTeamMembers);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [departmentFilter, setDepartmentFilter] = useState('all');
 
-  const handleAddMember = (newMember) => {
-    setTeamMembers(prev => [newMember, ...prev]);
-  };
+  const filteredMembers = useMemo(() => {
+    return teamMembers.filter(m => {
+      const searchMatch = m.name.toLowerCase().includes(searchTerm.toLowerCase()) || m.role.toLowerCase().includes(searchTerm.toLowerCase());
+      const departmentMatch = departmentFilter === 'all' || m.departmentId === departmentFilter;
+      return searchMatch && departmentMatch;
+    });
+  }, [searchTerm, departmentFilter]);
 
-  const getUtilizationColor = (utilization: number) => {
-    if (utilization >= 90) return "text-red-500";
-    if (utilization >= 75) return "text-green-500";
-    return "text-amber-500";
-  };
+  const teamStats = useMemo(() => {
+    const totalMembers = teamMembers.length;
+    const avgUtilization = teamMembers.reduce((sum, m) => sum + m.utilization, 0) / totalMembers;
+    return { totalMembers, avgUtilization: avgUtilization.toFixed(0), departmentCount: departments.length };
+  }, []);
 
-  const filteredTeamMembers = useMemo(() => teamMembers.filter(member => {
-    const term = searchTerm.toLowerCase();
-    return term === "" ||
-      member.name.toLowerCase().includes(term) ||
-      member.role.toLowerCase().includes(term) ||
-      member.skills.some(skill => skill.toLowerCase().includes(term));
-  }), [teamMembers, searchTerm]);
-
-  const avgUtilization = useMemo(() => (teamMembers.reduce((sum, member) => sum + member.utilization, 0) / teamMembers.length).toFixed(0), [teamMembers]);
-  const avgSatisfaction = useMemo(() => (teamMembers.reduce((sum, member) => sum + member.rating, 0) / teamMembers.length).toFixed(1), [teamMembers]);
+  const kpiData = [
+    { title: 'Total Team Members', value: teamStats.totalMembers, icon: Users },
+    { title: 'Departments', value: teamStats.departmentCount, icon: Briefcase },
+    { title: 'Average Utilization', value: `${teamStats.avgUtilization}%`, icon: BarChart },
+  ];
 
   return (
-    <main className="flex-1 px-6 py-8 bg-background">
-      {/* Team Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Team Members</CardTitle><Users className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{teamMembers.length}</div><p className="text-xs text-muted-foreground">+3 this month</p></CardContent></Card>
-        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Departments</CardTitle><Target className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{departments.length}</div><p className="text-xs text-muted-foreground">Fully operational</p></CardContent></Card>
-        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Avg Utilization</CardTitle><TrendingUp className="h-4 w-4 text-green-600" /></CardHeader><CardContent><div className="text-2xl font-bold">{avgUtilization}%</div><p className="text-xs text-muted-foreground">+2% from last month</p></CardContent></Card>
-        <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Team Satisfaction</CardTitle><Award className="h-4 w-4 text-amber-600" /></CardHeader><CardContent><div className="text-2xl font-bold">{avgSatisfaction}/5</div><p className="text-xs text-muted-foreground">Latest survey results</p></CardContent></Card>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Team Management</h1>
+          <p className="text-muted-foreground">Oversee your organization's members and departments.</p>
+        </div>
+        <Button>
+          <PlusCircle className="h-4 w-4 mr-2" />
+          Add New Member
+        </Button>
       </div>
 
-      <Tabs defaultValue="members" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="departments">Departments</TabsTrigger>
-          <TabsTrigger value="members">Team Members</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="org-chart">Org Chart</TabsTrigger>
-        </TabsList>
+      <div className="grid gap-6 md:grid-cols-3">
+        {kpiData.map(kpi => (
+          <Card key={kpi.title}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+              <kpi.icon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{kpi.value}</div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-        <TabsContent value="departments" className="space-y-6">{/* ... Department content ... */}</TabsContent>
-
-        <TabsContent value="members" className="space-y-6">
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="relative flex-1"><Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" /><Input placeholder="Search by name, role, or skill..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10"/></div>
-            <Dialog><DialogTrigger asChild><Button><UserPlus className="w-4 h-4 mr-2" /> Hire New Member</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>Hire New Team Member</DialogTitle><DialogDescription>Fill in the details to add a new member to the team.</DialogDescription></DialogHeader><HireMemberForm onAddMember={handleAddMember} /></DialogContent></Dialog>
+      <Card>
+        <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <CardTitle>All Team Members</CardTitle>
+            <CardDescription>A list of all members in your organization. Click a row for details.</CardDescription>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTeamMembers.map((member) => (
-              <Card key={member.id} className="hover:shadow-lg transition-shadow">
-                 <CardHeader><div className="flex items-center space-x-4"><Avatar className="w-16 h-16"><AvatarImage src={member.avatar} alt={member.name} /><AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback></Avatar><div className="flex-1"><CardTitle className="text-lg">{member.name}</CardTitle><CardDescription>{member.role}</CardDescription><Badge variant="secondary" className="mt-1">{member.department}</Badge></div></div></CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex flex-wrap gap-1">{member.skills.slice(0, 4).map((skill, index) => (<Badge key={index} variant="outline" className="text-xs">{skill}</Badge>))}</div>
-                    <div className="space-y-2 pt-2"><div className="flex justify-between text-sm"><span>Utilization</span><span className={`font-medium ${getUtilizationColor(member.utilization)}`}>{member.utilization}%</span></div><Progress value={member.utilization} /></div>
-                    <div className="flex items-center justify-between text-sm"><div className="flex items-center space-x-2"><CheckCircle className="w-4 h-4 text-green-500" /><span>{member.projects} Active Projects</span></div><div className="flex items-center space-x-2"><Award className="w-4 h-4 text-amber-500" /><span>Rating: {member.rating}/5.0</span></div></div>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search name or role..." 
+                className="pl-8 w-full md:w-64"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="All Departments" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Departments</SelectItem>
+                {departments.map(dept => (
+                  <SelectItem key={dept.id} value={dept.id}>{dept.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </TabsContent>
-
-        <TabsContent value="performance" className="space-y-6">{/* ... Performance content ... */}</TabsContent>
-        <TabsContent value="org-chart" className="space-y-6">{/* ... Org Chart content ... */}</TabsContent>
-      </Tabs>
-    </main>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Member</TableHead>
+                <TableHead className="hidden md:table-cell">Department</TableHead>
+                <TableHead className="hidden lg:table-cell">Role</TableHead>
+                <TableHead className="hidden sm:table-cell">Utilization</TableHead>
+                <TableHead className="hidden md:table-cell text-center">Projects</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredMembers.map(m => <TeamMemberRow key={m.id} member={m} />)}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

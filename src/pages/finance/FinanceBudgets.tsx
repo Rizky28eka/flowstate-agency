@@ -1,122 +1,114 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { ChartPie as PieChart, Plus, TrendingUp, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle } from "lucide-react";
-import { departments } from "@/lib/mock-data";
+import { useMemo } from 'react';
+import { getBudgetVsActuals, BudgetItem } from '@/lib/budget';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Progress } from '@/components/ui/progress';
+import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+// Helper to format currency
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
+};
+
+const BudgetRow = ({ item }: { item: BudgetItem }) => {
+  const performance = item.budgetedAmount > 0 ? (item.actualAmount / item.budgetedAmount) * 100 : 100;
+  const isRevenue = item.category === 'Revenue';
+  const isOverBudget = item.variance > 0;
+
+  let varianceColor = 'text-muted-foreground';
+  if (isRevenue) {
+    varianceColor = isOverBudget ? 'text-green-500' : 'text-red-500';
+  } else {
+    varianceColor = isOverBudget ? 'text-red-500' : 'text-green-500';
+  }
+
+  return (
+    <TableRow>
+      <TableCell className="font-medium">{item.category}</TableCell>
+      <TableCell className="text-right">{formatCurrency(item.budgetedAmount)}</TableCell>
+      <TableCell className="text-right">{formatCurrency(item.actualAmount)}</TableCell>
+      <TableCell className={`text-right font-medium ${varianceColor}`}>{formatCurrency(item.variance)}</TableCell>
+      <TableCell>
+        <Progress value={Math.min(performance, 100)} className="h-2" />
+      </TableCell>
+    </TableRow>
+  );
+};
 
 const FinanceBudgets = () => {
-  const budgets = departments.map(dept => ({
-    ...dept,
-    budgetUsed: (parseFloat(dept.spent.replace(/[^0-9.-]+/g,"")) / parseFloat(dept.budget.replace(/[^0-9.-]+/g,""))) * 100
-  }));
+  const budgetData = useMemo(() => getBudgetVsActuals(), []);
 
-return (
-    <>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold">Budget Planning</h2>
-        <Button className="w-full sm:w-auto">
-          <Plus className="w-4 h-4 mr-2" />
-          Create Budget
-        </Button>
+  const totals = useMemo(() => {
+    const totalBudgeted = budgetData.filter(i => i.category !== 'Revenue').reduce((s, i) => s + i.budgetedAmount, 0);
+    const totalActual = budgetData.filter(i => i.category !== 'Revenue').reduce((s, i) => s + i.actualAmount, 0);
+    const netVariance = totalActual - totalBudgeted;
+    return { totalBudgeted, totalActual, netVariance };
+  }, [budgetData]);
+
+  const kpiData = [
+    { title: 'Total Budgeted Costs', value: formatCurrency(totals.totalBudgeted), icon: DollarSign },
+    { title: 'Total Actual Costs', value: formatCurrency(totals.totalActual), icon: DollarSign },
+    { title: 'Net Cost Variance', value: formatCurrency(totals.netVariance), icon: totals.netVariance > 0 ? TrendingDown : TrendingUp, critical: totals.netVariance > 0 },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Budget vs. Actuals</h1>
+        <p className="text-muted-foreground">Analyze company-wide financial performance against the budget.</p>
       </div>
 
-      {/* Budget Overview */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">Total Budget</CardTitle>
-            <PieChart className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent className="p-3 sm:p-6 pt-0">
-            <div className="text-lg sm:text-2xl font-bold">
-              ${budgets.reduce((sum, b) => sum + parseFloat(b.budget.replace(/[^0-9.-]+/g, "")), 0).toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground">Annual</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">Spent</CardTitle>
-            <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent className="p-3 sm:p-6 pt-0">
-            <div className="text-lg sm:text-2xl font-bold">
-              ${budgets.reduce((sum, b) => sum + parseFloat(b.spent.replace(/[^0-9.-]+/g, "")), 0).toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {Math.round((budgets.reduce((sum, b) => sum + parseFloat(b.spent.replace(/[^0-9.-]+/g, "")), 0) / budgets.reduce((sum, b) => sum + parseFloat(b.budget.replace(/[^0-9.-]+/g, "")), 0)) * 100)}% used
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">On Track</CardTitle>
-            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
-          </CardHeader>
-          <CardContent className="p-3 sm:p-6 pt-0">
-            <div className="text-lg sm:text-2xl font-bold text-green-600">
-              {budgets.filter(b => b.budgetUsed <= 80).length}
-            </div>
-            <p className="text-xs text-muted-foreground">Depts</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
-            <CardTitle className="text-xs sm:text-sm font-medium">Over Budget</CardTitle>
-            <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
-          </CardHeader>
-          <CardContent className="p-3 sm:p-6 pt-0">
-            <div className="text-lg sm:text-2xl font-bold text-red-600">
-              {budgets.filter(b => b.budgetUsed > 100).length}
-            </div>
-            <p className="text-xs text-muted-foreground">Depts</p>
-          </CardContent>
-        </Card>
+      <div className="grid gap-6 md:grid-cols-3">
+        {kpiData.map(kpi => (
+          <Card key={kpi.title}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+              <kpi.icon className={cn("h-4 w-4 text-muted-foreground", kpi.critical && "text-destructive")} />
+            </CardHeader>
+            <CardContent>
+              <div className={cn("text-2xl font-bold", kpi.critical && "text-destructive")}>{kpi.value}</div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Department Budgets */}
       <Card>
-        <CardHeader className="p-4 sm:p-6">
-          <CardTitle className="text-lg sm:text-xl">Department Budgets</CardTitle>
-          <CardDescription>Budget allocation and spending by department</CardDescription>
+        <CardHeader>
+          <CardTitle>Financial Breakdown</CardTitle>
+          <CardDescription>Comparison of budgeted vs. actual amounts for each category.</CardDescription>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6 pt-0">
-          <div className="space-y-6">
-            {budgets.map((budget) => (
-              <div key={budget.id} className="space-y-3">
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold truncate">{budget.name}</h4>
-                    <p className="text-sm text-muted-foreground truncate">{budget.description}</p>
-                  </div>
-                  <div className="text-left sm:text-right shrink-0">
-                    <p className="font-bold text-sm sm:text-base">{budget.spent} / {budget.budget}</p>
-                    <p className={`text-xs sm:text-sm ${
-                      budget.budgetUsed > 100 ? 'text-red-600' :
-                      budget.budgetUsed > 80 ? 'text-amber-600' :
-                      'text-green-600'
-                    }`}>
-                      {budget.budgetUsed.toFixed(1)}% used
-                    </p>
-                  </div>
-                </div>
-                <Progress 
-                  value={Math.min(budget.budgetUsed, 100)} 
-                  className={budget.budgetUsed > 100 ? "bg-red-100" : ""}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{budget.members} team members</span>
-                  <span>{budget.projects} active projects</span>
-                </div>
-              </div>
-            ))}
-          </div>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Category</TableHead>
+                <TableHead className="text-right">Budgeted</TableHead>
+                <TableHead className="text-right">Actual</TableHead>
+                <TableHead className="text-right">Variance</TableHead>
+                <TableHead>Performance</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {budgetData.map(item => <BudgetRow key={item.category} item={item} />)}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 };
 

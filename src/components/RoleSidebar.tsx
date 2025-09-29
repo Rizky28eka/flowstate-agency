@@ -59,8 +59,7 @@ import {
   HelpCircle,
   Sun,
   Moon,
-  Star,
-  KeyRound,
+  Star, KeyRound, UserCog, HeartPulse, Bot, Gavel
 } from "lucide-react";
 import {
   Sidebar,
@@ -137,12 +136,8 @@ const roleConfigs: Record<UserRole, RoleConfig> = {
     icon: Crown,
     color: "from-purple-600 to-purple-800",
     items: [
-      {
-        id: "dashboard",
-        label: "Dashboard",
-        icon: LayoutDashboard,
-        href: "/dashboard/owner",
-      },
+{ id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/owner" },
+      { id: "agency-health", label: "Agency Health", icon: HeartPulse, href: "/dashboard/owner/agency-health" },
       {
         id: "strategy",
         label: "Strategy & Growth",
@@ -335,14 +330,8 @@ const roleConfigs: Record<UserRole, RoleConfig> = {
         icon: Users,
         href: "/dashboard/admin/roles",
       },
-      {
-        id: "security",
-        label: "Security Center",
-        icon: Lock,
-        href: "/dashboard/admin/security",
-        badge: 2,
-        badgeVariant: "destructive",
-      },
+{ id: "security", label: "Security Center", icon: Lock, href: "/dashboard/admin/security", badge: 2, badgeVariant: "destructive" },
+      { id: "compliance", label: "Compliance", icon: Gavel, href: "/dashboard/admin/compliance" },
       {
         id: "organization",
         label: "Organization Settings",
@@ -373,12 +362,8 @@ const roleConfigs: Record<UserRole, RoleConfig> = {
         icon: Plug,
         href: "/dashboard/admin/integrations",
       },
-      {
-        id: "api",
-        label: "API Management",
-        icon: KeyRound,
-        href: "/dashboard/admin/api-keys",
-      },
+{ id: "api", label: "API Management", icon: KeyRound, href: "/dashboard/admin/api-keys" },
+      { id: "automations", label: "Automations", icon: Bot, href: "/dashboard/admin/automations" }
     ],
   },
   PROJECT_MANAGER: {

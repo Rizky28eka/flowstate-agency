@@ -1,7 +1,11 @@
 import { Shield } from "lucide-react";
 import { RoleSidebar } from "@/components/RoleSidebar";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 const DashboardAdmin = () => {
   const location = useLocation();
@@ -15,30 +19,40 @@ const DashboardAdmin = () => {
 
   return (
     <SidebarProvider>
-      <RoleSidebar 
-        role="ADMIN" 
+      <RoleSidebar
+        role="ADMIN"
         currentPath={location.pathname}
         onNavigate={navigate}
         onSignOut={handleSignOut}
       />
       <SidebarInset>
+        {/* Header */}
         <header className="border-b bg-card sticky top-0 z-20">
-          <div className="px-4 sm:px-6 py-3 sm:py-4">
-            <div className="flex items-center justify-between gap-4">
+          <div className="px-3 sm:px-6 py-2 sm:py-4">
+            <div className="flex items-center justify-between gap-3 sm:gap-4">
+              {/* Sidebar Trigger hanya di mobile */}
               <div className="md:hidden">
                 <SidebarTrigger />
               </div>
-              <div className="flex items-center space-x-3 flex-1 min-w-0">
-                <Shield className="w-8 h-8 text-primary shrink-0" />
+
+              {/* Title & Subtitle */}
+              <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-primary shrink-0" />
                 <div className="min-w-0">
-                  <h1 className="text-2xl font-bold text-foreground truncate">Admin Dashboard</h1>
-                  <p className="text-sm text-muted-foreground">System administration & security</p>
+                  <h1 className="text-lg sm:text-2xl font-bold text-foreground truncate">
+                    Admin Dashboard
+                  </h1>
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                    System administration & security
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </header>
-        <main className="p-4 sm:p-6">
+
+        {/* Main Content */}
+        <main className="p-3 sm:p-6">
           <Outlet />
         </main>
       </SidebarInset>

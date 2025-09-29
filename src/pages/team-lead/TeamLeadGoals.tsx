@@ -1,154 +1,124 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Target, Plus, TrendingUp, Users, Award } from "lucide-react";
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getTeamGoals } from '@/lib/goals';
+import { goals as allGoals } from '@/lib/mock-data';
+import { Button } from '@/components/ui/button';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { PlusCircle, Target, CheckCircle, AlertTriangle } from 'lucide-react';
 
-const TeamLeadGoals = () => {
-  const teamGoals = [
-    {
-      id: 1,
-      title: "Increase Team Productivity by 15%",
-      description: "Improve overall team efficiency and output quality",
-      progress: 78,
-      target: 100,
-      deadline: "2024-12-31",
-      owner: "Team Lead",
-      status: "On Track"
-    },
-    {
-      id: 2,
-      title: "Reduce Project Delivery Time",
-      description: "Streamline workflows to deliver projects 20% faster",
-      progress: 45,
-      target: 100,
-      deadline: "2025-01-15",
-      owner: "Team Lead",
-      status: "In Progress"
-    },
-    {
-      id: 3,
-      title: "Improve Code Quality Score",
-      description: "Achieve 95% code quality score across all projects",
-      progress: 82,
-      target: 100,
-      deadline: "2024-12-20",
-      owner: "Development Team",
-      status: "On Track"
-    }
-  ];
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "On Track": return "text-green-600";
-      case "In Progress": return "text-blue-600";
-      case "At Risk": return "text-amber-600";
-      case "Delayed": return "text-red-600";
-      default: return "text-gray-600";
-    }
+const GoalRow = ({ goal }: { goal: (typeof allGoals)[0] }) => {
+  const navigate = useNavigate();
+  
+  const statusVariant: Record<string, 'default' | 'secondary' | 'destructive'> = {
+    'On Track': 'default',
+    'At Risk': 'destructive',
+    'Completed': 'secondary',
   };
 
   return (
-    <>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Team Goals</h2>
+    <TableRow 
+      className="cursor-pointer"
+      onClick={() => navigate(`/dashboard/team-lead/goals/${goal.id}`)}
+    >
+      <TableCell className="font-medium">{goal.title}</TableCell>
+      <TableCell className="hidden sm:table-cell">{goal.owner}</TableCell>
+      <TableCell>
+        <div className="flex items-center gap-2">
+          <Progress value={goal.progress} className="h-2 w-24" />
+          <span className="text-muted-foreground text-xs">{goal.progress.toFixed(0)}%</span>
+        </div>
+      </TableCell>
+      <TableCell className="hidden md:table-cell text-right">{goal.endDate}</TableCell>
+      <TableCell className="text-right">
+        <Badge variant={statusVariant[goal.status] || 'outline'}>{goal.status}</Badge>
+      </TableCell>
+    </TableRow>
+  );
+};
+
+const TeamLeadGoals = () => {
+  // Assume the logged-in Team Lead is 'Sarah Wilson' for this demo
+  const currentTeamLeadName = 'Sarah Wilson';
+  const teamGoals = useMemo(() => getTeamGoals(currentTeamLeadName), [currentTeamLeadName]);
+
+  const stats = useMemo(() => {
+    const onTrack = teamGoals.filter(g => g.status === 'On Track').length;
+    const atRisk = teamGoals.filter(g => g.status === 'At Risk').length;
+    return { total: teamGoals.length, onTrack, atRisk };
+  }, [teamGoals]);
+
+  const kpiData = [
+    { title: 'Total Goals', value: stats.total, icon: Target },
+    { title: 'On Track', value: stats.onTrack, icon: CheckCircle },
+    { title: 'At Risk', value: stats.atRisk, icon: AlertTriangle, critical: stats.atRisk > 0 },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Team Goals</h1>
+          <p className="text-muted-foreground">Set and track objectives for your team members.</p>
+        </div>
         <Button>
-          <Plus className="w-4 h-4 mr-2" />
+          <PlusCircle className="h-4 w-4 mr-2" />
           Set New Goal
         </Button>
       </div>
 
-      {/* Goal Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Goals</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{teamGoals.length}</div>
-            <p className="text-xs text-muted-foreground">This quarter</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">On Track</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {teamGoals.filter(g => g.status === "On Track").length}
-            </div>
-            <p className="text-xs text-muted-foreground">Goals progressing well</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Progress</CardTitle>
-            <Award className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {Math.round(teamGoals.reduce((sum, g) => sum + g.progress, 0) / teamGoals.length)}%
-            </div>
-            <p className="text-xs text-muted-foreground">Across all goals</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Team Engagement</CardTitle>
-            <Users className="h-4 w-4 text-purple-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">94%</div>
-            <p className="text-xs text-muted-foreground">Goal participation</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Goals List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {teamGoals.map((goal) => (
-          <Card key={goal.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <CardTitle className="text-lg">{goal.title}</CardTitle>
-                <span className={`text-sm font-semibold ${getStatusColor(goal.status)}`}>
-                  {goal.status}
-                </span>
-              </div>
-              <CardDescription>{goal.description}</CardDescription>
+      <div className="grid gap-6 md:grid-cols-3">
+        {kpiData.map(kpi => (
+          <Card key={kpi.title}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+              <kpi.icon className={`h-4 w-4 ${kpi.critical ? 'text-destructive' : 'text-muted-foreground'}`} />
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Progress</span>
-                  <span className="font-medium">{goal.progress}%</span>
-                </div>
-                <Progress value={goal.progress} />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Owner</p>
-                  <p className="font-medium">{goal.owner}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Deadline</p>
-                  <p className="font-medium">{new Date(goal.deadline).toLocaleDateString()}</p>
-                </div>
-              </div>
-
-              <Button variant="outline" className="w-full">
-                View Details
-              </Button>
+            <CardContent>
+              <div className={`text-2xl font-bold ${kpi.critical ? 'text-destructive' : ''}`}>{kpi.value}</div>
             </CardContent>
           </Card>
         ))}
       </div>
-    </>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>All Team Goals</CardTitle>
+          <CardDescription>A list of all goals assigned to your team members.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Goal</TableHead>
+                <TableHead className="hidden sm:table-cell">Owner</TableHead>
+                <TableHead>Progress</TableHead>
+                <TableHead className="hidden md:table-cell text-right">Target Date</TableHead>
+                <TableHead className="text-right">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {teamGoals.map(goal => <GoalRow key={goal.id} goal={goal} />)}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

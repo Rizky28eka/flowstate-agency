@@ -1275,46 +1275,67 @@ export const auditLogs = [
     ip: "192.168.1.10",
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
     status: "Success",
+    payload: null,
   },
   {
     id: "LOG-002",
     timestamp: "2024-11-28T14:30:00Z",
-    user: "system",
-    action: "Project Deadline Approaching",
-    resource: "Project PRJ-003",
-    ip: "127.0.0.1",
-    userAgent: "System Process",
+    user: "mike.johnson@agencyflow.com",
+    action: "Update Project Status",
+    resource: "Project PRJ-001",
+    ip: "10.0.0.54",
+    userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
     status: "Success",
+    payload: {
+      before: { status: "In Progress" },
+      after: { status: "In Review" },
+    }
   },
   {
     id: "LOG-003",
     timestamp: "2024-11-28T13:05:00Z",
-    user: "mike.johnson@agencyflow.com",
-    action: "File Upload",
-    resource: "PRJ-005/assets/new_mockup.png",
-    ip: "10.0.0.54",
-    userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
+    user: "system",
+    action: "Invoice Generated",
+    resource: "Invoice INV-003",
+    ip: "127.0.0.1",
+    userAgent: "System Process",
     status: "Success",
+    payload: null,
   },
   {
     id: "LOG-004",
     timestamp: "2024-11-28T11:15:00Z",
     user: "unknown",
-    action: "Failed Login",
+    action: "Failed Login Attempt",
     resource: "Authentication",
     ip: "203.0.113.45",
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
     status: "Failed",
+    payload: { reason: "Invalid credentials" },
   },
-    {
+  {
     id: "LOG-005",
+    timestamp: "2024-11-27T18:00:00Z",
+    user: "emma.davis@agencyflow.com",
+    action: "Delete Task",
+    resource: "Task TSK-007",
+    ip: "192.168.1.15",
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36",
+    status: "Success",
+    payload: {
+      deleted: { id: "TSK-007", title: "Draft Q1 Marketing Report" }
+    }
+  },
+  {
+    id: "LOG-006",
     timestamp: "2024-11-25T10:15:00Z",
     user: "system",
-    action: "Invoice Payment Received",
+    action: "Payment Received",
     resource: "Invoice INV-001",
     ip: "127.0.0.1",
     userAgent: "System Process",
     status: "Success",
+    payload: { amount: 15750, method: "Stripe" },
   },
 ];
 
@@ -1535,6 +1556,7 @@ export const salesLeads = [
     status: "Proposal",
     probability: 70,
     lastContactDate: "2024-11-25",
+    expectedCloseDate: "2025-01-15",
   },
   {
     id: "LEAD-002",
@@ -1544,6 +1566,7 @@ export const salesLeads = [
     status: "Qualified",
     probability: 50,
     lastContactDate: "2024-11-28",
+    expectedCloseDate: "2025-02-20",
   },
   {
     id: "LEAD-003",
@@ -1553,6 +1576,7 @@ export const salesLeads = [
     status: "Prospect",
     probability: 25,
     lastContactDate: "2024-11-15",
+    expectedCloseDate: "2025-03-10",
   },
   {
     id: "LEAD-004",
@@ -1562,6 +1586,7 @@ export const salesLeads = [
     status: "Negotiation",
     probability: 85,
     lastContactDate: "2024-11-29",
+    expectedCloseDate: "2025-01-25",
   },
   {
     id: "LEAD-005",
@@ -1571,6 +1596,7 @@ export const salesLeads = [
     status: "Qualified",
     probability: 45,
     lastContactDate: "2024-11-22",
+    expectedCloseDate: "2025-04-05",
   },
   {
     id: "LEAD-006",
@@ -1580,6 +1606,7 @@ export const salesLeads = [
     status: "Prospect",
     probability: 20,
     lastContactDate: "2024-11-10",
+    expectedCloseDate: "2025-05-20",
   },
   {
     id: "LEAD-007",
@@ -1589,6 +1616,7 @@ export const salesLeads = [
     status: "Proposal",
     probability: 65,
     lastContactDate: "2024-11-26",
+    expectedCloseDate: "2025-02-28",
   },
 ];
 

@@ -1,127 +1,110 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ChartBar as BarChart3, Download, FileText, TrendingUp, Calendar } from "lucide-react";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MOCK_REPORTS, Report } from '@/lib/reports';
+import { Button } from '@/components/ui/button';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { MoreHorizontal, PlusCircle } from 'lucide-react';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
-const ProjectManagerReports = () => {
-  const reports = [
-    {
-      id: 1,
-      title: "Project Performance Report",
-      description: "Detailed analysis of project timelines, budgets, and deliverables",
-      lastGenerated: "2024-12-01",
-      type: "Performance"
-    },
-    {
-      id: 2,
-      title: "Team Productivity Report",
-      description: "Team utilization, task completion rates, and efficiency metrics",
-      lastGenerated: "2024-11-28",
-      type: "Productivity"
-    },
-    {
-      id: 3,
-      title: "Client Satisfaction Report",
-      description: "Client feedback, approval rates, and relationship health",
-      lastGenerated: "2024-11-25",
-      type: "Client"
-    },
-    {
-      id: 4,
-      title: "Budget Variance Report",
-      description: "Budget vs actual spending analysis across all projects",
-      lastGenerated: "2024-11-30",
-      type: "Financial"
-    }
-  ];
+const ReportRow = ({ report }: { report: Report }) => {
+  const navigate = useNavigate();
 
   return (
-    <>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Project Reports</h2>
-        <Button>
-          <FileText className="w-4 h-4 mr-2" />
-          Generate Custom Report
+    <TableRow>
+      <TableCell>
+        <div className="font-medium">{report.name}</div>
+        <div className="text-xs text-muted-foreground hidden sm:table-cell">{report.description}</div>
+      </TableCell>
+      <TableCell className="hidden md:table-cell">
+        <Badge variant="outline">{report.dataSource}</Badge>
+      </TableCell>
+      <TableCell className="hidden sm:table-cell">{report.columns.length}</TableCell>
+      <TableCell className="hidden sm:table-cell">{report.filters.length}</TableCell>
+      <TableCell className="text-right">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button aria-haspopup="true" size="icon" variant="ghost">
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => navigate(`/dashboard/project-manager/reports/${report.id}/view`)}>
+              View Report
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate(`/dashboard/project-manager/reports/${report.id}/edit`)}>
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TableCell>
+    </TableRow>
+  );
+};
+
+const ProjectManagerReports = () => {
+  const [reports, setReports] = useState<Report[]>(MOCK_REPORTS);
+  const navigate = useNavigate();
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Custom Reports</h1>
+          <p className="text-muted-foreground">Create, view, and manage your custom reports.</p>
+        </div>
+        <Button onClick={() => navigate('/dashboard/project-manager/reports/new')}>
+          <PlusCircle className="h-4 w-4 mr-2" />
+          Create New Report
         </Button>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">On-Time Delivery</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">94%</div>
-            <p className="text-xs text-muted-foreground">This quarter</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Budget Adherence</CardTitle>
-            <BarChart3 className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">88%</div>
-            <p className="text-xs text-muted-foreground">Within budget</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Client Approval</CardTitle>
-            <Calendar className="h-4 w-4 text-purple-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">96%</div>
-            <p className="text-xs text-muted-foreground">First-time approval</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Team Efficiency</CardTitle>
-            <TrendingUp className="h-4 w-4 text-teal-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-teal-600">92%</div>
-            <p className="text-xs text-muted-foreground">Productivity score</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Available Reports */}
       <Card>
         <CardHeader>
-          <CardTitle>Available Reports</CardTitle>
-          <CardDescription>Generate and download project management reports</CardDescription>
+          <CardTitle>Saved Reports</CardTitle>
+          <CardDescription>A list of all your saved report templates.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {reports.map((report) => (
-              <div key={report.id} className="border rounded-lg p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h4 className="font-semibold">{report.title}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">{report.description}</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-muted-foreground">
-                    Last generated: {new Date(report.lastGenerated).toLocaleDateString()}
-                  </p>
-                  <Button variant="outline" size="sm">
-                    <Download className="w-3 h-3 mr-1" />
-                    Generate
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Report Name</TableHead>
+                <TableHead className="hidden md:table-cell">Data Source</TableHead>
+                <TableHead className="hidden sm:table-cell">Columns</TableHead>
+                <TableHead className="hidden sm:table-cell">Filters</TableHead>
+                <TableHead><span className="sr-only">Actions</span></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {reports.map(report => <ReportRow key={report.id} report={report} />)}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 };
 

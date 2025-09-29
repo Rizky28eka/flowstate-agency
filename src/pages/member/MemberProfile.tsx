@@ -1,183 +1,159 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, CreditCard as Edit, Mail, Phone, MapPin, Calendar, Award, Settings } from "lucide-react";
-import { teamMembers } from "@/lib/mock-data";
+import { useState, useMemo } from 'react';
+import { teamMembers } from '@/lib/mock-data';
+import { AVAILABLE_SKILLS, Skill } from '@/lib/skills';
+import { Button } from '@/components/ui/button';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger 
+} from '@/components/ui/dialog';
+import { 
+  Command, 
+  CommandEmpty, 
+  CommandGroup, 
+  CommandInput, 
+  CommandItem, 
+  CommandList 
+} from '@/components/ui/command';
+import { Mail, Phone, MapPin, PlusCircle, X } from 'lucide-react';
 
-const MemberProfile = () => {
-  const currentUser = teamMembers[0]; // Using first member as example
+const AddSkillDialog = ({ currentSkills, onAddSkill }: { currentSkills: string[], onAddSkill: (skill: string) => void }) => {
+  const [open, setOpen] = useState(false);
+
+  const unselectedSkills = useMemo(() => 
+    AVAILABLE_SKILLS.filter(skill => !currentSkills.includes(skill.name))
+  , [currentSkills]);
+
+  const handleSelect = (skillName: string) => {
+    onAddSkill(skillName);
+    setOpen(false);
+  };
 
   return (
-    <>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">My Profile</h2>
-        <Button>
-          <Edit className="w-4 h-4 mr-2" />
-          Edit Profile
-        </Button>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm"><PlusCircle className="h-4 w-4 mr-2"/>Add Skill</Button>
+      </DialogTrigger>
+      <DialogContent className="p-0">
+        <Command>
+          <CommandInput placeholder="Search for a skill..." />
+          <CommandList>
+            <CommandEmpty>No skills found.</CommandEmpty>
+            {Object.entries(
+              unselectedSkills.reduce((acc, skill) => {
+                if (!acc[skill.category]) acc[skill.category] = [];
+                acc[skill.category].push(skill);
+                return acc;
+              }, {} as Record<string, Skill[]>)
+            ).map(([category, skills]) => (
+              <CommandGroup key={category} heading={category}>
+                {skills.map(skill => (
+                  <CommandItem key={skill.id} onSelect={() => handleSelect(skill.name)}>
+                    {skill.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            ))}
+          </CommandList>
+        </Command>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const MemberProfile = () => {
+  // Assume logged-in member is Sarah Wilson (ID 1) for demo
+  const member = teamMembers.find(m => m.id === 1);
+  const [currentSkills, setCurrentSkills] = useState(member?.skills || []);
+
+  if (!member) {
+    return <div>Member not found.</div>;
+  }
+
+  const addSkill = (skill: string) => {
+    if (!currentSkills.includes(skill)) {
+      setCurrentSkills([...currentSkills, skill]);
+    }
+  };
+
+  const removeSkill = (skillToRemove: string) => {
+    setCurrentSkills(currentSkills.filter(skill => skill !== skillToRemove));
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">My Profile</h1>
+        <p className="text-muted-foreground">View and manage your personal information and skills.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Profile Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex flex-col items-center text-center">
-              <Avatar className="w-24 h-24 mb-4">
-                <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
-                <AvatarFallback className="text-lg">
-                  {currentUser.name.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              </Avatar>
-              <h3 className="text-xl font-bold">{currentUser.name}</h3>
-              <p className="text-muted-foreground">{currentUser.role}</p>
-              <Badge variant="secondary">{currentUser.department}</Badge>
-            </div>
-
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center space-x-2">
-                <Mail className="w-4 h-4 text-muted-foreground" />
-                <span>{currentUser.email}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="w-4 h-4 text-muted-foreground" />
-                <span>{currentUser.phone}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <MapPin className="w-4 h-4 text-muted-foreground" />
-                <span>{currentUser.location}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
-                <span>Joined {new Date(currentUser.joinDate).toLocaleDateString()}</span>
-              </div>
-            </div>
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Left Column: Profile Info */}
+        <Card className="lg:col-span-1">
+          <CardContent className="pt-6 flex flex-col items-center text-center">
+            <Avatar className="h-24 w-24 mb-4">
+              <AvatarImage src={member.avatar} alt={member.name} />
+              <AvatarFallback className="text-3xl">{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+            </Avatar>
+            <h2 className="text-xl font-semibold">{member.name}</h2>
+            <p className="text-muted-foreground">{member.role}</p>
+            <p className="text-sm text-muted-foreground">{member.department}</p>
+          </CardContent>
+          <CardContent className="text-sm space-y-3 border-t pt-4">
+            <div className="flex items-center"><Mail className="h-4 w-4 mr-3 text-muted-foreground"/><span>{member.email}</span></div>
+            <div className="flex items-center"><Phone className="h-4 w-4 mr-3 text-muted-foreground"/><span>{member.phone}</span></div>
+            <div className="flex items-center"><MapPin className="h-4 w-4 mr-3 text-muted-foreground"/><span>{member.location}</span></div>
           </CardContent>
         </Card>
 
-        {/* Profile Details */}
-        <Card className="lg:col-span-2">
-          <CardContent className="p-0">
-            <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="details">Details</TabsTrigger>
-                <TabsTrigger value="performance">Performance</TabsTrigger>
-                <TabsTrigger value="skills">Skills</TabsTrigger>
-                <TabsTrigger value="settings">Settings</TabsTrigger>
-              </TabsList>
+        {/* Right Column: Skills & Other Info */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>My Skills</CardTitle>
+                <CardDescription>Keep your skills up to date for better project matching.</CardDescription>
+              </div>
+              <AddSkillDialog currentSkills={currentSkills} onAddSkill={addSkill} />
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {currentSkills.map(skill => (
+                  <Badge key={skill} variant="secondary" className="text-base py-1 pl-3 pr-2">
+                    {skill}
+                    <button onClick={() => removeSkill(skill)} className="ml-2 rounded-full hover:bg-muted-foreground/20 p-0.5">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+                {currentSkills.length === 0 && <p className="text-sm text-muted-foreground">No skills added yet.</p>}
+              </div>
+            </CardContent>
+          </Card>
 
-              <TabsContent value="details" className="p-6 space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" defaultValue={currentUser.name.split(' ')[0]} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" defaultValue={currentUser.name.split(' ')[1]} />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" defaultValue={currentUser.email} />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input id="phone" defaultValue={currentUser.phone} />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
-                  <Input id="location" defaultValue={currentUser.location} />
-                </div>
-
-                <Button>Save Changes</Button>
-              </TabsContent>
-
-              <TabsContent value="performance" className="p-6 space-y-6">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="text-center p-4 border rounded-lg">
-                      <div className="text-3xl font-bold text-green-600">{currentUser.rating}</div>
-                      <p className="text-sm text-muted-foreground">Performance Rating</p>
-                    </div>
-                    <div className="text-center p-4 border rounded-lg">
-                      <div className="text-3xl font-bold text-blue-600">{currentUser.utilization}%</div>
-                      <p className="text-sm text-muted-foreground">Utilization Rate</p>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="text-center p-4 border rounded-lg">
-                      <div className="text-3xl font-bold text-purple-600">{currentUser.projects}</div>
-                      <p className="text-sm text-muted-foreground">Active Projects</p>
-                    </div>
-                    <div className="text-center p-4 border rounded-lg">
-                      <div className="text-3xl font-bold text-amber-600">98%</div>
-                      <p className="text-sm text-muted-foreground">Task Completion</p>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="skills" className="p-6 space-y-6">
-                <div>
-                  <h3 className="font-semibold mb-3">Technical Skills</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {currentUser.skills.map((skill, index) => (
-                      <Badge key={index} variant="outline">{skill}</Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold mb-3">Certifications</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <span>Adobe Certified Expert</span>
-                      <Badge>Certified</Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <span>Project Management Professional</span>
-                      <Badge variant="outline">In Progress</Badge>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="settings" className="p-6 space-y-6">
-                <div className="space-y-4">
-                  <h3 className="font-semibold">Notification Preferences</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span>Email notifications</span>
-                      <input type="checkbox" defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Task reminders</span>
-                      <input type="checkbox" defaultChecked />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Project updates</span>
-                      <input type="checkbox" defaultChecked />
-                    </div>
-                  </div>
-                </div>
-
-                <Button>Save Preferences</Button>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader><CardTitle>Performance Snapshot</CardTitle></CardHeader>
+            <CardContent className="text-sm space-y-2">
+              <div className="flex justify-between"><span>Average Utilization:</span><span className="font-medium">{member.utilization}%</span></div>
+              <div className="flex justify-between"><span>Completed Projects:</span><span className="font-medium">{member.projects}</span></div>
+              <div className="flex justify-between"><span>Average Rating:</span><span className="font-medium">{member.rating}/5.0</span></div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

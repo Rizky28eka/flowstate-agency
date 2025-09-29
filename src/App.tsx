@@ -33,6 +33,11 @@ import OwnerGoalDetail from "./pages/owner/OwnerGoalDetail";
 import OwnerForecasting from "./pages/owner/OwnerForecasting";
 import OwnerSalesPipeline from "./pages/owner/OwnerSalesPipeline";
 import OwnerStrategicRoadmap from "./pages/owner/OwnerStrategicRoadmap";
+import OwnerMemberWorkloadDetail from "./pages/owner/OwnerMemberWorkloadDetail";
+import OwnerProjectFinancialsDetail from "./pages/owner/OwnerProjectFinancialsDetail";
+import OwnerDealDetail from "./pages/owner/OwnerDealDetail";
+import OwnerContractDetail from "./pages/owner/OwnerContractDetail";
+import OwnerAgencyHealth from "./pages/owner/OwnerAgencyHealth";
 import OwnerProfitability from "./pages/owner/OwnerProfitability";
 import OwnerResourceAllocation from "./pages/owner/OwnerResourceAllocation";
 import OwnerKpiDashboard from "./pages/owner/OwnerKpiDashboard";
@@ -55,6 +60,10 @@ import AdminIntegrationDetail from "./pages/admin/AdminIntegrationDetail";
 import AdminApiKeys from "./pages/admin/AdminApiKeys";
 import AdminOrganizationSettings from "./pages/admin/AdminOrganizationSettings";
 import AdminSaaSAnalytics from "./pages/admin/AdminSaaSAnalytics";
+import AdminSecurityIncidentDetail from "./pages/admin/AdminSecurityIncidentDetail";
+import AdminAutomations from "./pages/admin/AdminAutomations";
+import AdminAutomationBuilder from "./pages/admin/AdminAutomationBuilder";
+import AdminComplianceCenter from "./pages/admin/AdminComplianceCenter";
 
 import ProjectManagerDashboard from "./pages/project-manager/ProjectManagerDashboard";
 import ProjectManagerProjects from "./pages/project-manager/ProjectManagerProjects";
@@ -65,6 +74,8 @@ import ProjectManagerResources from "./pages/project-manager/ProjectManagerResou
 import ProjectManagerReports from "./pages/project-manager/ProjectManagerReports";
 import ProjectManagerClients from "./pages/project-manager/ProjectManagerClients";
 import ProjectManagerTemplates from "./pages/project-manager/ProjectManagerTemplates";
+import ProjectManagerReportBuilder from "./pages/project-manager/ProjectManagerReportBuilder";
+import ProjectManagerReportViewer from "./pages/project-manager/ProjectManagerReportViewer";
 
 import TeamLeadDashboard from "./pages/team-lead/TeamLeadDashboard";
 import TeamLeadTeam from "./pages/team-lead/TeamLeadTeam";
@@ -74,6 +85,7 @@ import TeamLeadMeetings from "./pages/team-lead/TeamLeadMeetings";
 import TeamLeadCommunication from "./pages/team-lead/TeamLeadCommunication";
 import TeamLeadResources from "./pages/team-lead/TeamLeadResources";
 import TeamLeadReports from "./pages/team-lead/TeamLeadReports";
+import TeamLeadGoalDetail from "./pages/team-lead/TeamLeadGoalDetail";
 
 import MemberDashboard from "./pages/member/MemberDashboard";
 import MemberTasks from "./pages/member/MemberTasks";
@@ -103,6 +115,7 @@ import ClientInvoices from "./pages/client/ClientInvoices";
 import ClientCalendar from "./pages/client/ClientCalendar";
 import ClientFeedback from "./pages/client/ClientFeedback";
 import ClientSupport from "./pages/client/ClientSupport";
+import ClientInvoiceDetail from "./pages/client/ClientInvoiceDetail";
 
 const queryClient = new QueryClient();
 
@@ -126,13 +139,16 @@ const App = () => (
             <Route path="teams" element={<OwnerTeams />} />
             <Route path="teams/:teamId" element={<OwnerTeamDetail />} />
             <Route path="resource-allocation" element={<OwnerResourceAllocation />} />
+            <Route path="resource-allocation/:memberId" element={<OwnerMemberWorkloadDetail />} />
             <Route path="risks" element={<OwnerRisks />} />
             <Route path="risks/:riskId" element={<OwnerRiskDetail />} />
             <Route path="integrations" element={<OwnerIntegrations />} />
             <Route path="contract-management" element={<OwnerContractManagement />} />
+            <Route path="contract-management/:contractId" element={<OwnerContractDetail />} />
             <Route path="communication" element={<OwnerCommunication />} />
             <Route path="finances" element={<OwnerFinances />} />
             <Route path="profitability" element={<OwnerProfitability />} />
+            <Route path="profitability/:projectId" element={<OwnerProjectFinancialsDetail />} />
             <Route path="clients" element={<OwnerClients />} />
             <Route path="clients/:clientId" element={<OwnerClientDetail />} />
             <Route path="reports" element={<OwnerReports />} />
@@ -142,8 +158,10 @@ const App = () => (
             <Route path="goals/:id" element={<OwnerGoalDetail />} />
             <Route path="forecasting" element={<OwnerForecasting />} />
             <Route path="sales-pipeline" element={<OwnerSalesPipeline />} />
+            <Route path="sales-pipeline/:dealId" element={<OwnerDealDetail />} />
             <Route path="strategic-roadmap" element={<OwnerStrategicRoadmap />} />
             <Route path="alerts" element={<OwnerAlerts />} />
+            <Route path="agency-health" element={<OwnerAgencyHealth />} />
           </Route>
 
           {/* Admin dashboard (with nested routes) */}
@@ -151,6 +169,10 @@ const App = () => (
             <Route index element={<Navigate to="users" replace />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="security" element={<AdminSecurity />} />
+            <Route path="security/:incidentId" element={<AdminSecurityIncidentDetail />} />
+            <Route path="automations" element={<AdminAutomations />} />
+            <Route path="automations/:ruleId" element={<AdminAutomationBuilder />} />
+            <Route path="compliance" element={<AdminComplianceCenter />} />
             <Route path="system" element={<AdminSystemHealth />} />
             <Route path="audit" element={<AdminAuditLogs />} />
             <Route path="backup" element={<AdminBackup />} />
@@ -172,6 +194,9 @@ const App = () => (
             <Route path="team" element={<ProjectManagerTeam />} />
             <Route path="resources" element={<ProjectManagerResources />} />
             <Route path="reports" element={<ProjectManagerReports />} />
+            <Route path="reports/new" element={<ProjectManagerReportBuilder />} />
+            <Route path="reports/:reportId/edit" element={<ProjectManagerReportBuilder />} />
+            <Route path="reports/:reportId/view" element={<ProjectManagerReportViewer />} />
             <Route path="clients" element={<ProjectManagerClients />} />
             <Route path="templates" element={<ProjectManagerTemplates />} />
           </Route>
@@ -179,6 +204,7 @@ const App = () => (
             <Route index element={<TeamLeadDashboard />} />
             <Route path="team" element={<TeamLeadTeam />} />
             <Route path="goals" element={<TeamLeadGoals />} />
+            <Route path="goals/:goalId" element={<TeamLeadGoalDetail />} />
             <Route path="performance" element={<TeamLeadPerformance />} />
             <Route path="meetings" element={<TeamLeadMeetings />} />
             <Route path="communication" element={<TeamLeadCommunication />} />
@@ -213,6 +239,7 @@ const App = () => (
             <Route path="messages" element={<ClientMessages />} />
             <Route path="files" element={<ClientFiles />} />
             <Route path="invoices" element={<ClientInvoices />} />
+            <Route path="invoices/:invoiceId" element={<ClientInvoiceDetail />} />
             <Route path="calendar" element={<ClientCalendar />} />
             <Route path="feedback" element={<ClientFeedback />} />
             <Route path="support" element={<ClientSupport />} />

@@ -10,15 +10,52 @@ import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background">
+      {/* Sticky Navbar biar selalu kelihatan */}
       <Navbar />
-      <Hero />
-      <SocialProof />
-      <Features />
-      <Testimonials />
-      <HowItWorks />
-      <FAQ />
-      <FinalCTA />
+
+      {/* Hero biasanya full width */}
+      <section className="px-4 sm:px-6 lg:px-8">
+        <Hero />
+      </section>
+
+      {/* Section dengan container biar konten lebih rapih */}
+      <section className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
+        <div className="container mx-auto">
+          <SocialProof />
+        </div>
+      </section>
+
+      <section className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
+        <div className="container mx-auto">
+          <Features />
+        </div>
+      </section>
+
+      <section className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
+        <div className="container mx-auto">
+          <Testimonials />
+        </div>
+      </section>
+
+      <section className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
+        <div className="container mx-auto">
+          <HowItWorks />
+        </div>
+      </section>
+
+      <section className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
+        <div className="container mx-auto">
+          <FAQ />
+        </div>
+      </section>
+
+      {/* Final CTA biasanya full width */}
+      <section className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24">
+        <FinalCTA />
+      </section>
+
+      {/* Footer */}
       <Footer />
     </div>
   );

@@ -1,187 +1,164 @@
-import React, { useState, useMemo } from 'react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { contracts } from '@/lib/mock-data';
+import { Button } from '@/components/ui/button';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
 } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+import { Input } from '@/components/ui/input';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { contracts as initialContracts, clients } from '@/lib/mock-data';
-import { FileText, Download, CircleAlert, CheckCircle, Archive, Plus } from 'lucide-react';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { DollarSign, FileText, FileClock, Search, PlusCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-const statusConfig = {
-  Active: { icon: CheckCircle, color: "bg-green-100 text-green-800" },
-  "Expiring Soon": { icon: CircleAlert, color: "bg-yellow-100 text-yellow-800" },
-  Expired: { icon: Archive, color: "bg-gray-100 text-gray-800" },
+// Helper to format currency
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
 };
 
-const AddContractForm = ({ onAddContract }) => {
-  const [title, setTitle] = useState('');
-  const [clientId, setClientId] = useState('');
-  const [value, setValue] = useState(0);
-  const [endDate, setEndDate] = useState('');
-
-  const handleSubmit = () => {
-    if (!title || !clientId || !endDate) return;
-    const client = clients.find(c => c.id === clientId);
-    const newContract = {
-      id: `CTR-${Math.random().toString(36).substr(2, 5).toUpperCase()}`,
-      title,
-      clientName: client?.name || 'N/A',
-      clientId,
-      status: 'Active',
-      startDate: new Date().toISOString().split('T')[0],
-      endDate,
-      renewalDate: new Date(new Date(endDate).setDate(new Date(endDate).getDate() - 30)).toISOString().split('T')[0],
-      value,
-      documentUrl: "/mock-document.pdf",
-    };
-    onAddContract(newContract);
+const ContractRow = ({ contract }: { contract: (typeof contracts)[0] }) => {
+  const navigate = useNavigate();
+  
+  const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+    'Active': 'default',
+    'Expiring Soon': 'secondary',
+    'Expired': 'destructive',
+    'Draft': 'outline',
   };
 
   return (
-    <div className="grid gap-4 py-4">
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="title" className="text-right">Contract Title</Label>
-        <Input id="title" value={title} onChange={e => setTitle(e.target.value)} className="col-span-3" placeholder="e.g., Master Service Agreement" />
-      </div>
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="client" className="text-right">Client</Label>
-        <Select onValueChange={setClientId} defaultValue={clientId}>
-          <SelectTrigger className="col-span-3"><SelectValue placeholder="Select a client" /></SelectTrigger>
-          <SelectContent>
-            {clients.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="value" className="text-right">Value ($)</Label>
-        <Input id="value" type="number" value={value} onChange={e => setValue(parseFloat(e.target.value))} className="col-span-3" />
-      </div>
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="end-date" className="text-right">End Date</Label>
-        <Input id="end-date" type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="col-span-3" />
-      </div>
-      <DialogFooter>
-        <DialogClose asChild>
-          <Button onClick={handleSubmit}>Add Contract</Button>
-        </DialogClose>
-      </DialogFooter>
-    </div>
+    <TableRow 
+      className="cursor-pointer"
+      onClick={() => navigate(`/dashboard/owner/contract-management/${contract.id}`)}
+    >
+      <TableCell>
+        <div className="font-medium">{contract.title}</div>
+        <div className="text-xs text-muted-foreground hidden sm:table-cell">{contract.id}</div>
+      </TableCell>
+      <TableCell className="hidden md:table-cell">{contract.clientName}</TableCell>
+      <TableCell>
+        <Badge variant={statusVariant[contract.status] || 'outline'}>{contract.status}</Badge>
+      </TableCell>
+      <TableCell className="hidden sm:table-cell text-right font-medium">{formatCurrency(contract.value)}</TableCell>
+      <TableCell className="hidden lg:table-cell text-right">{contract.endDate || 'N/A'}</TableCell>
+    </TableRow>
   );
 };
 
-const StatCard = ({ title, value, icon: Icon }) => (
-  <Card>
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-sm font-medium">{title}</CardTitle>
-      <Icon className="h-4 w-4 text-muted-foreground" />
-    </CardHeader>
-    <CardContent>
-      <div className="text-2xl font-bold">{value}</div>
-    </CardContent>
-  </Card>
-);
-
 const OwnerContractManagement = () => {
-  const [contracts, setContracts] = useState(initialContracts);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
-  const summary = useMemo(() => {
-    const activeContracts = contracts.filter(c => c.status === 'Active').length;
-    const expiringSoon = contracts.filter(c => c.status === 'Expiring Soon').length;
-    const totalValue = contracts.reduce((sum, c) => c.status === 'Active' ? sum + c.value : sum, 0);
-    return { activeContracts, expiringSoon, totalValue };
-  }, [contracts]);
+  const filteredContracts = useMemo(() => {
+    return contracts.filter(c => {
+      const searchMatch = c.title.toLowerCase().includes(searchTerm.toLowerCase()) || c.clientName.toLowerCase().includes(searchTerm.toLowerCase());
+      const statusMatch = statusFilter === 'all' || c.status === statusFilter;
+      return searchMatch && statusMatch;
+    });
+  }, [searchTerm, statusFilter]);
 
-  const handleAddContract = (newContract) => {
-    setContracts(prev => [newContract, ...prev]);
-  };
+  const portfolioStats = useMemo(() => {
+    const activeContracts = contracts.filter(c => c.status === 'Active' || c.status === 'Expiring Soon');
+    const totalValue = activeContracts.reduce((sum, c) => sum + c.value, 0);
+    const expiringSoonCount = contracts.filter(c => c.status === 'Expiring Soon').length;
+    return { totalValue, activeCount: activeContracts.length, expiringSoonCount };
+  }, []);
+
+  const kpiData = [
+    { title: 'Total Active Contract Value', value: formatCurrency(portfolioStats.totalValue), icon: DollarSign },
+    { title: 'Active Contracts', value: portfolioStats.activeCount, icon: FileText },
+    { title: 'Expiring Soon', value: portfolioStats.expiringSoonCount, icon: FileClock },
+  ];
+
+  const contractStatuses = ['Active', 'Expiring Soon', 'Expired', 'Draft'];
 
   return (
-    <div className="p-4 md:p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Contract Management</h1>
-          <p className="text-gray-500">A central repository for all client and vendor contracts.</p>
+          <h1 className="text-2xl font-bold tracking-tight">Contract Management</h1>
+          <p className="text-muted-foreground">Oversee all client and vendor contracts.</p>
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button><Plus className="w-4 h-4 mr-2" /> Add New Contract</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>Add New Contract</DialogTitle></DialogHeader>
-            <AddContractForm onAddContract={handleAddContract} />
-          </DialogContent>
-        </Dialog>
+        <Button>
+          <PlusCircle className="h-4 w-4 mr-2" />
+          Add New Contract
+        </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
-        <StatCard title="Active Contracts" value={summary.activeContracts} icon={FileText} />
-        <StatCard title="Expiring Soon" value={summary.expiringSoon} icon={CircleAlert} />
-        <StatCard 
-          title="Total Active Contract Value"
-          value={new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact' }).format(summary.totalValue)}
-          icon={FileText}
-        />
+      <div className="grid gap-6 md:grid-cols-3">
+        {kpiData.map(kpi => (
+          <Card key={kpi.title}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+              <kpi.icon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{kpi.value}</div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Contract Repository</CardTitle>
-          <CardDescription>List of all legal agreements.</CardDescription>
+        <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <CardTitle>All Contracts</CardTitle>
+            <CardDescription>A list of all contracts. Click a row for details.</CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search title or client..." 
+                className="pl-8 w-full md:w-64"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                {contractStatuses.map(status => (
+                  <SelectItem key={status} value={status}>{status}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Contract Title</TableHead>
-                <TableHead>Client / Vendor</TableHead>
+                <TableHead className="hidden md:table-cell">Client</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>End Date</TableHead>
-                <TableHead>Renewal Date</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="hidden sm:table-cell text-right">Value</TableHead>
+                <TableHead className="hidden lg:table-cell text-right">End Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {contracts.map((contract) => {
-                const config = statusConfig[contract.status] || { icon: FileText, color: "bg-gray-100 text-gray-800" };
-                const Icon = config.icon;
-                return (
-                  <TableRow key={contract.id}>
-                    <TableCell className="font-medium">{contract.title}</TableCell>
-                    <TableCell>{contract.clientName}</TableCell>
-                    <TableCell>
-                      <Badge className={config.color}>
-                        <Icon className="h-3 w-3 mr-1" />
-                        {contract.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{contract.endDate}</TableCell>
-                    <TableCell>{contract.renewalDate || 'N/A'}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={contract.documentUrl} target="_blank" rel="noopener noreferrer">
-                          <Download className="w-4 h-4 mr-2"/> View
-                        </a>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
+              {filteredContracts.map(c => <ContractRow key={c.id} contract={c} />)}
             </TableBody>
           </Table>
         </CardContent>
