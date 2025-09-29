@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,7 +13,7 @@ import { Crown, Shield, User, Users, Code, DollarSign, Handshake, LayoutDashboar
 interface SidebarItem {
   id: string;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.FC<{ className?: string }>;
   href?: string;
   badge?: string;
   children?: SidebarItem[];
@@ -241,7 +241,7 @@ export const RoleSidebar = ({ role, currentPath, onNavigate }: RoleSidebarProps)
   const IconComponent = config.icon;
 
   // Check if mobile
-  React.useEffect(() => {
+  useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
       if (window.innerWidth < 768) {

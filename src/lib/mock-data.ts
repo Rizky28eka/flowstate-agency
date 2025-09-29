@@ -618,7 +618,37 @@ export const tasks = [
     dueDate: "2024-12-05",
     estimatedHours: 24,
     actualHours: 8,
-    tags: ["Development", "Database"]
+    tags: ["Development", "Database"],
+    parentId: null
+  },
+  {
+    id: "TSK-005",
+    title: "Create User Table",
+    description: "Define and create the user table with all necessary fields.",
+    projectId: "PRJ-002",
+    assignedTo: "Alex Thompson",
+    status: "In Progress",
+    priority: "High",
+    dueDate: "2024-11-30",
+    estimatedHours: 8,
+    actualHours: 4,
+    tags: ["Development", "Database"],
+    parentId: "TSK-002"
+  },
+  {
+    id: "TSK-006",
+    title: "Create Products Table",
+    description: "Define and create the products table for the e-commerce platform.",
+    projectId: "PRJ-002",
+    assignedTo: "Alex Thompson",
+    status: "To Do",
+    priority: "High",
+    dueDate: "2024-12-02",
+    estimatedHours: 8,
+    actualHours: 0,
+    tags: ["Development", "Database"],
+    parentId: "TSK-002"
+
   },
   {
     id: "TSK-003",
