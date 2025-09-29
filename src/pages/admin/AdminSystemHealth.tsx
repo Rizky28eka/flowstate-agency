@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Activity, Server, Database, Zap, HardDrive, Wifi, Globe, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, XCircle } from "lucide-react";
+import { Activity, Server, Database, Zap, HardDrive, Wifi, Globe, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle, Circle as XCircle } from "lucide-react";
 
 import { systemMetrics, services } from "@/lib/mock-data";
 

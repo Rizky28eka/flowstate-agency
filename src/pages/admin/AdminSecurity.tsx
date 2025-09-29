@@ -25,7 +25,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { Shield, AlertTriangle, Search, Siren } from 'lucide-react';
+import { Shield, TriangleAlert as AlertTriangle, Search, Siren } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const IncidentRow = ({ incident }: { incident: (typeof MOCK_SECURITY_INCIDENTS)[0] }) => {

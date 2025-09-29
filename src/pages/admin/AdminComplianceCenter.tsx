@@ -1,32 +1,9 @@
-import { useState, useMemo } from 'react';
-import { 
-  MOCK_RETENTION_POLICIES, 
-  MOCK_DATA_SUBJECT_REQUESTS,
-  DataRetentionPolicy,
-  DataSubjectRequest,
-  RequestStatus,
-  REQUEST_STATUSES
-} from '@/lib/compliance';
-import { Button } from '@/components/ui/button';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MoreHorizontal, PlusCircle, ShieldCheck } from 'lucide-react';
+{"codCheck } from 'lucide-react';
+impt
+ /p/ ey a anyag tnM</respelYunast <St<u a,cn  p={ist) dtael
+yw3  =B
+   rosk trpi n<a    l, mNmmw  {Lo=p< xlt/nr   , ea eo{nh>
+ >TaN  n hieldCheck } from 'lucide-react';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 

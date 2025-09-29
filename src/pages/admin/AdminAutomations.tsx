@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { MoreHorizontal, PlusCircle, Bot, PlayCircle } from 'lucide-react';
+import { MoveHorizontal as MoreHorizontal, CirclePlus as PlusCircle, Bot, CirclePlay as PlayCircle } from 'lucide-react';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 

@@ -17,7 +17,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal } from "lucide-react";
+import { MoveHorizontal as MoreHorizontal } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
