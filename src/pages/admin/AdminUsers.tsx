@@ -334,7 +334,7 @@ const AdminUsers = () => {
                   <tbody>
                     {users.map((user) => {
                       const roleData = securityRoles.find(r => r.role === user.role);
-                      const RoleIcon = roleData ? roleIcons[roleData.icon as keyof typeof roleIcons] || User : User;
+                      const RoleIcon = roleData && (roleData as any).icon ? (roleData as any).icon : User;
                       return (
                         <tr key={user.id} className="border-b hover:bg-muted/50">
                           <td className="p-3">

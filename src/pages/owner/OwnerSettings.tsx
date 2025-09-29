@@ -52,7 +52,7 @@ const PermissionsMatrix = () => (
       <CardContent>
         <div className="mb-4 flex flex-wrap gap-2">
           {securityRoles.map(role => (
-            <Badge key={role.id} variant={role.color} className="flex items-center gap-1">
+            <Badge key={role.id} variant="secondary" className="flex items-center gap-1">
               {role.role}
               <span className="text-xs opacity-70">({role.description})</span>
             </Badge>

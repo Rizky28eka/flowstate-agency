@@ -80,23 +80,29 @@ const OwnerProfitability = () => {
           title="Total Profit"
           value={new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalProfit)}
           icon={DollarSign}
+          change="+15.3%"
+          changeType="positive"
         />
         <StatCard 
           title="Average Margin"
           value={`${averageMargin.toFixed(2)}%`}
           icon={Percent}
+          change="+2.4%"
+          changeType="positive"
         />
         <StatCard 
           title="Most Profitable Project"
           value={mostProfitable.name}
           icon={TrendingUp}
           change={new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(mostProfitable.profit)}
+          changeType="positive"
         />
         <StatCard 
           title="Least Profitable Project"
           value={leastProfitable.name}
           icon={TrendingDown}
           change={new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(leastProfitable.profit)}
+          changeType="negative"
         />
       </div>
 

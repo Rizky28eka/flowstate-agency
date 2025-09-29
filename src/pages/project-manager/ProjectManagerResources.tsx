@@ -1,6 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Target, Users, Calendar, TrendingUp, Plus, TriangleAlert as AlertTriangle } from "lucide-react";
 import { teamMembers, projects } from "@/lib/mock-data";
 

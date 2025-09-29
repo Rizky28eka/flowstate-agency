@@ -209,10 +209,10 @@ const AdminSecurity = () => {
                     <div key={index} className="border rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <Badge className={role.color}>{role.role}</Badge>
-                        <span className="text-sm text-muted-foreground">{role.users} users</span>
+                        <span className="text-sm text-muted-foreground">{(role as any).users || 0} users</span>
                       </div>
                       <div className="flex flex-wrap gap-1 mb-3">
-                        {role.permissions.map((permission, pIndex) => (
+                        {((role as any).permissions || []).map((permission, pIndex) => (
                           <Badge key={pIndex} variant="outline" className="text-xs">
                             {permission}
                           </Badge>
@@ -256,10 +256,10 @@ const AdminSecurity = () => {
                             {row.admin ? <span className="text-green-600">✓</span> : <span className="text-red-600">✗</span>}
                           </td>
                           <td className="text-center p-2">
-                            {row.pm ? <span className="text-green-600">✓</span> : <span className="text-red-600">✗</span>}
+                            {(row as any).pm ? <span className="text-green-600">✓</span> : <span className="text-red-600">✗</span>}
                           </td>
                           <td className="text-center p-2">
-                            {row.lead ? <span className="text-green-600">✓</span> : <span className="text-red-600">✗</span>}
+                            {(row as any).lead ? <span className="text-green-600">✓</span> : <span className="text-red-600">✗</span>}
                           </td>
                           <td className="text-center p-2">
                             {row.member ? <span className="text-green-600">✓</span> : <span className="text-red-600">✗</span>}

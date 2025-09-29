@@ -193,7 +193,7 @@ const ClientSupport = () => {
                       {getStatusIcon(ticket.status)}
                       <div>
                         <h4 className="font-semibold">{ticket.title}</h4>
-                        <p className="text-sm text-muted-foreground">{ticket.project}</p>
+                        <p className="text-sm text-muted-foreground">{(ticket as any).project || 'General Support'}</p>
                       </div>
                     </div>
                     <div className="flex flex-col items-end space-y-1">

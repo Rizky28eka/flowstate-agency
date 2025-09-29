@@ -82,6 +82,8 @@ const OwnerKpiDashboard = () => {
           value={new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact' }).format(totalRevenue)}
           icon={DollarSign}
           footer="Year-to-date performance"
+          footerColor="text-muted-foreground"
+          footerIcon={TrendingUp}
         />
         <KpiCard 
           title="Net Profit (YTD)"
@@ -96,6 +98,8 @@ const OwnerKpiDashboard = () => {
           value={`${profitMargin.toFixed(1)}%`}
           icon={Percent}
           footer="Target: 50%"
+          footerColor="text-muted-foreground"
+          footerIcon={Target}
         />
       </div>
 
@@ -115,6 +119,8 @@ const OwnerKpiDashboard = () => {
           value={`${avgClientSatisfaction} / 5.0`}
           icon={Heart}
           footer="Based on Q4 surveys"
+          footerColor="text-muted-foreground"
+          footerIcon={Heart}
         />
       </div>
 
@@ -126,18 +132,24 @@ const OwnerKpiDashboard = () => {
           value={`${projectSuccessRate.toFixed(1)}%`}
           icon={CheckCircle}
           footer={`${completedProjects} of ${totalProjects} projects completed`}
+          footerColor="text-muted-foreground"
+          footerIcon={CheckCircle}
         />
         <KpiCard 
           title="Average Project Progress"
           value={`${avgProjectProgress.toFixed(1)}%`}
           icon={Clock}
           footer="Across all active projects"
+          footerColor="text-muted-foreground"
+          footerIcon={Clock}
         />
         <KpiCard 
           title="Average Team Utilization"
           value={`${avgTeamUtilization}%`}
           icon={Target}
           footer="Target: 85-90%"
+          footerColor="text-muted-foreground"
+          footerIcon={Target}
         />
       </div>
 

@@ -125,7 +125,7 @@ const OwnerClients = () => {
   }>({ key: "totalBilled", direction: "desc" });
 
   const handleAddClient = (newClient: Client) => {
-    setClients((prev) => [newClient, ...prev]);
+    setClients((prev: any) => [newClient, ...prev]);
   };
 
   const getStatusBadge = (status: string) => {

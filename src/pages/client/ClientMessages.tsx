@@ -157,9 +157,9 @@ const ClientMessages = () => {
                   </div>
                   <div className="text-right">
                     {conversation.unread > 0 && (
-                      <Badge variant="secondary" className="mb-1">
+                      <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-red-500 rounded-full mb-1">
                         {conversation.unread}
-                      </Badge>
+                      </span>
                     )}
                     <p className="text-xs text-muted-foreground">{conversation.timestamp}</p>
                   </div>
