@@ -18,13 +18,12 @@ import DashboardClient from "./pages/DashboardClient";
 
 import OwnerAnalytics from "./pages/owner/OwnerAnalytics";
 import OwnerProjects from "./pages/owner/OwnerProjects";
-import OwnerProjectDetail from "./pages/owner/OwnerProjectDetail";
 import OwnerTeams from "./pages/owner/OwnerTeams";
 import OwnerRisks from "./pages/owner/OwnerRisks";
 import OwnerIntegrations from "./pages/owner/OwnerIntegrations";
 import OwnerFinances from "./pages/owner/OwnerFinances";
 import OwnerClients from "./pages/owner/OwnerClients";
-import OwnerClientDetail from "./pages/owner/OwnerClientDetail";
+
 import OwnerReports from "./pages/owner/OwnerReports";
 import OwnerReportDetail from "./pages/owner/OwnerReportDetail";
 import OwnerSettings from "./pages/owner/OwnerSettings";
@@ -67,7 +66,7 @@ import AdminComplianceCenter from "./pages/admin/AdminComplianceCenter";
 
 import ProjectManagerDashboard from "./pages/project-manager/ProjectManagerDashboard";
 import ProjectManagerProjects from "./pages/project-manager/ProjectManagerProjects";
-import ProjectManagerProjectDetail from "./pages/project-manager/ProjectManagerProjectDetail";
+
 import ProjectManagerCalendar from "./pages/project-manager/ProjectManagerCalendar";
 import ProjectManagerTeam from "./pages/project-manager/ProjectManagerTeam";
 import ProjectManagerResources from "./pages/project-manager/ProjectManagerResources";
@@ -108,7 +107,7 @@ import FinanceTaxes from "./pages/finance/FinanceTaxes";
 
 import ClientDashboard from "./pages/client/ClientDashboard";
 import ClientProjects from "./pages/client/ClientProjects";
-import ClientProjectDetail from "./pages/client/ClientProjectDetail";
+
 import ClientMessages from "./pages/client/ClientMessages";
 import ClientFiles from "./pages/client/ClientFiles";
 import ClientInvoices from "./pages/client/ClientInvoices";
@@ -135,7 +134,7 @@ const App = () => (
             <Route path="analytics" element={<OwnerAnalytics />} />
             <Route path="kpi-dashboard" element={<OwnerKpiDashboard />} />
             <Route path="projects" element={<OwnerProjects />} />
-            <Route path="projects/:id" element={<OwnerProjectDetail />} />
+            
             <Route path="teams" element={<OwnerTeams />} />
             <Route path="teams/:teamId" element={<OwnerTeamDetail />} />
             <Route path="resource-allocation" element={<OwnerResourceAllocation />} />
@@ -150,7 +149,7 @@ const App = () => (
             <Route path="profitability" element={<OwnerProfitability />} />
             <Route path="profitability/:projectId" element={<OwnerProjectFinancialsDetail />} />
             <Route path="clients" element={<OwnerClients />} />
-            <Route path="clients/:clientId" element={<OwnerClientDetail />} />
+            
             <Route path="reports" element={<OwnerReports />} />
             <Route path="reports/:reportId" element={<OwnerReportDetail />} />
             <Route path="settings" element={<OwnerSettings />} />
@@ -189,7 +188,7 @@ const App = () => (
           <Route path="/dashboard/project-manager" element={<DashboardProjectManager />}>
             <Route index element={<ProjectManagerDashboard />} />
             <Route path="projects" element={<ProjectManagerProjects />} />
-            <Route path="projects/:id" element={<ProjectManagerProjectDetail />} />
+            
             <Route path="calendar" element={<ProjectManagerCalendar />} />
             <Route path="team" element={<ProjectManagerTeam />} />
             <Route path="resources" element={<ProjectManagerResources />} />
@@ -235,7 +234,7 @@ const App = () => (
           <Route path="/dashboard/client" element={<DashboardClient />}>
             <Route index element={<ClientDashboard />} />
             <Route path="projects" element={<ClientProjects />} />
-            <Route path="projects/:id" element={<ClientProjectDetail />} />
+            
             <Route path="messages" element={<ClientMessages />} />
             <Route path="files" element={<ClientFiles />} />
             <Route path="invoices" element={<ClientInvoices />} />

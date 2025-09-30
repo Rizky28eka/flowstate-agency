@@ -1,4 +1,4 @@
-import { teamMembers, tasks } from './mock-data';
+import { teamMembers, tasks, projects } from './mock-data';
 
 export interface MemberTask {
   id: string;

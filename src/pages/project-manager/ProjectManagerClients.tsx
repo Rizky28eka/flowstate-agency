@@ -1,14 +1,35 @@
+import { useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Phone, Mail, Calendar, Star, Plus } from "lucide-react";
-import { clients, projects } from "@/lib/mock-data";
+import { clients, projects, meetings } from "@/lib/mock-data";
 
 const ProjectManagerClients = () => {
-  const myClients = clients.filter(c => 
-    projects.some(p => p.clientId === c.id && (p.manager === "Sarah Wilson" || p.manager === "Tom Rodriguez"))
-  );
+  // Assume the logged-in PM is 'Sarah Wilson' for this demo
+  const currentPmName = 'Sarah Wilson';
+
+  const myClients = useMemo(() => clients.filter(c => 
+    projects.some(p => p.clientId === c.id && p.manager === currentPmName)
+  ), [currentPmName]);
+
+  const myClientIds = useMemo(() => myClients.map(c => c.id), [myClients]);
+
+  const meetingsThisWeek = useMemo(() => {
+    const today = new Date();
+    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return meetings.filter(m => 
+      myClientIds.includes(m.clientId) && 
+      new Date(m.date) >= today && 
+      new Date(m.date) <= nextWeek
+    ).length;
+  }, [myClientIds]);
+
+  const avgSatisfaction = useMemo(() => {
+    if (myClients.length === 0) return 0;
+    return myClients.reduce((sum, c) => sum + c.satisfaction, 0) / myClients.length;
+  }, [myClients]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -23,7 +44,7 @@ const ProjectManagerClients = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">Client Communication</h2>
-        <Button>
+        <Button onClick={() => alert('Opening meeting scheduler...')}>
           <Plus className="w-4 h-4 mr-2" />
           Schedule Meeting
         </Button>
@@ -48,9 +69,7 @@ const ProjectManagerClients = () => {
             <Star className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {(myClients.reduce((sum, c) => sum + c.satisfaction, 0) / myClients.length).toFixed(1)}
-            </div>
+            <div className="text-2xl font-bold">{avgSatisfaction.toFixed(1)}</div>
             <p className="text-xs text-muted-foreground">Out of 5.0</p>
           </CardContent>
         </Card>
@@ -61,7 +80,7 @@ const ProjectManagerClients = () => {
             <Calendar className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8</div>
+            <div className="text-2xl font-bold">{meetingsThisWeek}</div>
             <p className="text-xs text-muted-foreground">Scheduled meetings</p>
           </CardContent>
         </Card>
@@ -73,7 +92,7 @@ const ProjectManagerClients = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">2.4h</div>
-            <p className="text-xs text-muted-foreground">Average response</p>
+            <p className="text-xs text-muted-foreground">Average response (static)</p>
           </CardContent>
         </Card>
       </div>
@@ -122,15 +141,19 @@ const ProjectManagerClients = () => {
                   </div>
 
                   <div className="flex space-x-2 mt-4">
-                    <Button variant="outline" size="sm">
-                      <Mail className="w-3 h-3 mr-1" />
-                      Email
+                    <Button asChild variant="outline" size="sm">
+                      <a href={`mailto:${client.email}`}>
+                        <Mail className="w-3 h-3 mr-1" />
+                        Email
+                      </a>
                     </Button>
-                    <Button variant="outline" size="sm">
-                      <Phone className="w-3 h-3 mr-1" />
-                      Call
+                    <Button asChild variant="outline" size="sm">
+                      <a href={`tel:${client.phone}`}>
+                        <Phone className="w-3 h-3 mr-1" />
+                        Call
+                      </a>
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => alert(`Scheduling meeting with ${client.name}...`)}>
                       <Calendar className="w-3 h-3 mr-1" />
                       Meet
                     </Button>

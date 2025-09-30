@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -124,7 +124,12 @@ const OwnerGoals = () => {
             <Button><Plus className="w-4 h-4 mr-2" /> Add New Goal</Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>Add a New Company Goal</DialogTitle></DialogHeader>
+            <DialogHeader>
+              <DialogTitle>Add a New Company Goal</DialogTitle>
+              <DialogDescription>
+                Fill in the details below to create a new goal for the organization.
+              </DialogDescription>
+            </DialogHeader>
             <AddGoalForm onAddGoal={handleAddGoal} />
           </DialogContent>
         </Dialog>

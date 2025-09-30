@@ -9,6 +9,7 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { 
   Table, 
@@ -57,10 +58,10 @@ const MemberTimesheet = () => {
   // Assume logged-in member is Sarah Wilson (ID 1) for demo
   const currentUserId = 1;
 
-  const weekInterval = {
+  const weekInterval = useMemo(() => ({
     start: startOfWeek(currentDate, { weekStartsOn: 1 }),
     end: endOfWeek(currentDate, { weekStartsOn: 1 }),
-  };
+  }), [currentDate]);
 
   const weeklyEntries = useMemo(() => {
     return timeEntries.filter(entry => {

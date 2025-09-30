@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { teamMembers, securityRoles } from "@/lib/mock-data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,159 +8,26 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserCheck, Search, Plus, Shield, Crown, User, Users, Code, DollarSign, Handshake, Lock } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { UserCheck, Search, Plus, Filter, Shield, Crown, User, Users, Code, DollarSign, Handshake, MoveHorizontal as MoreHorizontal, CreditCard as Edit, Trash2, Lock, Clock as Unlock } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-
-const userFormSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters."),
-  email: z.string().email("Invalid email address."),
-  role: z.string(),
-  department: z.string(),
-  status: z.string(),
-});
-
-const UserForm = ({ form, onSubmit }) => (
-  <Form {...form}>
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <FormField
-        control={form.control}
-        name="name"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Full Name</FormLabel>
-            <FormControl>
-              <Input placeholder="John Doe" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="email"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Email</FormLabel>
-            <FormControl>
-              <Input placeholder="john.doe@example.com" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="role"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Role</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a role" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {securityRoles.map(role => (
-                  <SelectItem key={role.id} value={role.role}>{role.role}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="department"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Department</FormLabel>
-            <FormControl>
-              <Input placeholder="e.g. Creative Team" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="status"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Status</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a status" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Inactive">Inactive</SelectItem>
-                <SelectItem value="Suspended">Suspended</SelectItem>
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <Button type="submit">Save changes</Button>
-    </form>
-  </Form>
-);
 
 const roleIcons: { [key: string]: React.ElementType } = {
-  Crown,
-  Shield,
-  User,
-  Users,
-  Code,
-  DollarSign,
-  Handshake
+  OWNER: Crown,
+  ADMIN: Shield,
+  PROJECT_MANAGER: User,
+  TEAM_LEAD: Users,
+  MEMBER: Code,
+  FINANCE: DollarSign,
+  CLIENT: Handshake
 };
 
 const AdminUsers = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
 
-  const users = teamMembers; // Use real data
-
-  const form = useForm<z.infer<typeof userFormSchema>>({
-    resolver: zodResolver(userFormSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      role: "MEMBER",
-      department: "",
-      status: "Active",
-    },
-  });
-
-  const handleEditUser = (user) => {
-    setEditingUser(user);
-    form.reset(user);
-    setIsUserDialogOpen(true);
-  };
-
-  const handleDeleteUser = (userId) => {
-    console.log("Delete user:", userId);
-    // Here you would typically call an API to delete the user
-  };
-
-  const onSubmit = (values: z.infer<typeof userFormSchema>) => {
-    console.log(values);
-    setIsUserDialogOpen(false);
-  };
+  const users = teamMembers;
 
   const getRoleColor = (role: string) => {
     const roleData = securityRoles.find(r => r.id === role);
@@ -190,27 +58,10 @@ const AdminUsers = () => {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 sm:mb-6">
         <h2 className="text-xl sm:text-2xl font-bold">User Management</h2>
-        <Dialog open={isUserDialogOpen} onOpenChange={setIsUserDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="w-full sm:w-auto" onClick={() => {
-              setEditingUser(null);
-              form.reset();
-              setIsUserDialogOpen(true);
-            }}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add User
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{editingUser ? "Edit User" : "Add New User"}</DialogTitle>
-              <DialogDescription>
-                {editingUser ? "Update the details for this user." : "Fill in the form to add a new user to the system."}
-              </DialogDescription>
-            </DialogHeader>
-            <UserForm form={form} onSubmit={onSubmit} />
-          </DialogContent>
-        </Dialog>
+        <Button className="w-full sm:w-auto" onClick={() => alert("Navigate to new user page")}>
+          <Plus className="w-4 h-4 mr-2" />
+          Add User
+        </Button>
       </div>
 
       {/* User Statistics */}
@@ -330,15 +181,14 @@ const AdminUsers = () => {
                       <th className="text-left p-2 sm:p-3 text-xs sm:text-sm">Status</th>
                       <th className="text-left p-2 sm:p-3 text-xs sm:text-sm hidden lg:table-cell">Last Login</th>
                       <th className="text-left p-2 sm:p-3 text-xs sm:text-sm hidden sm:table-cell">Projects</th>
-                      <th className="text-left p-2 sm:p-3 text-xs sm:text-sm">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {users.map((user) => {
                       const roleData = securityRoles.find(r => r.role === user.role);
-                      const RoleIcon = roleData && (roleData as any).icon ? (roleData as any).icon : User;
+                      const RoleIcon = roleData ? roleIcons[roleData.id] || User : User;
                       return (
-                        <tr key={user.id} className="border-b hover:bg-muted/50">
+                        <tr key={user.id} className="border-b hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/user/${user.id}`)}>
                           <td className="p-2 sm:p-3">
                             <div className="flex items-center space-x-2 sm:space-x-3">
                               <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
@@ -371,32 +221,6 @@ const AdminUsers = () => {
                             {formatLastLogin(user.joinDate)} {/* Using joinDate as lastLogin is not available in teamMembers */}
                           </td>
                           <td className="p-2 sm:p-3 hidden sm:table-cell">{user.projects}</td>
-                          <td className="p-2 sm:p-3">
-                            <div className="flex space-x-1">
-                              <Button variant="ghost" size="sm" onClick={() => handleEditUser(user)} className="h-8 w-8 p-0">
-                                <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
-                              </Button>
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      This action cannot be undone. This will permanently delete the user account.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDeleteUser(user.id)}>Delete</AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </div>
-                          </td>
                         </tr>
                       );
                     })}
@@ -409,12 +233,14 @@ const AdminUsers = () => {
 
         <TabsContent value="roles" className="space-y-4 sm:space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {Object.entries(roleIcons).map(([role, Icon]) => (
-              <Card key={role}>
+            {securityRoles.map((role) => {
+              const Icon = roleIcons[role.id] || User;
+              return (
+              <Card key={role.id}>
                 <CardHeader>
                   <div className="flex items-center space-x-3">
                     <Icon className="w-6 h-6 text-primary" />
-                    <CardTitle className="text-base sm:text-lg">{role.replace('_', ' ')}</CardTitle>
+                    <CardTitle className="text-base sm:text-lg">{role.role}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -422,28 +248,22 @@ const AdminUsers = () => {
                     <div className="flex justify-between">
                       <span className="text-sm text-muted-foreground">Users</span>
                       <span className="font-medium">
-                        {users.filter(u => u.role.toUpperCase().replace(' ', '_') === role).length}
+                        {users.filter(u => u.role === role.role).length}
                       </span>
                     </div>
                     
                     <div className="space-y-2">
-                      <p className="text-sm font-medium">Permissions:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {users.find(u => u.role.toUpperCase().replace(' ', '_') === role)?.skills.map((permission, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {permission}
-                          </Badge>
-                        ))}
-                      </div>
+                      <p className="text-sm font-medium">Description:</p>
+                      <p className="text-xs text-muted-foreground">{role.description}</p>
                     </div>
 
-                    <Button variant="outline" size="sm" className="w-full">
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => navigate(`/dashboard/admin/roles/${role.id}`)}>
                       Manage Permissions
                     </Button>
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            )})}
           </div>
         </TabsContent>
 
@@ -535,14 +355,14 @@ const AdminUsers = () => {
                       <p className="font-medium">Password Complexity</p>
                       <p className="text-sm text-muted-foreground">Enforce strong passwords</p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch checked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium">Session Timeout</p>
                       <p className="text-sm text-muted-foreground">Auto-logout after inactivity</p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch checked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>

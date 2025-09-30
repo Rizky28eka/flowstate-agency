@@ -35,7 +35,7 @@ const ProjectManagerReportBuilder = () => {
   const isNewReport = reportId === 'new';
 
   useEffect(() => {
-    if (!isNewRule) {
+    if (!isNewReport) {
       const existingReport = MOCK_REPORTS.find(r => r.id === reportId);
       if (existingReport) setReport(existingReport);
     } else {
@@ -58,7 +58,7 @@ const ProjectManagerReportBuilder = () => {
     setReport({ ...report, columns: newColumns });
   };
 
-  const handleFilterChange = (index: number, field: keyof FilterCondition, value: any) => {
+  const handleFilterChange = (index: number, field: keyof FilterCondition, value: string | number | boolean) => {
     const newFilters = [...(report.filters || [])];
     newFilters[index] = { ...newFilters[index], [field]: value };
     setReport({ ...report, filters: newFilters });
@@ -157,4 +157,4 @@ const ProjectManagerReportBuilder = () => {
   );
 };
 
-export default ProjectManagerReportBuilder; // Typo from previous feature, will be corrected by file name
+export default ProjectManagerReportBuilder;

@@ -1,114 +1,68 @@
-import {
-  teamMembers,
-  tasks,
-  projects,
-  timeEntries
-} from './mock-data';
-
-// --- INTERFACES ---
-
-export interface PerformanceKPIs {
-  avgUtilization: number;
-  completedTasks: number;
-  financialContribution: number; // Total revenue generated from billable hours
-  avgProjectRating: number; // Mocked data
-}
-
-export interface ProjectHistoryItem {
-  projectId: string;
-  projectName: string;
-  status: string;
-  employeeRole?: string; // Role in that specific project
-}
+import { teamMembers, projects, tasks } from './mock-data';
 
 export interface PerformanceReview {
   id: string;
-  date: string;
   reviewer: string;
+  date: string;
+  rating: number; // out of 5
   summary: string;
-  rating: number;
 }
 
-export interface EmployeeProfile {
-  id: number;
-  name: string;
-  role: string;
-  department: string;
-  email: string;
-  phone: string;
-  location: string;
-  joinDate: string;
-  status: string;
-  avatar: string;
-  skills: string[];
-  kpis: PerformanceKPIs;
-  projectHistory: ProjectHistoryItem[];
-  performanceReviews: PerformanceReview[];
-  assignedTasks: (typeof tasks)[0][];
-}
+// Get the type of a single element from the arrays
+type TeamMember = (typeof teamMembers)[0];
+type Project = (typeof projects)[0];
+type Task = (typeof tasks)[0];
 
-// --- LOGIC ---
-
-/**
- * Fetches and assembles all performance and historical data for a specific employee.
- */
-export const getEmployeeProfile = (employeeId: number): EmployeeProfile | null => {
-  const member = teamMembers.find(m => m.id === employeeId);
-  if (!member) return null;
-
-  // 1. Aggregate data
-  const memberTasks = tasks.filter(t => t.assignedTo === member.name);
-  const memberTimeEntries = timeEntries.filter(t => t.employeeId === member.id);
-  const memberProjects = projects.filter(p => p.team.includes(member.name));
-
-  // 2. Calculate KPIs
-  const completedTasks = memberTasks.filter(t => t.status === 'Completed').length;
-  const financialContribution = memberTimeEntries
-    .filter(t => t.billable)
-    .reduce((sum, entry) => sum + (entry.hours * entry.hourlyRate), 0);
-
-  const kpis: PerformanceKPIs = {
-    avgUtilization: member.utilization, // Using the static value from mock data for simplicity
-    completedTasks,
-    financialContribution,
-    avgProjectRating: 4.7, // Mocked value
+export interface EmployeeDetails extends TeamMember {
+  kpis: {
+    activeProjects: number;
+    tasksCompleted: number;
+    avgUtilization: number; // percentage
   };
+  assignedProjects: Project[];
+  recentActivity: Task[];
+  performanceHistory: PerformanceReview[];
+}
 
-  // 3. Format Project History
-  const projectHistory: ProjectHistoryItem[] = memberProjects.map(p => ({
-    projectId: p.id,
-    projectName: p.name,
-    status: p.status,
-  }));
+// --- MOCK DATA GENERATION ---
 
-  // 4. Generate Mock Performance Reviews
-  const performanceReviews: PerformanceReview[] = [
-    {
-      id: 'REV-1', date: '2024-09-01', reviewer: 'Sarah Wilson', rating: 4.8,
-      summary: 'Excellent performance in Q3. Consistently delivers high-quality work ahead of schedule. A key team player.'
-    },
-    {
-      id: 'REV-2', date: '2024-03-01', reviewer: 'Sarah Wilson', rating: 4.5,
-      summary: 'Great progress in Q1. Shows strong potential for leadership. Could improve on providing proactive updates.'
-    },
-  ];
+const MOCK_PERFORMANCE_REVIEWS: Record<number, PerformanceReview[]> = {
+  1: [ // Sarah Wilson
+    { id: 'REV-001', reviewer: 'John Doe (Owner)', date: '2024-09-01', rating: 4.5, summary: 'Excellent work on the "Project Phoenix" launch. Proactive and great leadership.' },
+    { id: 'REV-002', reviewer: 'John Doe (Owner)', date: '2024-03-15', rating: 4.2, summary: 'Consistently delivers high-quality results. Room for improvement in delegation.' },
+  ],
+  2: [ // Mike Johnson
+    { id: 'REV-003', reviewer: 'Sarah Wilson (PM)', date: '2024-08-20', rating: 4.8, summary: 'Top-tier developer. Technical skills are a huge asset to the team.' },
+  ],
+  3: [ // David Chen
+    { id: 'REV-004', reviewer: 'Sarah Wilson (PM)', date: '2024-08-22', rating: 4.0, summary: 'Great designer with a keen eye for detail. Improving on meeting deadlines.' },
+  ],
+};
 
-  // 5. Assemble final profile object
+export const getEmployeeDetails = (employeeId: number): EmployeeDetails | null => {
+  const employee = teamMembers.find(m => m.id === employeeId);
+  if (!employee) return null;
+
+  const assignedProjects = projects.filter(p => p.team.includes(employee.name));
+  const assignedTasks = tasks.filter(t => t.assignedTo === employee.name);
+
+  const tasksCompleted = assignedTasks.filter(t => t.status === 'Completed').length;
+
+  const totalAllocation = assignedProjects.reduce((acc, project) => {
+      const tasksInProject = assignedTasks.filter(t => t.projectId === project.id);
+      return acc + tasksInProject.reduce((taskAcc, task) => taskAcc + (task.estimatedHours || 0) / 4, 0);
+  }, 0);
+  const avgUtilization = (totalAllocation / 40) * 100; // Assuming 40h/week capacity
+
   return {
-    id: member.id,
-    name: member.name,
-    role: member.role,
-    department: member.department,
-    email: member.email,
-    phone: member.phone,
-    location: member.location,
-    joinDate: member.joinDate,
-    status: member.status,
-    avatar: member.avatar,
-    skills: member.skills,
-    kpis,
-    projectHistory,
-    performanceReviews,
-    assignedTasks: memberTasks,
+    ...employee,
+    kpis: {
+      activeProjects: assignedProjects.filter(p => p.status === 'In Progress').length,
+      tasksCompleted,
+      avgUtilization: Math.round(avgUtilization),
+    },
+    assignedProjects,
+    recentActivity: assignedTasks.sort((a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime()).slice(0, 5),
+    performanceHistory: MOCK_PERFORMANCE_REVIEWS[employeeId] || [],
   };
 };

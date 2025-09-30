@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getEmployeeProfile, EmployeeProfile } from '@/lib/employee-detail';
+import { getEmployeeDetails, EmployeeDetails } from '@/lib/employee-detail';
 import { Button } from '@/components/ui/button';
 import { 
   Card, 
@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, BarChart, CheckCircle2, DollarSign, Star, Phone, Mail, MapPin } from 'lucide-react';
+import { ArrowLeft, BarChart, CheckCircle2, DollarSign, Star, Phone, Mail, MapPin, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Helper to format currency
@@ -33,7 +33,7 @@ const OwnerTeamDetail = () => {
   const navigate = useNavigate();
 
   const employee = useMemo(() => 
-    teamId ? getEmployeeProfile(parseInt(teamId, 10)) : null
+    teamId ? getEmployeeDetails(parseInt(teamId, 10)) : null
   , [teamId]);
 
   useEffect(() => {
@@ -48,9 +48,9 @@ const OwnerTeamDetail = () => {
 
   const kpiData = [
     { title: 'Avg. Utilization', value: `${employee.kpis.avgUtilization}%`, icon: BarChart },
-    { title: 'Completed Tasks', value: employee.kpis.completedTasks, icon: CheckCircle2 },
-    { title: 'Financial Contribution', value: formatCurrency(employee.kpis.financialContribution), icon: DollarSign },
-    { title: 'Avg. Project Rating', value: `${employee.kpis.avgProjectRating}/5.0`, icon: Star },
+    { title: 'Completed Tasks', value: employee.kpis.tasksCompleted, icon: CheckCircle2 },
+    { title: 'Active Projects', value: employee.kpis.activeProjects, icon: Briefcase },
+    { title: 'Overall Rating', value: `${employee.rating}/5.0`, icon: Star },
   ];
 
   return (
@@ -58,7 +58,7 @@ const OwnerTeamDetail = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" onClick={() => navigate('/dashboard/owner/teams')}>
+          <Button variant="outline" size="icon" onClick={() => navigate('/dashboard/owner/employees')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <Avatar className="h-16 w-16">
@@ -121,7 +121,7 @@ const OwnerTeamDetail = () => {
           <Card>
             <CardHeader><CardTitle>Performance Reviews</CardTitle></CardHeader>
             <CardContent className="space-y-6">
-              {employee.performanceReviews.map(review => (
+              {employee.performanceHistory.map(review => (
                 <div key={review.id} className="flex gap-4">
                   <Avatar className="h-9 w-9">
                     <AvatarFallback>{review.reviewer.split(' ').map(n => n[0]).join('')}</AvatarFallback>
@@ -146,9 +146,9 @@ const OwnerTeamDetail = () => {
               <Table>
                 <TableHeader><TableRow><TableHead>Project</TableHead><TableHead>Status</TableHead><TableHead className="text-right">End Date</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {employee.projectHistory.map(p => (
-                    <TableRow key={p.projectId} className="cursor-pointer" onClick={() => navigate(`/dashboard/owner/projects/${p.projectId}`)}>
-                      <TableCell className="font-medium">{p.projectName}</TableCell>
+                  {employee.assignedProjects.map(p => (
+                    <TableRow key={p.id} className="cursor-pointer" onClick={() => navigate(`/project/${p.id}`)}>
+                      <TableCell className="font-medium">{p.name}</TableCell>
                       <TableCell><Badge variant={p.status === 'Completed' ? 'secondary' : 'default'}>{p.status}</Badge></TableCell>
                       <TableCell className="text-right">{p.endDate}</TableCell>
                     </TableRow>
@@ -166,7 +166,7 @@ const OwnerTeamDetail = () => {
               <Table>
                 <TableHeader><TableRow><TableHead>Task</TableHead><TableHead>Project</TableHead><TableHead>Due Date</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {employee.assignedTasks.map(task => (
+                  {employee.recentActivity.map(task => (
                     <TableRow key={task.id}>
                       <TableCell className="font-medium">{task.title}</TableCell>
                       <TableCell>{task.projectId}</TableCell>

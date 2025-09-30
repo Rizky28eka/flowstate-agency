@@ -5,8 +5,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Plus, Phone, Mail, Clock, CircleCheck as CheckCircle, TriangleAlert as AlertTriangle } from "lucide-react";
 
+interface SupportTicket {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
+  priority: string;
+  createdDate: string;
+  lastUpdate: string;
+  assignedTo: string;
+  project?: string; // Make project optional
+  resolution?: string;
+}
+
 const ClientSupport = () => {
-  const supportTickets = [
+  const supportTickets: SupportTicket[] = [
     {
       id: "SUP-001",
       title: "Question about project timeline",
@@ -193,7 +206,7 @@ const ClientSupport = () => {
                       {getStatusIcon(ticket.status)}
                       <div>
                         <h4 className="font-semibold">{ticket.title}</h4>
-                        <p className="text-sm text-muted-foreground">{(ticket as any).project || 'General Support'}</p>
+                        <p className="text-sm text-muted-foreground">{ticket.project || 'General Support'}</p>
                       </div>
                     </div>
                     <div className="flex flex-col items-end space-y-1">

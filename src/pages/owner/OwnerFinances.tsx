@@ -7,7 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { DollarSign, TrendingUp, TrendingDown, Landmark, Download, Filter, FileText, Banknote, Scale, PieChart, Calendar as CalendarIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Line, ComposedChart, Pie, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Line, ComposedChart, Pie, Cell, Legend, Tooltip } from "recharts";
 import { Progress } from "@/components/ui/progress";
 import { monthlyRevenueData, expenses as allExpenses } from "@/lib/mock-data";
 import { DateRange } from "react-day-picker";
@@ -83,10 +83,83 @@ const OwnerFinances = () => {
       <Tabs defaultValue="pnl" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4"><TabsTrigger value="pnl">Profit & Loss</TabsTrigger><TabsTrigger value="balance-sheet">Balance Sheet</TabsTrigger><TabsTrigger value="cash-flow">Cash Flow</TabsTrigger><TabsTrigger value="expenses">Expenses</TabsTrigger></TabsList>
         
-        <TabsContent value="pnl">{/* P&L Content */}</TabsContent>
+        <TabsContent value="pnl">
+          <Card>
+            <CardHeader>
+              <CardTitle>Profit & Loss</CardTitle>
+              <CardDescription>Monthly revenue, expenses, and profit.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer className="h-96 w-full" config={{}}>
+                <ComposedChart data={pnlData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="month" tickLine={false} tickMargin={10} />
+                  <YAxis tickFormatter={(value) => `$${value / 1000}k`} tickLine={false} tickMargin={10} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Legend />
+                  <Bar dataKey="revenue" fill="hsl(var(--primary) / 0.5)" radius={4} name="Revenue" />
+                  <Bar dataKey="expenses" fill="hsl(var(--destructive) / 0.5)" radius={4} name="Expenses" />
+                  <Line type="monotone" dataKey="profit" stroke="hsl(var(--primary))" strokeWidth={2} name="Profit" />
+                </ComposedChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </TabsContent>
         <TabsContent value="balance-sheet"><Card><CardHeader><CardTitle>Balance Sheet</CardTitle></CardHeader><CardContent><p>Balance Sheet view is under construction.</p></CardContent></Card></TabsContent>
-        <TabsContent value="cash-flow">{/* Cash Flow Content */}</TabsContent>
-        <TabsContent value="expenses">{/* Expenses Content */}</TabsContent>
+        <TabsContent value="cash-flow">
+          <Card>
+            <CardHeader>
+              <CardTitle>Cash Flow</CardTitle>
+              <CardDescription>Monthly cash in vs. cash out.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer className="h-96 w-full" config={{}}>
+                <BarChart data={cashFlowData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="month" tickLine={false} tickMargin={10} />
+                  <YAxis tickFormatter={(value) => `$${value / 1000}k`} tickLine={false} tickMargin={10} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Legend />
+                  <Bar dataKey="cashIn" fill="hsl(var(--primary) / 0.7)" radius={4} name="Cash In" />
+                  <Bar dataKey="cashOut" fill="hsl(var(--destructive) / 0.7)" radius={4} name="Cash Out" />
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="expenses">
+          <Card>
+            <CardHeader>
+              <CardTitle>Expense Breakdown</CardTitle>
+              <CardDescription>Expenses by category for the selected period.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="h-96">
+                <ChartContainer config={{}} className="w-full h-full">
+                  <PieChart>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Pie data={expenseData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} label>
+                      {expenseData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ChartContainer>
+              </div>
+              <div className="space-y-4 self-center">
+                {expenseData.map(item => (
+                  <div key={item.name} className="flex justify-between items-center p-3 border rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                      <span className="font-medium">{item.name}</span>
+                    </div>
+                    <span className="font-mono">${item.value.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </main>
   );

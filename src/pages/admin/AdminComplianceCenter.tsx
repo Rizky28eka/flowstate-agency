@@ -1,9 +1,12 @@
-{"codCheck } from 'lucide-react';
-impt
- /p/ ey a anyag tnM</respelYunast <St<u a,cn  p={ist) dtael
-yw3  =B
-   rosk trpi n<a    l, mNmmw  {Lo=p< xlt/nr   , ea eo{nh>
- >TaN  n hieldCheck } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { MOCK_DATA_SUBJECT_REQUESTS, MOCK_RETENTION_POLICIES, DataRetentionPolicy, DataSubjectRequest, RequestStatus, REQUEST_STATUSES } from '@/lib/compliance';
+import { MoreHorizontal, PlusCircle } from 'lucide-react';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -145,66 +148,6 @@ const AdminComplianceCenter = () => {
                   <TableBody>{requests.map(r => <DataSubjectRequestRow key={r.id} request={r} onStatusChange={handleRequestStatusChange} />)}</TableBody>
                 </Table>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-};
-
-export default AdminComplianceCenter;
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="retention">Data Retention</TabsTrigger>
-          <TabsTrigger value="requests">Subject Requests</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="mt-6">
-          <Card>
-            <CardHeader><CardTitle>Compliance Overview</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <p className="font-medium">GDPR Status</p>
-                <Badge className="bg-green-500 text-white">Compliant</Badge>
-              </div>
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <p className="font-medium">CCPA Status</p>
-                <Badge className="bg-green-500 text-white">Compliant</Badge>
-              </div>
-              <p className="text-sm text-muted-foreground pt-4">This overview provides a summary of the platform's compliance status. Manage specific policies and requests in their respective tabs.</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="retention" className="mt-6">
-          <Card>
-            <CardHeader className="flex justify-between items-center">
-              <div>
-                <CardTitle>Data Retention Policies</CardTitle>
-                <CardDescription>Automated rules for data anonymization and deletion.</CardDescription>
-              </div>
-              <Button><PlusCircle className="h-4 w-4 mr-2"/>New Policy</Button>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader><TableRow><TableHead>Data Type</TableHead><TableHead className="hidden md:table-cell">Period</TableHead><TableHead className="hidden md:table-cell">Action</TableHead><TableHead>Is Active</TableHead><TableHead><span className="sr-only">Actions</span></TableHead></TableRow></TableHeader>
-                <TableBody>{policies.map(p => <RetentionPolicyRow key={p.id} policy={p} onToggle={handlePolicyToggle} />)}</TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="requests" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Data Subject Requests</CardTitle>
-              <CardDescription>Manage data export and deletion requests from your users.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader><TableRow><TableHead>Request</TableHead><TableHead>User</TableHead><TableHead className="hidden md:table-cell">Date</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
-                <TableBody>{requests.map(r => <DataSubjectRequestRow key={r.id} request={r} onStatusChange={handleRequestStatusChange} />)}</TableBody>
-              </Table>
             </CardContent>
           </Card>
         </TabsContent>

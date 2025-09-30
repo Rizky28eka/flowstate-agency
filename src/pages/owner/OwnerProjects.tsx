@@ -33,7 +33,7 @@ const getPriorityColor = (priority) => {
 const ProjectGridView = ({ projects }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
     {projects.map((project) => (
-      <Link to={`/dashboard/owner/projects/${project.id}`} key={project.id}>
+      <Link to={`/project/${project.id}`} key={project.id}>
         <Card className="hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full">
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -85,7 +85,7 @@ const ProjectListView = ({ projects }) => (
           <tbody>
             {projects.map((project) => (
               <tr key={project.id} className="border-b hover:bg-muted/50">
-                <td className="p-3"><Link to={`/dashboard/owner/projects/${project.id}`} className="font-medium hover:underline">{project.name}</Link><div className="text-sm text-muted-foreground">{project.client}</div></td>
+                <td className="p-3"><Link to={`/project/${project.id}`} className="font-medium hover:underline">{project.name}</Link><div className="text-sm text-muted-foreground">{project.client}</div></td>
                 <td className="p-3"><Badge className={getStatusColor(project.status)}>{project.status}</Badge></td>
                 <td className="p-3"><div className="flex items-center space-x-2"><Progress value={project.progress} className="w-24" /><span className="text-sm text-muted-foreground">{project.progress}%</span></div></td>
                 <td className="p-3"><div className="flex items-center space-x-2"><Avatar className="w-6 h-6"><AvatarFallback>{project.manager.charAt(0)}</AvatarFallback></Avatar><span>{project.manager}</span></div></td>

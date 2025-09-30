@@ -49,7 +49,7 @@ const ClientRow = ({ client }: { client: (typeof clients)[0] }) => {
   return (
     <TableRow 
       className="cursor-pointer"
-      onClick={() => navigate(`/dashboard/owner/clients/${client.id}`)}
+      onClick={() => navigate(`/client/${client.id}`)}
     >
       <TableCell>
         <div className="flex items-center gap-3">

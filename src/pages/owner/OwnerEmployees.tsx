@@ -36,7 +36,7 @@ const TeamMemberRow = ({ member }: { member: (typeof teamMembers)[0] }) => {
   return (
     <TableRow 
       className="cursor-pointer"
-      onClick={() => navigate(`/dashboard/owner/employees/${member.id}`)}
+      onClick={() => navigate(`/user/${member.id}`)}
     >
       <TableCell>
         <div className="flex items-center gap-3">
@@ -66,7 +66,7 @@ const TeamMemberRow = ({ member }: { member: (typeof teamMembers)[0] }) => {
   );
 };
 
-const OwnerTeams = () => {
+const OwnerEmployees = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('all');
 
@@ -168,4 +168,4 @@ const OwnerTeams = () => {
   );
 };
 
-export default OwnerTeams;
+export default OwnerEmployees;

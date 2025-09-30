@@ -218,7 +218,7 @@ const roleConfigs: Record<UserRole, RoleConfig> = {
             id: "team-management",
             label: "Team Management",
             icon: Users,
-            href: "/dashboard/owner/teams",
+            href: "/dashboard/owner/employees",
           },
           {
             id: "communication",
@@ -329,6 +329,12 @@ const roleConfigs: Record<UserRole, RoleConfig> = {
         label: "Roles & Permissions",
         icon: Users,
         href: "/dashboard/admin/roles",
+      },
+      {
+        id: "communication",
+        label: "Communication",
+        icon: MessageSquare,
+        href: "/dashboard/admin/communication",
       },
 { id: "security", label: "Security Center", icon: Lock, href: "/dashboard/admin/security", badge: 2, badgeVariant: "destructive" },
       { id: "compliance", label: "Compliance", icon: Gavel, href: "/dashboard/admin/compliance" },
@@ -560,6 +566,12 @@ const roleConfigs: Record<UserRole, RoleConfig> = {
         href: "/dashboard/finance/invoices",
         badge: 7,
         badgeVariant: "secondary",
+      },
+      {
+        id: "communication",
+        label: "Communication",
+        icon: MessageSquare,
+        href: "/dashboard/finance/communication",
       },
       {
         id: "expenses",

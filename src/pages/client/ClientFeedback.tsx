@@ -1,43 +1,67 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { CircleCheck as CheckCircle, Plus, Star, MessageSquare, ThumbsUp, ThumbsDown } from "lucide-react";
 
+const initialFeedbackRequests = [
+  {
+    id: 1,
+    title: "Website Wireframes Review",
+    project: "Website Redesign",
+    description: "Please review the wireframes and provide feedback on layout and navigation",
+    status: "Pending",
+    dueDate: "2024-12-12",
+    submittedBy: "Lisa Chen",
+    priority: "High",
+    feedback: ""
+  },
+  {
+    id: 2,
+    title: "Brand Logo Concepts",
+    project: "Brand Identity",
+    description: "Review the three logo concepts and select your preferred direction",
+    status: "Completed",
+    dueDate: "2024-12-08",
+    submittedBy: "Sarah Wilson",
+    priority: "Medium",
+    feedback: "Love concept #2! The typography is perfect for our brand."
+  },
+  {
+    id: 3,
+    title: "Color Palette Approval",
+    project: "Brand Identity",
+    description: "Approve the final color palette for the brand refresh",
+    status: "In Review",
+    dueDate: "2024-12-10",
+    submittedBy: "Lisa Chen",
+    priority: "Medium",
+    feedback: ""
+  }
+];
+
 const ClientFeedback = () => {
-  const feedbackRequests = [
-    {
-      id: 1,
-      title: "Website Wireframes Review",
-      project: "Website Redesign",
-      description: "Please review the wireframes and provide feedback on layout and navigation",
-      status: "Pending",
-      dueDate: "2024-12-12",
-      submittedBy: "Lisa Chen",
-      priority: "High"
-    },
-    {
-      id: 2,
-      title: "Brand Logo Concepts",
-      project: "Brand Identity",
-      description: "Review the three logo concepts and select your preferred direction",
-      status: "Completed",
-      dueDate: "2024-12-08",
-      submittedBy: "Sarah Wilson",
-      priority: "Medium",
-      feedback: "Love concept #2! The typography is perfect for our brand."
-    },
-    {
-      id: 3,
-      title: "Color Palette Approval",
-      project: "Brand Identity",
-      description: "Approve the final color palette for the brand refresh",
-      status: "In Review",
-      dueDate: "2024-12-10",
-      submittedBy: "Lisa Chen",
-      priority: "Medium"
-    }
-  ];
+  const [feedbackRequests, setFeedbackRequests] = useState(initialFeedbackRequests);
+  const [feedbackText, setFeedbackText] = useState({});
+
+  const handleTextChange = (id, text) => {
+    setFeedbackText(prev => ({ ...prev, [id]: text }));
+  };
+
+  const handleSubmitFeedback = (id, action) => {
+    setFeedbackRequests(prev => prev.map(req => {
+      if (req.id === id) {
+        if (action === 'approve') {
+          return { ...req, status: 'Completed', feedback: feedbackText[id] || 'Approved without comments.' };
+        } else if (action === 'request_changes') {
+          return { ...req, status: 'In Review', feedback: feedbackText[id] };
+        }
+      }
+      return req;
+    }));
+    setFeedbackText(prev => ({ ...prev, [id]: '' }));
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -61,7 +85,7 @@ const ClientFeedback = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">Feedback & Reviews</h2>
-        <Button>
+        <Button onClick={() => alert('Opening general feedback form...')}>
           <Plus className="w-4 h-4 mr-2" />
           Provide General Feedback
         </Button>
@@ -157,13 +181,17 @@ const ClientFeedback = () => {
                 </div>
               ) : request.status === "Pending" ? (
                 <div className="space-y-3">
-                  <Textarea placeholder="Provide your feedback here..." />
+                  <Textarea 
+                    placeholder="Provide your feedback here..." 
+                    value={feedbackText[request.id] || ''}
+                    onChange={(e) => handleTextChange(request.id, e.target.value)}
+                  />
                   <div className="flex space-x-2">
-                    <Button size="sm">
+                    <Button size="sm" onClick={() => handleSubmitFeedback(request.id, 'approve')}>
                       <ThumbsUp className="w-3 h-3 mr-1" />
                       Approve
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => handleSubmitFeedback(request.id, 'request_changes')}>
                       <MessageSquare className="w-3 h-3 mr-1" />
                       Request Changes
                     </Button>

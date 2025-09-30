@@ -1,20 +1,50 @@
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, MessageSquare, Download, Clock, CircleCheck as CheckCircle } from "lucide-react";
-import { projects, notifications } from "@/lib/mock-data";
+import { Progress } from "@/components/ui/progress";
+import { Eye, MessageSquare, Download, Clock, CheckCircle, Receipt } from "lucide-react";
+import { projects, notifications, invoices } from "@/lib/mock-data";
 
 const ClientDashboard = () => {
+  const navigate = useNavigate();
+
   // Assuming a logged-in client, we'll filter for a specific client ID
   const clientId = "CLI-001"; // Example: TechCorp Inc.
-  const clientProjects = projects.filter((p) => p.clientId === clientId);
-  const clientProjectIds = clientProjects.map((p) => p.id);
-  const recentUpdates = notifications.filter(
-    (n) => n.projectId && clientProjectIds.includes(n.projectId)
-  );
 
-  const activeProjects = clientProjects.filter((p) => p.status === "In Progress").length;
-  const completedProjects = clientProjects.filter((p) => p.status === "Completed").length;
-  const pendingReviews = clientProjects.filter((p) => p.status === "Review").length;
+  const { 
+    clientProjects,
+    activeProjects,
+    completedProjects,
+    pendingReviews,
+    recentUpdates,
+    dueInvoices
+  } = useMemo(() => {
+    const clientProjects = projects.filter((p) => p.clientId === clientId);
+    const clientProjectIds = clientProjects.map((p) => p.id);
+    const recentUpdates = notifications.filter(
+      (n) => (n.projectId && clientProjectIds.includes(n.projectId)) || n.clientId === clientId
+    );
+    const dueInvoices = invoices.filter(inv => inv.clientId === clientId && inv.status === 'Pending').length;
+
+    return {
+      clientProjects,
+      activeProjects: clientProjects.filter((p) => p.status === "In Progress").length,
+      completedProjects: clientProjects.filter((p) => p.status === "Completed").length,
+      pendingReviews: clientProjects.filter((p) => p.status === "Review").length,
+      recentUpdates,
+      dueInvoices
+    };
+  }, [clientId]);
+
+  const handleUpdateClick = (update) => {
+    if (update.type === 'payment' || update.clientId) {
+      const invoice = invoices.find(inv => inv.clientId === update.clientId);
+      if (invoice) navigate(`/dashboard/client/invoices/${invoice.id}`);
+    } else if (update.projectId) {
+      navigate(`/project/${update.projectId}`);
+    }
+  };
 
   return (
     <>
@@ -33,7 +63,7 @@ const ClientDashboard = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed</CardTitle>
+            <CardTitle className="text-sm font-medium">Projects Completed</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -44,12 +74,12 @@ const ClientDashboard = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Reviews</CardTitle>
-            <Clock className="h-4 w-4 text-amber-600" />
+            <CardTitle className="text-sm font-medium">Invoices Due</CardTitle>
+            <Receipt className="h-4 w-4 text-amber-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingReviews}</div>
-            <p className="text-xs text-muted-foreground">Awaiting feedback</p>
+            <div className="text-2xl font-bold">{dueInvoices}</div>
+            <p className="text-xs text-muted-foreground">Awaiting payment</p>
           </CardContent>
         </Card>
 
@@ -60,7 +90,7 @@ const ClientDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">5</div>
-            <p className="text-xs text-muted-foreground">Unread</p>
+            <p className="text-xs text-muted-foreground">Unread (static)</p>
           </CardContent>
         </Card>
       </div>
@@ -74,8 +104,8 @@ const ClientDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {clientProjects.map((project, index) => (
-                <div key={index} className="border rounded-lg p-4">
+              {clientProjects.map((project) => (
+                <div key={project.id} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <h4 className="font-medium">{project.name}</h4>
@@ -100,21 +130,16 @@ const ClientDashboard = () => {
                       <span>Progress</span>
                       <span>{project.progress}%</span>
                     </div>
-                    <div className="w-full bg-secondary rounded-full h-2">
-                      <div
-                        className="bg-primary h-2 rounded-full"
-                        style={{ width: `${project.progress}%` }}
-                      ></div>
-                    </div>
+                    <Progress value={project.progress} />
                     <p className="text-xs text-muted-foreground">
                       Next delivery: {new Date(project.endDate).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="flex space-x-2 mt-3">
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/project/${project.id}`)}>
                       View Details
                     </Button>
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/client/feedback')}>
                       Leave Feedback
                     </Button>
                   </div>
@@ -132,8 +157,8 @@ const ClientDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentUpdates.map((update, index) => (
-                <div key={index} className="border rounded-lg p-3">
+              {recentUpdates.map((update) => (
+                <div key={update.id} className="border rounded-lg p-3 cursor-pointer hover:bg-muted/50" onClick={() => handleUpdateClick(update)}>
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h4 className="font-medium text-sm">{update.title}</h4>

@@ -1,51 +1,157 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Plus, Copy, CreditCard as Edit, Trash2, Folder } from "lucide-react";
+import { FileText, Plus, Copy, Edit, Trash2, Folder } from "lucide-react";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger, 
+  DialogFooter,
+  DialogClose
+} from "@/components/ui/dialog";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
+const initialTemplates = [
+  {
+    id: 1,
+    name: "Brand Identity Project",
+    description: "Complete brand identity development including logo, guidelines, and assets",
+    category: "Design",
+    estimatedDuration: "8-12 weeks",
+    phases: ["Discovery", "Concept Development", "Design Refinement", "Final Delivery"],
+    usageCount: 15,
+    lastUsed: "2024-11-20"
+  },
+  {
+    id: 2,
+    name: "Website Development",
+    description: "Full website development from design to deployment",
+    category: "Development",
+    estimatedDuration: "12-16 weeks",
+    phases: ["Planning", "Design", "Development", "Testing", "Launch"],
+    usageCount: 23,
+    lastUsed: "2024-12-01"
+  },
+  {
+    id: 3,
+    name: "Marketing Campaign",
+    description: "Digital marketing campaign with content creation and advertising",
+    category: "Marketing",
+    estimatedDuration: "6-8 weeks",
+    phases: ["Strategy", "Content Creation", "Campaign Launch", "Optimization"],
+    usageCount: 8,
+    lastUsed: "2024-10-15"
+  },
+  {
+    id: 4,
+    name: "Mobile App Development",
+    description: "Native or cross-platform mobile application development",
+    category: "Development",
+    estimatedDuration: "16-20 weeks",
+    phases: ["Requirements", "UI/UX Design", "Development", "Testing", "App Store"],
+    usageCount: 5,
+    lastUsed: "2024-09-30"
+  }
+];
+
+const TemplateForm = ({ template, onSave, closeDialog }) => {
+  const [formData, setFormData] = useState(template || {
+    name: '',
+    description: '',
+    category: '',
+    estimatedDuration: '',
+    phases: '',
+  });
+
+  useEffect(() => {
+    setFormData(template || {
+      name: '',
+      description: '',
+      category: '',
+      estimatedDuration: '',
+      phases: '',
+    });
+  }, [template]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePhasesChange = (e) => {
+    setFormData(prev => ({ ...prev, phases: e.target.value.split(',').map(p => p.trim()) }));
+  }
+
+  const handleSubmit = () => {
+    onSave(formData);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2"><Label>Template Name</Label><Input name="name" value={formData.name} onChange={handleChange} /></div>
+      <div className="space-y-2"><Label>Description</Label><Textarea name="description" value={formData.description} onChange={handleChange} /></div>
+      <div className="space-y-2"><Label>Category</Label><Input name="category" value={formData.category} onChange={handleChange} /></div>
+      <div className="space-y-2"><Label>Estimated Duration</Label><Input name="estimatedDuration" value={formData.estimatedDuration} onChange={handleChange} /></div>
+      <div className="space-y-2"><Label>Phases (comma-separated)</Label><Input name="phases" value={Array.isArray(formData.phases) ? formData.phases.join(', ') : formData.phases} onChange={handlePhasesChange} /></div>
+      <DialogFooter>
+        <Button variant="outline" onClick={closeDialog}>Cancel</Button>
+        <Button onClick={handleSubmit}>Save Template</Button>
+      </DialogFooter>
+    </div>
+  );
+};
 
 const ProjectManagerTemplates = () => {
-  const templates = [
-    {
-      id: 1,
-      name: "Brand Identity Project",
-      description: "Complete brand identity development including logo, guidelines, and assets",
-      category: "Design",
-      estimatedDuration: "8-12 weeks",
-      phases: ["Discovery", "Concept Development", "Design Refinement", "Final Delivery"],
-      usageCount: 15,
-      lastUsed: "2024-11-20"
-    },
-    {
-      id: 2,
-      name: "Website Development",
-      description: "Full website development from design to deployment",
-      category: "Development",
-      estimatedDuration: "12-16 weeks",
-      phases: ["Planning", "Design", "Development", "Testing", "Launch"],
-      usageCount: 23,
-      lastUsed: "2024-12-01"
-    },
-    {
-      id: 3,
-      name: "Marketing Campaign",
-      description: "Digital marketing campaign with content creation and advertising",
-      category: "Marketing",
-      estimatedDuration: "6-8 weeks",
-      phases: ["Strategy", "Content Creation", "Campaign Launch", "Optimization"],
-      usageCount: 8,
-      lastUsed: "2024-10-15"
-    },
-    {
-      id: 4,
-      name: "Mobile App Development",
-      description: "Native or cross-platform mobile application development",
-      category: "Development",
-      estimatedDuration: "16-20 weeks",
-      phases: ["Requirements", "UI/UX Design", "Development", "Testing", "App Store"],
-      usageCount: 5,
-      lastUsed: "2024-09-30"
+  const navigate = useNavigate();
+  const [templates, setTemplates] = useState(initialTemplates);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState(null);
+
+  const handleUseTemplate = (template) => {
+    navigate('/dashboard/project-manager/projects', { state: { template } });
+  };
+
+  const openDialog = (template = null) => {
+    setEditingTemplate(template);
+    setIsDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setEditingTemplate(null);
+  };
+
+  const handleSaveTemplate = (templateData) => {
+    if (editingTemplate) {
+      setTemplates(templates.map(t => t.id === editingTemplate.id ? { ...t, ...templateData } : t));
+    } else {
+      const newTemplate = { ...templateData, id: Date.now(), usageCount: 0, lastUsed: new Date().toISOString().split('T')[0] };
+      setTemplates([newTemplate, ...templates]);
     }
-  ];
+    closeDialog();
+  };
+
+  const handleDeleteTemplate = (templateId) => {
+    setTemplates(templates.filter(t => t.id !== templateId));
+  };
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -60,7 +166,7 @@ const ProjectManagerTemplates = () => {
     <>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">Project Templates</h2>
-        <Button>
+        <Button onClick={() => openDialog()}>
           <Plus className="w-4 h-4 mr-2" />
           Create Template
         </Button>
@@ -141,24 +247,40 @@ const ProjectManagerTemplates = () => {
               <div>
                 <p className="text-sm font-medium mb-2">Project Phases:</p>
                 <div className="flex flex-wrap gap-1">
-                  {template.phases.map((phase, index) => (
+                  {Array.isArray(template.phases) && template.phases.map((phase, index) => (
                     <Badge key={index} variant="outline" className="text-xs">{phase}</Badge>
                   ))}
                 </div>
               </div>
 
               <div className="flex space-x-2">
-                <Button size="sm">
+                <Button size="sm" onClick={() => handleUseTemplate(template)}>
                   <Copy className="w-3 h-3 mr-1" />
                   Use Template
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => openDialog(template)}>
                   <Edit className="w-3 h-3 mr-1" />
                   Edit
                 </Button>
-                <Button variant="outline" size="sm">
-                  <Trash2 className="w-3 h-3" />
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete the template.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDeleteTemplate(template.id)}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
 
               <p className="text-xs text-muted-foreground">
@@ -168,6 +290,17 @@ const ProjectManagerTemplates = () => {
           </Card>
         ))}
       </div>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingTemplate ? "Edit Template" : "Create New Template"}</DialogTitle>
+            <DialogDescription>
+              {editingTemplate ? "Update the details for your project template." : "Fill out the form to create a new reusable project template."}
+            </DialogDescription>
+          </DialogHeader>
+          <TemplateForm template={editingTemplate} onSave={handleSaveTemplate} closeDialog={closeDialog} />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
