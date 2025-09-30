@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { TrendingUp, Award, Clock, Target, FileText, Calendar } from "lucide-react";
 import { teamMembers } from "@/lib/mock-data";
 
+import Paywall from "@/components/Paywall";
+
 const TeamLeadPerformance = () => {
   const myTeam = teamMembers.filter(m => 
     m.department === "Creative Team" || 
@@ -43,7 +45,14 @@ const TeamLeadPerformance = () => {
   ];
 
   return (
-    <>
+    <Paywall 
+      feature="performance"
+      featureName="Team Performance"
+      features={[
+        "Track team and individual performance metrics",
+        "Conduct performance reviews",
+        "Set and track goals for your team",
+      ]}>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">Performance Reviews</h2>
         <Button>
@@ -193,7 +202,7 @@ const TeamLeadPerformance = () => {
           </CardContent>
         </Card>
       </div>
-    </>
+    </Paywall>
   );
 };
 

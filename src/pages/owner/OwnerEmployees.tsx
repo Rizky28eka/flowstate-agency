@@ -1,167 +1,152 @@
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { teamMembers, departments } from '@/lib/mock-data';
-import { Button } from '@/components/ui/button';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
-import { Users, Briefcase, BarChart, Search, PlusCircle } from 'lucide-react';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { teamMembers, securityRoles } from "@/lib/mock-data";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Search, Plus, User } from "lucide-react";
 
-const TeamMemberRow = ({ member }: { member: (typeof teamMembers)[0] }) => {
-  const navigate = useNavigate();
-
-  return (
-    <TableRow 
-      className="cursor-pointer"
-      onClick={() => navigate(`/user/${member.id}`)}
-    >
-      <TableCell>
-        <div className="flex items-center gap-3">
-          <Avatar className="h-9 w-9">
-            <AvatarImage src={member.avatar} alt={member.name} />
-            <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-          </Avatar>
-          <div>
-            <div className="font-medium">{member.name}</div>
-            <div className="text-xs text-muted-foreground hidden sm:table-cell">{member.email}</div>
-          </div>
-        </div>
-      </TableCell>
-      <TableCell className="hidden md:table-cell">{member.department}</TableCell>
-      <TableCell className="hidden lg:table-cell">{member.role}</TableCell>
-      <TableCell className="hidden sm:table-cell">
-        <div className="flex items-center gap-2">
-          <Progress value={member.utilization} className="h-2 w-20" />
-          <span className="text-muted-foreground text-xs">{member.utilization}%</span>
-        </div>
-      </TableCell>
-      <TableCell className="hidden md:table-cell text-center">{member.projects}</TableCell>
-      <TableCell>
-        <Badge variant={member.status === 'Active' ? 'default' : 'secondary'}>{member.status}</Badge>
-      </TableCell>
-    </TableRow>
-  );
-};
+import { useOrganization } from "@/hooks/useOrganization";
+import { Link } from "react-router-dom";
+import { canCreate, getPlanFeatures } from "@/lib/SubscriptionManager";
 
 const OwnerEmployees = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [departmentFilter, setDepartmentFilter] = useState('all');
+  const { plan } = useOrganization();
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
 
-  const filteredMembers = useMemo(() => {
-    return teamMembers.filter(m => {
-      const searchMatch = m.name.toLowerCase().includes(searchTerm.toLowerCase()) || m.role.toLowerCase().includes(searchTerm.toLowerCase());
-      const departmentMatch = departmentFilter === 'all' || m.departmentId === departmentFilter;
-      return searchMatch && departmentMatch;
-    });
-  }, [searchTerm, departmentFilter]);
+  const employees = teamMembers.filter(member => member.role !== 'Client');
+  const canAddEmployee = canCreate(plan, 'users', employees.length);
 
-  const teamStats = useMemo(() => {
-    const totalMembers = teamMembers.length;
-    const avgUtilization = teamMembers.reduce((sum, m) => sum + m.utilization, 0) / totalMembers;
-    return { totalMembers, avgUtilization: avgUtilization.toFixed(0), departmentCount: departments.length };
-  }, []);
+  const getRoleColor = (role: string) => {
+    const roleData = securityRoles.find(r => r.role === role);
+    return roleData ? roleData.color : "bg-gray-100 text-gray-800";
+  };
 
-  const kpiData = [
-    { title: 'Total Team Members', value: teamStats.totalMembers, icon: Users },
-    { title: 'Departments', value: teamStats.departmentCount, icon: Briefcase },
-    { title: 'Average Utilization', value: `${teamStats.avgUtilization}%`, icon: BarChart },
-  ];
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Active": return "bg-green-100 text-green-800";
+      case "Inactive": return "bg-gray-100 text-gray-800";
+      case "On Leave": return "bg-yellow-100 text-yellow-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const filteredEmployees = employees
+    .filter(
+      (employee) =>
+        employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.email.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter((employee) => roleFilter === "all" || employee.role === roleFilter)
+    .filter((employee) => statusFilter === "all" || employee.status === statusFilter);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Team Management</h1>
-          <p className="text-muted-foreground">Oversee your organization's members and departments.</p>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Employees</h2>
+        <div className="flex flex-col items-end">
+          <Button onClick={() => alert("Navigate to new employee page")} disabled={!canAddEmployee}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Employee
+          </Button>
+          {!canAddEmployee && (
+            <div className="text-sm text-red-500 mt-2">
+              You have reached the maximum number of employees for the {plan} plan. 
+              <Link to="/dashboard/owner/settings" className="underline">Upgrade your plan</Link> to add more employees.
+            </div>
+          )}
         </div>
-        <Button>
-          <PlusCircle className="h-4 w-4 mr-2" />
-          Add New Member
-        </Button>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-3">
-        {kpiData.map(kpi => (
-          <Card key={kpi.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
-              <kpi.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{kpi.value}</div>
-            </CardContent>
-          </Card>
-        ))}
       </div>
 
       <Card>
-        <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <CardTitle>All Team Members</CardTitle>
-            <CardDescription>A list of all members in your organization. Click a row for details.</CardDescription>
-          </div>
-          <div className="flex items-center gap-2">
+        <CardHeader>
+          <CardTitle>Employee Directory</CardTitle>
+          <CardDescription>Manage all employee information and roles.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4 mb-4">
             <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search name or role..." 
-                className="pl-8 w-full md:w-64"
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search employees..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
               />
             </div>
-            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="All Departments" />
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Filter by role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Departments</SelectItem>
-                {departments.map(dept => (
-                  <SelectItem key={dept.id} value={dept.id}>{dept.name}</SelectItem>
+                <SelectItem value="all">All Roles</SelectItem>
+                {securityRoles
+                  .filter(role => role.id !== 'CLIENT')
+                  .map(role => (
+                  <SelectItem key={role.id} value={role.role}>{role.role}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="Active">Active</SelectItem>
+                <SelectItem value="Inactive">Inactive</SelectItem>
+                <SelectItem value="On Leave">On Leave</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Member</TableHead>
-                <TableHead className="hidden md:table-cell">Department</TableHead>
-                <TableHead className="hidden lg:table-cell">Role</TableHead>
-                <TableHead className="hidden sm:table-cell">Utilization</TableHead>
-                <TableHead className="hidden md:table-cell text-center">Projects</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredMembers.map(m => <TeamMemberRow key={m.id} member={m} />)}
-            </TableBody>
-          </Table>
+
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left p-3">Employee</th>
+                  <th className="text-left p-3">Role</th>
+                  <th className="text-left p-3 hidden md:table-cell">Department</th>
+                  <th className="text-left p-3">Status</th>
+                  <th className="text-left p-3 hidden lg:table-cell">Join Date</th>
+                  <th className="text-left p-3 hidden sm:table-cell">Projects</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredEmployees.map((employee) => (
+                  <tr key={employee.id} className="border-b hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/dashboard/owner/employees/${employee.id}`)}>
+                    <td className="p-3">
+                      <div className="flex items-center space-x-3">
+                        <Avatar>
+                          <AvatarImage src={employee.avatar} alt={employee.name} />
+                          <AvatarFallback>{employee.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{employee.name}</p>
+                          <p className="text-sm text-muted-foreground">{employee.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-3">
+                      <Badge className={getRoleColor(employee.role)}>{employee.role}</Badge>
+                    </td>
+                    <td className="p-3 hidden md:table-cell">{employee.department}</td>
+                    <td className="p-3">
+                      <Badge className={getStatusColor(employee.status)}>{employee.status}</Badge>
+                    </td>
+                    <td className="p-3 hidden lg:table-cell">{new Date(employee.joinDate).toLocaleDateString()}</td>
+                    <td className="p-3 hidden sm:table-cell">{employee.projects}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </div>

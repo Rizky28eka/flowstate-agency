@@ -90,8 +90,15 @@ const AddGoalForm = ({ onAddGoal }) => {
   );
 };
 
+import { useOrganization } from "@/hooks/useOrganization";
+import { Link } from "react-router-dom";
+import { canCreate, getPlanFeatures } from "@/lib/SubscriptionManager";
+
 const OwnerGoals = () => {
+  const { plan } = useOrganization();
   const [goals, setGoals] = useState(initialGoals);
+
+  const canAddGoal = canCreate(plan, 'goals', goals.length);
 
   const handleAddGoal = (newGoal) => {
     setGoals(prev => [newGoal, ...prev]);
@@ -121,7 +128,7 @@ const OwnerGoals = () => {
         </div>
         <Dialog>
           <DialogTrigger asChild>
-            <Button><Plus className="w-4 h-4 mr-2" /> Add New Goal</Button>
+            <Button disabled={!canAddGoal}><Plus className="w-4 h-4 mr-2" /> Add New Goal</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -134,6 +141,13 @@ const OwnerGoals = () => {
           </DialogContent>
         </Dialog>
       </div>
+
+      {!canAddGoal && (
+        <div className="text-sm text-red-500 mb-8">
+          You have reached the maximum number of goals for the {plan} plan. 
+          <Link to="/dashboard/owner/settings" className="underline">Upgrade your plan</Link> to add more goals.
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {goals.map((goal) => {

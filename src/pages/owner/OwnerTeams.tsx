@@ -66,9 +66,16 @@ const TeamMemberRow = ({ member }: { member: (typeof teamMembers)[0] }) => {
   );
 };
 
+import { useOrganization } from "@/hooks/useOrganization";
+import { Link } from "react-router-dom";
+import { canCreate, getPlanFeatures } from "@/lib/SubscriptionManager";
+
 const OwnerTeams = () => {
+  const { plan } = useOrganization();
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('all');
+
+  const canAddTeam = canCreate(plan, 'teams', departments.length);
 
   const filteredMembers = useMemo(() => {
     return teamMembers.filter(m => {
@@ -97,11 +104,23 @@ const OwnerTeams = () => {
           <h1 className="text-2xl font-bold tracking-tight">Team Management</h1>
           <p className="text-muted-foreground">Oversee your organization's members and departments.</p>
         </div>
-        <Button>
-          <PlusCircle className="h-4 w-4 mr-2" />
-          Add New Member
-        </Button>
+        <div className="flex gap-2">
+          <Button>
+            <PlusCircle className="h-4 w-4 mr-2" />
+            Add New Member
+          </Button>
+          <Button disabled={!canAddTeam}>
+            <PlusCircle className="h-4 w-4 mr-2" />
+            Add New Department
+          </Button>
+        </div>
       </div>
+      {!canAddTeam && (
+        <div className="text-sm text-red-500">
+          You have reached the maximum number of departments for the {plan} plan. 
+          <Link to="/dashboard/owner/settings" className="underline">Upgrade your plan</Link> to add more departments.
+        </div>
+      )}
 
       <div className="grid gap-6 md:grid-cols-3">
         {kpiData.map(kpi => (

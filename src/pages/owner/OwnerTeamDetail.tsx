@@ -147,7 +147,7 @@ const OwnerTeamDetail = () => {
                 <TableHeader><TableRow><TableHead>Project</TableHead><TableHead>Status</TableHead><TableHead className="text-right">End Date</TableHead></TableRow></TableHeader>
                 <TableBody>
                   {employee.assignedProjects.map(p => (
-                    <TableRow key={p.id} className="cursor-pointer" onClick={() => navigate(`/project/${p.id}`)}>
+                    <TableRow key={p.id} className="cursor-pointer" onClick={() => navigate(`/dashboard/owner/projects/${p.id}`)}>
                       <TableCell className="font-medium">{p.name}</TableCell>
                       <TableCell><Badge variant={p.status === 'Completed' ? 'secondary' : 'default'}>{p.status}</Badge></TableCell>
                       <TableCell className="text-right">{p.endDate}</TableCell>

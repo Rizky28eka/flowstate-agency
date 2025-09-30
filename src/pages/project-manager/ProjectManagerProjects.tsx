@@ -10,7 +10,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, PlusCircle } from 'lucide-react';
 import { toast } from "sonner";
-
+import { Link } from 'react-router-dom';
+import { useOrganization } from '@/hooks/useOrganization';
+import { canCreate } from "@/lib/SubscriptionManager";
 
 const CreateProjectForm = ({ onSave, isSaving, closeDialog }) => {
   const [name, setName] = useState('');
@@ -47,6 +49,7 @@ const CreateProjectForm = ({ onSave, isSaving, closeDialog }) => {
 
 
 const ProjectManagerProjects = () => {
+  const { plan } = useOrganization();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -57,6 +60,8 @@ const ProjectManagerProjects = () => {
     queryKey: ['projects'],
     queryFn: getProjects,
   });
+
+  const canCreateProject = canCreate(plan, 'projects', projects ? projects.length : 0);
 
   const createProjectMutation = useMutation({
     mutationFn: createProject,
@@ -97,11 +102,18 @@ const ProjectManagerProjects = () => {
             <h1 className="text-2xl font-bold tracking-tight">My Projects</h1>
             <p className="text-muted-foreground">An overview of all projects from the database.</p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)}>
+        <Button onClick={() => setIsDialogOpen(true)} disabled={!canCreateProject}>
             <PlusCircle className="h-4 w-4 mr-2" />
             Create New Project
         </Button>
       </div>
+
+      {!canCreateProject && (
+        <div className="text-sm text-red-500">
+          You have reached the maximum number of projects for the {plan} plan. 
+          <Link to="/dashboard/owner/settings" className="underline">Upgrade your plan</Link> to create more projects.
+        </div>
+      )}
 
       <Card>
         <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

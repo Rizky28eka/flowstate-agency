@@ -14,9 +14,15 @@ const iconMap = {
   Client: BarChart3,
 };
 
+import { useOrganization } from "@/contexts/OrganizationContext";
+import { hasFeature } from "@/lib/SubscriptionManager";
+
 const OwnerReports = () => {
+  const { plan } = useOrganization();
   const [reportType, setReportType] = useState("financial");
   const [dateRange, setDateRange] = useState("q3-2024");
+
+  const hasAccess = hasFeature(plan, 'reports');
 
   return (
     <main className="flex-1 px-6 py-8">
@@ -29,11 +35,18 @@ const OwnerReports = () => {
             <p className="text-sm text-muted-foreground">Generate and download detailed company reports</p>
           </div>
         </div>
-        <Button>
+        <Button disabled={!hasAccess}>
           <Plus className="w-4 h-4 mr-2" />
           Generate New Report
         </Button>
       </div>
+
+      {!hasAccess && (
+        <div className="text-sm text-red-500 mb-8">
+          You need to be on the Enterprise plan or higher to generate new reports. 
+          <Link to="/dashboard/owner/settings" className="underline">Upgrade your plan</Link>.
+        </div>
+      )}
 
       {/* Report Generation Section */}
       <Card className="mb-8">
@@ -42,7 +55,7 @@ const OwnerReports = () => {
           <CardDescription>Select the report type and date range to generate a new document.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <fieldset disabled={!hasAccess} className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <label htmlFor="report-type" className="text-sm font-medium mb-2 block">Report Type</label>
               <Select value={reportType} onValueChange={setReportType}>
@@ -78,7 +91,7 @@ const OwnerReports = () => {
                 Generate & Download
               </Button>
             </div>
-          </div>
+          </fieldset>
         </CardContent>
       </Card>
 
@@ -120,5 +133,4 @@ const OwnerReports = () => {
     </main>
   );
 };
-
 export default OwnerReports;

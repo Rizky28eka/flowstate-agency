@@ -108,14 +108,27 @@ const PermissionsMatrix = () => (
   </div>
 );
 
+import { useOrganization } from "@/hooks/useOrganization";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
+
 // Main Component
 const OwnerSettings = () => {
+  const { plan, setPlan } = useOrganization();
   const [settings, setSettings] = useState(initialSettings);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
-  const [activeTab, setActiveTab] = useState("general");
+  const [activeTab, setActiveTab] = useState("billing");
   const [showPassword, setShowPassword] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+
+  const handlePlanChange = () => {
+    if (selectedPlan) {
+      setPlan(selectedPlan);
+      showToast(`Plan changed to ${selectedPlan}!`, "success");
+      setSelectedPlan(null);
+    }
+  };
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -509,6 +522,192 @@ const OwnerSettings = () => {
           </TabsContent>
 
           <TabsContent value="billing" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Subscription Plan</CardTitle>
+                <CardDescription>Manage your subscription plan and billing details.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                  <Card className={plan === "Free" ? "border-2 border-primary" : ""}>
+                    <CardHeader>
+                      <CardTitle>Free</CardTitle>
+                      <CardDescription>For personal use or testing.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-4xl font-bold">$0</div>
+                      <ul className="space-y-2 text-sm">
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />3 Projects</li>
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />5 Users</li>
+                        <li className="flex items-center"><X className="w-4 h-4 mr-2 text-red-500" />Basic Analytics</li>
+                      </ul>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant={plan === "Free" ? "default" : "outline"} className="w-full" onClick={() => setSelectedPlan("Free")} disabled={plan === "Free"}>
+                            {plan === "Free" ? "Current Plan" : "Downgrade to Free"}
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Confirm Plan Change</DialogTitle>
+                            <DialogDescription>
+                              You are about to downgrade to the Free plan.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter>
+                            <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
+                            <Button onClick={handlePlanChange}>Confirm</Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </CardContent>
+                  </Card>
+                  <Card className={plan === "Starter" ? "border-2 border-primary" : ""}>
+                    <CardHeader>
+                      <CardTitle>Starter</CardTitle>
+                      <CardDescription>For small teams.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-4xl font-bold">$19</div>
+                      <ul className="space-y-2 text-sm">
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />10 Projects</li>
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />15 Users</li>
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />Basic Analytics</li>
+                      </ul>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button className="w-full" onClick={() => setSelectedPlan("Starter")} disabled={plan === "Starter"}>
+                            {plan === "Starter" ? "Current Plan" : "Upgrade to Starter"}
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Upgrade to Starter</DialogTitle>
+                            <DialogDescription>
+                              Enter your payment details to upgrade to the Starter plan.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="grid gap-4 py-4">
+                            <Input placeholder="Card Number" />
+                            <div className="grid grid-cols-3 gap-4">
+                              <Input placeholder="MM / YY" />
+                              <Input placeholder="CVC" />
+                              <Input placeholder="ZIP" />
+                            </div>
+                          </div>
+                          <DialogFooter>
+                            <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
+                            <Button onClick={handlePlanChange}>Pay $19</Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </CardContent>
+                  </Card>
+                  <Card className={plan === "Business" ? "border-2 border-primary" : ""}>
+                    <CardHeader>
+                      <CardTitle>Business</CardTitle>
+                      <CardDescription>For growing businesses.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-4xl font-bold">$99</div>
+                      <ul className="space-y-2 text-sm">
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />Unlimited Projects</li>
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />50 Users</li>
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />Advanced Analytics</li>
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />Priority Support</li>
+                      </ul>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button className="w-full" onClick={() => setSelectedPlan("Business")} disabled={plan === "Business"}>
+                            {plan === "Business" ? "Current Plan" : "Upgrade to Business"}
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Upgrade to Business</DialogTitle>
+                            <DialogDescription>
+                              Enter your payment details to upgrade to the Business plan.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="grid gap-4 py-4">
+                            <Input placeholder="Card Number" />
+                            <div className="grid grid-cols-3 gap-4">
+                              <Input placeholder="MM / YY" />
+                              <Input placeholder="CVC" />
+                              <Input placeholder="ZIP" />
+                            </div>
+                          </div>
+                          <DialogFooter>
+                            <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
+                            <Button onClick={handlePlanChange}>Pay $99</Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </CardContent>
+                  </Card>
+                  <Card className={plan === "Enterprise" ? "border-2 border-primary" : ""}>
+                    <CardHeader>
+                      <CardTitle>Enterprise</CardTitle>
+                      <CardDescription>For large organizations.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-4xl font-bold">$299</div>
+                      <ul className="space-y-2 text-sm">
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />Unlimited Projects</li>
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />Unlimited Users</li>
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />Advanced Analytics & Reports</li>
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />Dedicated Support</li>
+                      </ul>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button className="w-full" onClick={() => setSelectedPlan("Enterprise")} disabled={plan === "Enterprise"}>
+                            {plan === "Enterprise" ? "Current Plan" : "Upgrade to Enterprise"}
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Upgrade to Enterprise</DialogTitle>
+                            <DialogDescription>
+                              Enter your payment details to upgrade to the Enterprise plan.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="grid gap-4 py-4">
+                            <Input placeholder="Card Number" />
+                            <div className="grid grid-cols-3 gap-4">
+                              <Input placeholder="MM / YY" />
+                              <Input placeholder="CVC" />
+                              <Input placeholder="ZIP" />
+                            </div>
+                          </div>
+                          <DialogFooter>
+                            <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
+                            <Button onClick={handlePlanChange}>Pay $299</Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Custom</CardTitle>
+                      <CardDescription>For specific needs.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-4xl font-bold">Contact Us</div>
+                      <ul className="space-y-2 text-sm">
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />Custom Features</li>
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />Custom Integrations</li>
+                        <li className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" />24/7 Support</li>
+                      </ul>
+                      <Button variant="outline" className="w-full" onClick={() => alert("Contact sales for custom plan.")}>
+                        Contact Sales
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle>Billing Information</CardTitle>

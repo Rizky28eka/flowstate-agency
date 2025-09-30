@@ -30,6 +30,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Users, DollarSign, Smile, Search, PlusCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+import { useOrganization } from '@/hooks/useOrganization';
+import { canCreate } from "@/lib/SubscriptionManager";
+import { Link } from 'react-router-dom';
+
 // Helper to format currency
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
@@ -49,7 +53,7 @@ const ClientRow = ({ client }: { client: (typeof clients)[0] }) => {
   return (
     <TableRow 
       className="cursor-pointer"
-      onClick={() => navigate(`/client/${client.id}`)}
+      onClick={() => navigate(`/dashboard/owner/clients/${client.id}`)}
     >
       <TableCell>
         <div className="flex items-center gap-3">
@@ -76,8 +80,11 @@ const ClientRow = ({ client }: { client: (typeof clients)[0] }) => {
 };
 
 const OwnerClients = () => {
+  const { plan } = useOrganization();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+
+  const canAddClient = canCreate(plan, 'clients', clients.length);
 
   const filteredClients = useMemo(() => {
     return clients.filter(c => {
@@ -109,11 +116,18 @@ const OwnerClients = () => {
           <h1 className="text-2xl font-bold tracking-tight">Client Management</h1>
           <p className="text-muted-foreground">View and manage your client portfolio.</p>
         </div>
-        <Button>
+        <Button disabled={!canAddClient}>
           <PlusCircle className="h-4 w-4 mr-2" />
           Add New Client
         </Button>
       </div>
+
+      {!canAddClient && (
+        <div className="text-sm text-red-500">
+          You have reached the maximum number of clients for the {plan} plan. 
+          <Link to="/dashboard/owner/settings" className="underline">Upgrade your plan</Link> to add more clients.
+        </div>
+      )}
 
       <div className="grid gap-6 md:grid-cols-3">
         {kpiData.map(kpi => (

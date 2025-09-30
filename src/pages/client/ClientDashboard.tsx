@@ -42,7 +42,7 @@ const ClientDashboard = () => {
       const invoice = invoices.find(inv => inv.clientId === update.clientId);
       if (invoice) navigate(`/dashboard/client/invoices/${invoice.id}`);
     } else if (update.projectId) {
-      navigate(`/project/${update.projectId}`);
+      navigate(`/dashboard/client/projects/${update.projectId}`);
     }
   };
 
@@ -136,7 +136,7 @@ const ClientDashboard = () => {
                     </p>
                   </div>
                   <div className="flex space-x-2 mt-3">
-                    <Button variant="outline" size="sm" onClick={() => navigate(`/project/${project.id}`)}>
+                    <Button variant="outline" size="sm" onClick={() => navigate(`/dashboard/client/projects/${project.id}`)}>
                       View Details
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/client/feedback')}>

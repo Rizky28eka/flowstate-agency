@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Download, Calendar, Calculator, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle } from "lucide-react";
 
+import Paywall from "@/components/Paywall";
+
 const FinanceTaxes = () => {
   const taxPeriods = [
     {
@@ -53,7 +55,14 @@ const FinanceTaxes = () => {
   };
 
   return (
-    <>
+    <Paywall 
+      feature="taxes"
+      featureName="Tax Management"
+      features={[
+        "Automated tax calculations",
+        "Generate and file tax reports",
+        "Integrate with accounting software",
+      ]}>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">Tax Management</h2>
         <Button>
@@ -171,7 +180,7 @@ const FinanceTaxes = () => {
           </div>
         </CardContent>
       </Card>
-    </>
+    </Paywall>
   );
 };
 

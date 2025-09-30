@@ -26,7 +26,7 @@ const ProjectCard = ({ project }: { project: (typeof projects)[0] }) => {
   return (
         <Card
           className="hover:shadow-lg transition-shadow cursor-pointer"
-          onClick={() => navigate(`/project/${project.id}`)}    >
+          onClick={() => navigate(`/dashboard/client/projects/${project.id}`)}    >
       <CardHeader>
         <CardTitle>{project.name}</CardTitle>
                 <div className="text-sm text-muted-foreground">Status: <Badge variant={project.status === 'Completed' ? 'outline' : 'default'}>{project.status}</Badge></div>
@@ -52,7 +52,7 @@ const ProjectRow = ({ project }: { project: (typeof projects)[0] }) => {
   return (
     <TableRow 
       className="cursor-pointer"
-      onClick={() => navigate(`/project/${project.id}`)}
+      onClick={() => navigate(`/dashboard/client/projects/${project.id}`)}
     >
       <TableCell className="font-medium">{project.name}</TableCell>
       <TableCell><Badge variant={project.status === 'Completed' ? 'outline' : 'default'}>{project.status}</Badge></TableCell>

@@ -109,7 +109,7 @@ const ProjectManagerDashboard = () => {
           <CardContent>
             <div className="space-y-4">
               {myProjects.filter(p => p.status !== "Completed").map((project) => (
-                <div key={project.id} className="border rounded-lg p-4 cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/project/${project.id}`)}>
+                <div key={project.id} className="border rounded-lg p-4 cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/dashboard/project-manager/projects/${project.id}`)}>
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <h4 className="font-medium">{project.name}</h4>
@@ -151,7 +151,7 @@ const ProjectManagerDashboard = () => {
               {upcomingDeadlines.map((project) => {
                 const daysLeft = Math.ceil((new Date(project.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
                 return (
-                  <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/project/${project.id}`)}>
+                  <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/dashboard/project-manager/projects/${project.id}`)}>
                     <div>
                       <p className="font-medium">{project.name}</p>
                       <p className="text-sm text-muted-foreground">{project.client}</p>
@@ -167,7 +167,7 @@ const ProjectManagerDashboard = () => {
               })}
               
               {overdueTasks.map((task) => (
-                <div key={task.id} className="flex items-center justify-between p-3 border border-red-200 rounded-lg bg-red-50 cursor-pointer hover:bg-red-50/50" onClick={() => navigate(`/project/${task.projectId}/tasks`)}>
+                <div key={task.id} className="flex items-center justify-between p-3 border border-red-200 rounded-lg bg-red-50 cursor-pointer hover:bg-red-50/50" onClick={() => navigate(`/dashboard/project-manager/projects/${task.projectId}/tasks`)}>
                   <div>
                     <p className="font-medium text-red-800">{task.title}</p>
                     <p className="text-sm text-red-600">Overdue since {task.dueDate}</p>

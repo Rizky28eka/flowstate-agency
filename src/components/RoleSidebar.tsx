@@ -77,6 +77,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
+import ProBadge from "./ProBadge";
+
 // Type definitions
 interface SidebarItem {
   id: string;
@@ -88,6 +90,7 @@ interface SidebarItem {
   children?: SidebarItem[];
   isNew?: boolean;
   description?: string;
+  isPro?: boolean;
 }
 
 interface UserProfile {
@@ -148,6 +151,7 @@ const roleConfigs: Record<UserRole, RoleConfig> = {
             label: "Analytics",
             icon: BarChart3,
             href: "/dashboard/owner/analytics",
+            isPro: true,
           },
           {
             id: "kpi-dashboard",
@@ -263,6 +267,7 @@ const roleConfigs: Record<UserRole, RoleConfig> = {
             label: "Reports",
             icon: FileText,
             href: "/dashboard/owner/reports",
+            isPro: true,
           },
           {
             id: "sales-pipeline",
@@ -677,10 +682,12 @@ const SidebarMenuItem = ({
   item,
   onNavigate,
   currentPath,
+  showProBadge,
 }: {
   item: SidebarItem;
   onNavigate?: (path: string) => void;
   currentPath?: string;
+  showProBadge?: boolean;
 }) => {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
@@ -770,6 +777,7 @@ const SidebarMenuItem = ({
                     isActive={child.href === currentPath}
                   >
                     {child.label}
+                    {showProBadge && <ProBadge />}
                     {child.badge && (
                       <Badge
                         variant={child.badgeVariant || "default"}
@@ -801,6 +809,7 @@ const SidebarMenuItem = ({
           className={cn("h-4 w-4 shrink-0", isActive && "text-primary")}
         />
         <span className="truncate flex-1 text-left">{item.label}</span>
+        {showProBadge && <ProBadge />}
         {item.badge && (
           <Badge
             variant={item.badgeVariant || "default"}
@@ -924,6 +933,8 @@ const UserProfileSection = ({
   );
 };
 
+import { useOrganization } from "@/hooks/useOrganization";
+
 // Main sidebar component
 export const RoleSidebar = ({
   role,
@@ -939,6 +950,7 @@ export const RoleSidebar = ({
   const IconComponent = config.icon;
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const { plan } = useOrganization();
 
   return (
     <Sidebar collapsible="icon">
@@ -978,14 +990,18 @@ export const RoleSidebar = ({
       <ScrollArea className="flex-1">
         <SidebarContent>
           <SidebarMenu>
-            {config.items.map((item) => (
-              <SidebarMenuItem
-                key={item.id}
-                item={item}
-                onNavigate={onNavigate}
-                currentPath={currentPath}
-              />
-            ))}
+            {config.items.map((item) => {
+              const showProBadge = item.isPro && (plan === "Free" || plan === "Starter");
+              return (
+                <SidebarMenuItem
+                  key={item.id}
+                  item={item}
+                  onNavigate={onNavigate}
+                  currentPath={currentPath}
+                  showProBadge={showProBadge}
+                />
+              );
+            })}
           </SidebarMenu>
         </SidebarContent>
       </ScrollArea>
