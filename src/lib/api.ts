@@ -1,8 +1,7 @@
 import { User as Employee } from '../types';
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = ''; // Use relative path for proxy
 
-// TODO: Replace this with a dynamic ID from your authentication context
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -11,9 +10,27 @@ const getAuthHeaders = () => {
   };
 };
 
+const handleAuthError = (status: number) => {
+  if (status === 401 || status === 403) {
+    localStorage.removeItem('token');
+    window.location.href = '/login'; // Redirect to login page
+  }
+};
+
+const fetchWithAuth = async (url: string, options?: RequestInit) => {
+  const response = await fetch(url, { ...options, headers: { ...getAuthHeaders(), ...options?.headers } });
+  handleAuthError(response.status);
+  return response;
+};
+
+export const logout = () => {
+  localStorage.removeItem('token');
+  window.location.href = '/login';
+};
+
 export const getEmployees = async (): Promise<Employee[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/users`, { headers: getAuthHeaders() });
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/users`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -42,7 +59,7 @@ export interface Client {
 
 export const getClients = async (): Promise<Client[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/clients`, { headers: getAuthHeaders() });
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/clients`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -54,7 +71,7 @@ export const getClients = async (): Promise<Client[]> => {
 };
 
 export const getClientById = async (id: string): Promise<Client> => {
-  const response = await fetch(`${API_BASE_URL}/api/clients/${id}`, { headers: getAuthHeaders() });
+  const response = await fetchWithAuth(`${API_BASE_URL}/api/clients/${id}`);
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
@@ -75,7 +92,7 @@ export interface Project {
 }
 
 export async function getProjects(): Promise<Project[]> {
-  const response = await fetch(`${API_BASE_URL}/api/projects`, { headers: getAuthHeaders() });
+  const response = await fetchWithAuth(`${API_BASE_URL}/api/projects`);
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ message: 'Failed to fetch projects' }));
     throw new Error(errorData.message || 'Failed to fetch projects');
@@ -91,9 +108,8 @@ export type NewProjectData = {
 };
 
 export async function createProject(projectData: NewProjectData): Promise<Project> {
-  const response = await fetch(`${API_BASE_URL}/api/projects`, {
+  const response = await fetchWithAuth(`${API_BASE_URL}/api/projects`, {
     method: 'POST',
-    headers: getAuthHeaders(),
     body: JSON.stringify(projectData),
   });
 
@@ -108,7 +124,7 @@ export async function createProject(projectData: NewProjectData): Promise<Projec
 
 export const getOrganization = async (): Promise<any> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/organization`, { headers: getAuthHeaders() });
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/organization`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -134,7 +150,7 @@ export interface Report {
 
 export const getReports = async (): Promise<Report[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/reports`, { headers: getAuthHeaders() });
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/reports`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -155,7 +171,7 @@ export interface AnalyticsData {
 
 export const getAnalytics = async (): Promise<AnalyticsData> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/analytics`, { headers: getAuthHeaders() });
+    const response = await fetchWithAuth(`${API_BASE_URL}/api/analytics`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
