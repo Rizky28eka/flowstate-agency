@@ -15,9 +15,10 @@ import { Separator } from "@/components/ui/separator";
 import { AlertTriangle, Settings, Building2, Palette, Bell, CreditCard, Lock, Users, Upload, Check, X, Save, RefreshCw, Eye, EyeOff, Shield, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { securityRoles, permissionMatrix } from "@/lib/mock-data";
-import { getCurrentUser, updateCurrentUser, getOrganizationSettings, updateOrganizationSettings, UserProfile, OrganizationSettings } from '@/lib/api';
-const Toast = ({ message, type = "success", onClose }) => {
+import { securityRoles as mockSecurityRoles, permissionMatrix as mockPermissionMatrix } from "@/lib/mock-data";
+import { getCurrentUser, updateCurrentUser, getOrganizationSettings, updateOrganizationSettings, getRoles, getPermissions, updateRolePermissions, UserProfile, OrganizationSettings, Role, Permission } from '@/lib/api';
+
+const Toast = ({ message, type = "success", onClose }: { message: string; type?: string; onClose: () => void }) => {
   useEffect(() => {
     const timer = setTimeout(onClose, 3000);
     return () => clearTimeout(timer);
@@ -41,74 +42,155 @@ const Toast = ({ message, type = "success", onClose }) => {
 };
 
 // Enhanced Permissions Matrix
-const PermissionsMatrix = () => (
-  <div className="space-y-6">
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Shield className="w-5 h-5" />
-          Permission Matrix
-        </CardTitle>
-        <CardDescription>Overview of permissions for each role in your organization</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4 flex flex-wrap gap-2">
-          {securityRoles.map(role => (
-            <Badge key={role.id} variant="secondary" className="flex items-center gap-1">
-              {role.role}
-              <span className="text-xs opacity-70">({role.description})</span>
-            </Badge>
-          ))}
-        </div>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-1/3">Permission</TableHead>
-                {securityRoles.map(role => (
-                  <TableHead key={role.id} className="text-center min-w-[100px]">
-                    {role.role}
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {permissionMatrix.map(perm => (
-                <TableRow key={perm.permission}>
-                  <TableCell className="font-medium">{perm.permission}</TableCell>
-                  {securityRoles.map(role => (
-                    <TableCell key={`${perm.permission}-${role.id}`} className="text-center">
-                      {perm[role.id.toLowerCase()] ? (
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      ) : (
-                        <X className="w-5 h-5 text-red-300 mx-auto" />
-                      )}
-                    </TableCell>
+const PermissionsMatrix = ({ showToast }: { showToast: (message: string, type?: string) => void }) => {
+  const queryClient = useQueryClient();
+  const [selectedPermissions, setSelectedPermissions] = useState<Record<string, string[]>>({});
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+
+  const { data: roles, isLoading: isRolesLoading, isError: isRolesError } = useQuery<Role[]>({
+    queryKey: ['roles'],
+    queryFn: getRoles,
+  });
+
+  const { data: permissions, isLoading: isPermissionsLoading, isError: isPermissionsError } = useQuery<Permission[]>({
+    queryKey: ['permissions'],
+    queryFn: getPermissions,
+  });
+
+  useEffect(() => {
+    if (roles) {
+      const initialSelected: Record<string, string[]> = {};
+      roles.forEach(role => {
+        initialSelected[role.id] = role.permissions.map(p => p.permission.id);
+      });
+      setSelectedPermissions(initialSelected);
+    }
+  }, [roles]);
+
+  const updateRolePermissionsMutation = useMutation({
+    mutationFn: ({ roleId, permissionIds }: { roleId: string; permissionIds: string[] }) => updateRolePermissions(roleId, permissionIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
+      showToast('Role permissions updated successfully!', 'success');
+      setUnsavedChanges(false);
+    },
+    onError: (error) => {
+      showToast(`Failed to update role permissions: ${error.message}`, 'error');
+    },
+  });
+
+  const handlePermissionChange = (roleId: string, permissionId: string, isChecked: boolean) => {
+    setUnsavedChanges(true);
+    setSelectedPermissions(prev => {
+      const currentPermissions = prev[roleId] || [];
+      if (isChecked) {
+        return { ...prev, [roleId]: [...currentPermissions, permissionId] };
+      } else {
+        return { ...prev, [roleId]: currentPermissions.filter(id => id !== permissionId) };
+      }
+    });
+  };
+
+  const handleSaveRolePermissions = async (roleId: string) => {
+    await updateRolePermissionsMutation.mutateAsync({ roleId, permissionIds: selectedPermissions[roleId] });
+  };
+
+  if (isRolesLoading || isPermissionsLoading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading roles and permissions...</div>;
+  }
+
+  if (isRolesError || isPermissionsError) {
+    return <div className="flex items-center justify-center min-h-screen text-red-500">Error loading roles or permissions. Please try again.</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="w-5 h-5" />
+            Permission Matrix
+          </CardTitle>
+          <CardDescription>Overview of permissions for each role in your organization</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {unsavedChanges && (
+            <Alert className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Unsaved changes in roles and permissions. Click save for each role to apply changes.
+              </AlertDescription>
+            </Alert>
+          )}
+          <div className="mb-4 flex flex-wrap gap-2">
+            {roles?.map(role => (
+              <Badge key={role.id} variant="secondary" className="flex items-center gap-1">
+                {role.name}
+                <span className="text-xs opacity-70">({role.description})</span>
+              </Badge>
+            ))}
+          </div>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-1/3">Permission</TableHead>
+                  {roles?.map(role => (
+                    <TableHead key={role.id} className="text-center min-w-[100px]">
+                      {role.name}
+                    </TableHead>
                   ))}
+                  <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
-    
-    <Card>
-      <CardHeader>
-        <CardTitle>Role Management</CardTitle>
-        <CardDescription>Add or modify user roles and their permissions</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Alert>
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
-            Role modifications will take effect immediately. Users may need to log in again to see changes.
-          </AlertDescription>
-        </Alert>
-      </CardContent>
-    </Card>
-  </div>
-);
+              </TableHeader>
+              <TableBody>
+                {permissions?.map(perm => (
+                  <TableRow key={perm.id}>
+                    <TableCell className="font-medium">{perm.name}</TableCell>
+                    {roles?.map(role => (
+                      <TableCell key={`${perm.id}-${role.id}`} className="text-center">
+                        <Switch
+                          checked={selectedPermissions[role.id]?.includes(perm.id) || false}
+                          onCheckedChange={(isChecked) => handlePermissionChange(role.id, perm.id, isChecked)}
+                        />
+                      </TableCell>
+                    ))}
+                    <TableCell className="text-center">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleSaveRolePermissions(role.id)}
+                        disabled={!unsavedChanges || updateRolePermissionsMutation.isPending}
+                      >
+                        {updateRolePermissionsMutation.isPending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        Save
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Role Management</CardTitle>
+          <CardDescription>Add or modify user roles and their permissions</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Role modifications will take effect immediately. Users may need to log in again to see changes.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
 import { useOrganization } from "@/hooks/useOrganization";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";

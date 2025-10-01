@@ -286,3 +286,53 @@ export const updateOrganizationSettings = async (settingsData: Partial<Organizat
   const updatedSettings = await response.json();
   return updatedSettings;
 };
+
+export interface Role {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  level: number;
+  isSystem: boolean;
+  permissions: Array<{ permission: { id: string; slug: string; name: string; resource: string; action: string; } }>;
+}
+
+export interface Permission {
+  id: string;
+  name: string;
+  slug: string;
+  resource: string;
+  action: string;
+  description?: string;
+  isSystem: boolean;
+}
+
+export const getRoles = async (): Promise<Role[]> => {
+  const response = await fetchWithAuth(`${API_BASE_URL}/api/organization/roles`);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const roles = await response.json();
+  return roles;
+};
+
+export const getPermissions = async (): Promise<Permission[]> => {
+  const response = await fetchWithAuth(`${API_BASE_URL}/api/organization/permissions`);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const permissions = await response.json();
+  return permissions;
+};
+
+export const updateRolePermissions = async (roleId: string, permissionIds: string[]): Promise<Role> => {
+  const response = await fetchWithAuth(`${API_BASE_URL}/api/organization/roles/${roleId}/permissions`, {
+    method: 'PATCH',
+    body: JSON.stringify({ permissionIds }),
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const updatedRole = await response.json();
+  return updatedRole;
+};
