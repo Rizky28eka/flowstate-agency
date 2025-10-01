@@ -37,25 +37,32 @@ export async function seedUsers(prisma: PrismaClient, organization: Organization
 
     for (let i = 0; i < count; i++) {
       let userName: string;
-      
+      let emailPrefix: string;
+
       if (roleName === 'OWNER') {
         userName = i === 0 ? 'Founder' : 'Co-Founder';
+        emailPrefix = userName.toLowerCase().replace(/\s+/g, '.');
       } else if (Math.random() > 0.5) {
         userName = getIndonesianName();
+        emailPrefix = userName.split(' ')[0].toLowerCase(); // Take first name for email prefix
       } else {
         const roleTitle = role.name.split('_').map(w => 
           w.charAt(0) + w.slice(1).toLowerCase()
         ).join(' ');
         userName = `${roleTitle} ${i + 1}`;
+        emailPrefix = role.name.toLowerCase().replace(/_/g, ''); // Use slugified role name for email prefix
       }
-      
-      let baseEmail = `${userName.toLowerCase().replace(/\s+/g, '.')}@${organization.name.toLowerCase().replace(/\s+/g, '')}.com`;
+
+      const domain = Math.random() > 0.5 ? '.com' : '.id';
+      const organizationSlug = organization.name.toLowerCase().replace(/\s+/g, '');
+
+      let baseEmail = `${emailPrefix}@${organizationSlug}${domain}`;
       let email = baseEmail;
       let emailCounter = 1;
 
       // Ensure email uniqueness
       while (await prisma.user.findUnique({ where: { email } })) {
-        email = `${userName.toLowerCase().replace(/\s+/g, '.')}${emailCounter}@${organization.name.toLowerCase().replace(/\s+/g, '')}.com`;
+        email = `${emailPrefix}${emailCounter}@${organizationSlug}${domain}`;
         emailCounter++;
       }
       
