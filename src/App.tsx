@@ -14,7 +14,7 @@ import DashboardProjectManager from "./pages/DashboardProjectManager";
 import DashboardTeamLead from "./pages/DashboardTeamLead";
 import DashboardMember from "./pages/DashboardMember";
 import DashboardFinance from "./pages/DashboardFinance";
-import DashboardClient from "./pages/ClientDashboard";
+import DashboardClient from "./pages/DashboardClient";
 import LoginPage from "./pages/user/LoginPage";
 import ForgotPasswordPage from "./pages/user/ForgotPasswordPage";
 

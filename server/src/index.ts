@@ -16,6 +16,7 @@ import reportRoutes from './routes/report.routes';
 import invoiceRoutes from './routes/invoice.routes';
 import organizationRoutes from './routes/organization.routes';
 import analyticsRoutes from './routes/analytics.routes';
+import authRoutes from './routes/auth.routes';
 
 const app: Express = express();
 const server = http.createServer(app);
@@ -49,6 +50,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 const apiRouter = express.Router();
+apiRouter.use('/auth', authRoutes);
 apiRouter.use(userAuthMiddleware);
 
 apiRouter.use('/users', userRoutes);
