@@ -78,10 +78,14 @@ const Features = () => {
                 </div>
                 
                 <div className={`${feature.side === "right" ? "lg:col-start-1" : ""} mt-6 lg:mt-0`}>
-                  <div className="bg-gradient-to-br from-secondary to-muted rounded-xl sm:rounded-2xl p-6 sm:p-8 h-60 sm:h-80 flex items-center justify-center">
-                    <div className="text-center">
-                      <IconComponent className="w-16 h-16 sm:w-20 sm:h-20 text-primary/20 mx-auto mb-3 sm:mb-4" />
-                      <p className="text-muted-foreground">Feature Mockup</p>
+                  <div className="relative bg-gradient-to-br from-secondary/50 via-accent/5 to-primary/10 rounded-xl sm:rounded-2xl p-6 sm:p-8 h-60 sm:h-80 flex items-center justify-center border border-border/50 overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="relative text-center">
+                      <div className="relative inline-block">
+                        <div className="absolute inset-0 bg-accent/20 blur-2xl rounded-full"></div>
+                        <IconComponent className="relative w-16 h-16 sm:w-24 sm:h-24 text-accent/60 mx-auto mb-3 sm:mb-4" />
+                      </div>
+                      <p className="text-muted-foreground font-medium">Interactive Demo</p>
                     </div>
                   </div>
                 </div>
