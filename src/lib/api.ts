@@ -183,3 +183,34 @@ export const getAnalytics = async (): Promise<AnalyticsData> => {
     return { totalRevenue: 0, activeClients: 0, projectSuccessRate: 0, avgProjectValue: 0 };
   }
 };
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  avatarUrl?: string;
+  bio?: string;
+  organizationId: string;
+  roles: Array<{ role: { name: string } }>;
+}
+
+export const getCurrentUser = async (): Promise<UserProfile> => {
+  const response = await fetchWithAuth(`${API_BASE_URL}/api/users/me`);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const user = await response.json();
+  return user;
+};
+
+export const updateCurrentUser = async (userData: Partial<UserProfile>): Promise<UserProfile> => {
+  const response = await fetchWithAuth(`${API_BASE_URL}/api/users/me`, {
+    method: 'PATCH',
+    body: JSON.stringify(userData),
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const updatedUser = await response.json();
+  return updatedUser;
+};

@@ -6,6 +6,49 @@ import bcrypt from 'bcryptjs';
 
 const router = Router();
 
+router.get('/me', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      include: {
+        roles: { include: { role: true } },
+        organization: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch('/me', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { name, avatarUrl, bio } = req.body;
+
+    const updatedUser = await prisma.user.update({
+      where: { id: req.userId },
+      data: {
+        name,
+        avatarUrl,
+        bio,
+      },
+      include: {
+        roles: { include: { role: true } },
+        organization: true,
+      },
+    });
+
+    io.emit('user_updated', updatedUser);
+    res.json(updatedUser);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const users = await prisma.user.findMany({
@@ -41,7 +84,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
       },
       include: { roles: { include: { role: true } }, teams: { include: { team: true } } },
     });
-    io.emit('employee_updated', newUser);
+    io.emit('user_updated', newUser);
     res.status(201).json(newUser);
   } catch (error) {
     next(error);
@@ -61,7 +104,7 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
       },
       include: { roles: { include: { role: true } }, teams: { include: { team: true } } },
     });
-    io.emit('employee_updated', updatedUser);
+    io.emit('user_updated', updatedUser);
     res.json(updatedUser);
   } catch (error) {
     next(error);

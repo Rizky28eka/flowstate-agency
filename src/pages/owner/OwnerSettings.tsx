@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,8 @@ import { Separator } from "@/components/ui/separator";
 import { AlertTriangle, Settings, Building2, Palette, Bell, CreditCard, Lock, Users, Upload, Check, X, Save, RefreshCw, Eye, EyeOff, Shield, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { settings as initialSettings, securityRoles, permissionMatrix } from "@/lib/mock-data";
+import { securityRoles, permissionMatrix } from "@/lib/mock-data";
+import { getCurrentUser, updateCurrentUser, UserProfile } from '@/lib/api';
 const Toast = ({ message, type = "success", onClose }) => {
   useEffect(() => {
     const timer = setTimeout(onClose, 3000);
@@ -114,13 +116,53 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 // Main Component
 const OwnerSettings = () => {
   const { plan, setPlan } = useOrganization();
-  const [settings, setSettings] = useState(initialSettings);
+  const queryClient = useQueryClient();
+  const [settings, setSettings] = useState<any>({
+    profile: { name: '', email: '', avatar: '', bio: '' },
+    company: { name: '', website: '', address: '', logo: '', description: '', industry: '', size: '', founded: '' },
+    branding: { primaryColor: '', secondaryColor: '', logoUrl: '', favicon: '', customCSS: '' },
+    notifications: { emailNotifications: false, projectDeadlines: false, teamUpdates: false, systemMaintenance: false, securityAlerts: false, weeklyReports: false, frequency: 'immediate' },
+    billing: { currency: '', taxRate: 0, paymentTerms: '', invoicePrefix: '', autoRenewal: false, billingAddress: '', paymentMethod: '' },
+    security: { enforce2FA: false, sessionTimeout: 0, passwordPolicy: { minLength: 0, requireSpecialChars: false, requireNumbers: false, requireUppercase: false }, ipWhitelist: [], auditLogging: false, dataRetention: 0 }
+  });
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState(null);
+  const [toast, setToast] = useState<any>(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
-  const [activeTab, setActiveTab] = useState("billing");
+  const [activeTab, setActiveTab] = useState("profile"); // Default to profile tab
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+
+  const { data: currentUser, isLoading: isUserLoading, isError: isUserError } = useQuery<UserProfile>({
+    queryKey: ['currentUser'],
+    queryFn: getCurrentUser,
+  });
+
+  useEffect(() => {
+    if (currentUser) {
+      setSettings(prev => ({
+        ...prev,
+        profile: {
+          name: currentUser.name || '',
+          email: currentUser.email || '',
+          avatar: currentUser.avatarUrl || '/api/placeholder/128/128',
+          bio: currentUser.bio || '',
+        },
+        // Populate other settings from currentUser.preferences or organization settings if available
+      }));
+    }
+  }, [currentUser]);
+
+  const updateProfileMutation = useMutation({
+    mutationFn: updateCurrentUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      showToast('Profile updated successfully!', 'success');
+      setUnsavedChanges(false);
+    },
+    onError: (error) => {
+      showToast(`Failed to update profile: ${error.message}`, 'error');
+    },
+  });
 
   const handlePlanChange = () => {
     if (selectedPlan) {
@@ -130,15 +172,15 @@ const OwnerSettings = () => {
     }
   };
 
-  const showToast = (message, type = "success") => {
+  const showToast = (message: string, type: string = "success") => {
     setToast({ message, type });
   };
 
-  const handleSettingChange = (path, value) => {
+  const handleSettingChange = (path: string, value: any) => {
     setUnsavedChanges(true);
-    setSettings(prev => {
+    setSettings((prev: any) => {
       const keys = path.split('.');
-      const newSettings = JSON.parse(JSON.stringify(prev));
+      const newSettings = { ...prev }; // Shallow copy
       let temp = newSettings;
       for (let i = 0; i < keys.length - 1; i++) {
         if (!temp[keys[i]]) temp[keys[i]] = {};
@@ -149,28 +191,36 @@ const OwnerSettings = () => {
     });
   };
 
-  const handleSaveChanges = async (tabName) => {
+  const handleSaveChanges = async (tabName: string) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log(`Saving ${tabName} settings:`, settings);
+      if (tabName === 'Profile Information') {
+        await updateProfileMutation.mutateAsync({
+          name: settings.profile.name,
+          avatarUrl: settings.profile.avatar,
+          bio: settings.profile.bio,
+        });
+      } else {
+        // Simulate API call for other settings
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log(`Saving ${tabName} settings:`, settings);
+        showToast(`${tabName} settings saved successfully!`, "success");
+      }
       setUnsavedChanges(false);
-      showToast(`${tabName} settings saved successfully!`, "success");
-    } catch (error) {
-      showToast(`Failed to save ${tabName} settings. Please try again.`, "error");
+    } catch (error: any) {
+      showToast(`Failed to save ${tabName} settings. ${error.message}`, "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFileUpload = (field) => {
+  const handleFileUpload = (field: string) => {
     // Simulate file upload
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files[0];
+      const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = () => {
@@ -183,11 +233,11 @@ const OwnerSettings = () => {
     input.click();
   };
 
-  const validateEmail = (email) => {
+  const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  const validateURL = (url) => {
+  const validateURL = (url: string) => {
     try {
       new URL(url);
       return true;
@@ -195,6 +245,14 @@ const OwnerSettings = () => {
       return false;
     }
   };
+
+  if (isUserLoading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading profile...</div>;
+  }
+
+  if (isUserError) {
+    return <div className="flex items-center justify-center min-h-screen text-red-500">Error loading profile. Please try again.</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
