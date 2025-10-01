@@ -203,7 +203,7 @@ const OwnerSettings: React.FC = () => {
     profile: {
       name: '',
       email: '',
-      avatar: '/api/placeholder/128/128',
+      avatar: '',
       bio: '',
       phoneNumber: '',
     },
@@ -211,7 +211,7 @@ const OwnerSettings: React.FC = () => {
       name: '',
       website: '',
       address: '',
-      logo: '/api/placeholder/256/256',
+      logo: '',
       description: '',
       industry: '',
       size: '',
@@ -496,7 +496,7 @@ const OwnerSettings: React.FC = () => {
               <CardContent className="space-y-6">
                 <div className="flex items-center space-x-6">
                   <Avatar className="w-24 h-24 border-2 border-gray-200">
-                    <AvatarImage src={settings.profile.avatar} alt="User Avatar" />
+                    {settings.profile.avatar && <AvatarImage src={settings.profile.avatar} alt="User Avatar" />}
                     <AvatarFallback className="text-lg font-bold">
                       {settings.profile.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
@@ -682,13 +682,12 @@ const OwnerSettings: React.FC = () => {
               <CardContent className="space-y-6">
                 <div className="flex items-start space-x-6">
                   <div className="space-y-4">
-                    <Avatar className="w-24 h-24 border-2 border-gray-200">
-                      <AvatarImage src={settings.company.logo} alt="Company Logo" />
-                      <AvatarFallback className="text-lg font-bold">
-                        {settings.company.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <Button 
+                                      <Avatar className="w-24 h-24 border-2 border-gray-200">
+                                        {settings.company.logo && <AvatarImage src={settings.company.logo} alt="Company Logo" />}
+                                        <AvatarFallback className="text-lg font-bold">
+                                          {settings.company.name.split(' ').map(n => n[0]).join('')}
+                                        </AvatarFallback>
+                                      </Avatar>                    <Button 
                       variant="outline" 
                       onClick={() => handleFileUpload('company.logo')}
                       className="flex items-center gap-2"
