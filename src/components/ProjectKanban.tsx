@@ -21,7 +21,7 @@ export const DraggableProjectCard = ({ project }) => {
       <Card className="bg-card hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing">
         <CardContent className="p-4">
           <h4 className="font-medium text-sm mb-2">{project.name}</h4>
-          <p className="text-xs text-muted-foreground mb-3">{project.client}</p>
+          <p className="text-xs text-muted-foreground mb-3">{project.client.name}</p>
           <div className="flex items-center justify-between mb-3">
             <Badge className={getPriorityColor(project.priority)}>{project.priority}</Badge>
             <span className="text-xs font-semibold">{project.progress}%</span>
@@ -32,7 +32,7 @@ export const DraggableProjectCard = ({ project }) => {
               <span className="text-sm text-muted-foreground">{project.team.length}</span>
             </div>
             <Avatar className="w-6 h-6">
-              <AvatarFallback>{project.manager.charAt(0)}</AvatarFallback>
+              <AvatarFallback>{project.client?.name?.charAt(0) || '-'}</AvatarFallback>
             </Avatar>
           </div>
         </CardContent>

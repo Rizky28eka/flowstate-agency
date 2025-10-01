@@ -6,6 +6,11 @@ import { ChartBar as BarChart3, TrendingUp, DollarSign, Users, Calendar, Downloa
 import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { useQuery } from "@tanstack/react-query";
+import { getAnalytics, AnalyticsData } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Mock data for charts - will be replaced with API data in the future
 import { monthlyRevenueData, clientAcquisitionData } from "@/lib/mock-data";
 
 const chartConfig = {
@@ -24,6 +29,14 @@ import Paywall from "@/components/Paywall";
 const OwnerAnalytics = () => {
   const [timeRange, setTimeRange] = useState("30d");
 
+  const { data: analyticsData, isLoading } = useQuery<AnalyticsData>({
+    queryKey: ['analytics'],
+    queryFn: getAnalytics,
+  });
+
+  const formatCurrency = (value: number) => 
+    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact' }).format(value);
+
   return (
     <Paywall 
       feature="analytics"
@@ -36,49 +49,60 @@ const OwnerAnalytics = () => {
       <main className="flex-1 px-6 py-8">
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">$1,284,592</div>
-              <p className="text-xs text-muted-foreground">+18.2% from last period</p>
-            </CardContent>
-          </Card>
+          {isLoading ? (
+            <>
+              <Card><CardHeader><Skeleton className="h-5 w-3/4" /></CardHeader><CardContent><Skeleton className="h-8 w-1/2" /></CardContent></Card>
+              <Card><CardHeader><Skeleton className="h-5 w-3/4" /></CardHeader><CardContent><Skeleton className="h-8 w-1/2" /></CardContent></Card>
+              <Card><CardHeader><Skeleton className="h-5 w-3/4" /></CardHeader><CardContent><Skeleton className="h-8 w-1/2" /></CardContent></Card>
+              <Card><CardHeader><Skeleton className="h-5 w-3/4" /></CardHeader><CardContent><Skeleton className="h-8 w-1/2" /></CardContent></Card>
+            </>
+          ) : (
+            <>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{formatCurrency(analyticsData?.totalRevenue || 0)}</div>
+                  <p className="text-xs text-muted-foreground">+18.2% from last period</p>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Clients</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">127</div>
-              <p className="text-xs text-muted-foreground">+12 new this month</p>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Active Clients</CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{analyticsData?.activeClients || 0}</div>
+                  <p className="text-xs text-muted-foreground">+12 new this month</p>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Project Success Rate</CardTitle>
-              <TrendingUp className="h-4 w-4 text-green-600" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">94.8%</div>
-              <p className="text-xs text-muted-foreground">+2.1% improvement</p>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Project Success Rate</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-green-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{analyticsData?.projectSuccessRate.toFixed(1) || '0.0'}%</div>
+                  <p className="text-xs text-muted-foreground">+2.1% improvement</p>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg Project Value</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">$24,750</div>
-              <p className="text-xs text-muted-foreground">+8.5% from last quarter</p>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Avg Project Value</CardTitle>
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{formatCurrency(analyticsData?.avgProjectValue || 0)}</div>
+                  <p className="text-xs text-muted-foreground">+8.5% from last quarter</p>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
 
         <Tabs defaultValue="revenue" className="space-y-6">
@@ -90,6 +114,7 @@ const OwnerAnalytics = () => {
             <TabsTrigger value="performance">Performance</TabsTrigger>
           </TabsList>
 
+          {/* Note: Charts below still use mock data. A more advanced analytics API would be needed for time-series data. */}
           <TabsContent value="revenue" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>

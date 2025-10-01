@@ -57,7 +57,7 @@ const ClientInvoiceDetail = () => {
           <Button variant="outline" size="icon" onClick={() => navigate('/dashboard/client/invoices')}><ArrowLeft className="h-4 w-4" /></Button>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Invoice {invoice.invoiceNumber}</h1>
-            <p className="text-muted-foreground">Issued on {invoice.issueDate}</p>
+            <p className="text-muted-foreground">Issued on {invoice.issuedAt}</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -91,7 +91,7 @@ const ClientInvoiceDetail = () => {
             <p>{invoice.clientDetails.address}</p>
           </div>
           <div className="text-right space-y-1">
-            <p><span className="font-semibold">Issue Date:</span> {invoice.issueDate}</p>
+            <p><span className="font-semibold">Issue Date:</span> {invoice.issuedAt}</p>
             <p><span className="font-semibold">Due Date:</span> {invoice.dueDate}</p>
           </div>
         </div>

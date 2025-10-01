@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { invoices } from '@/lib/mock-data';
+import { invoices, projects } from '@/lib/mock-data';
 import { 
   Card, 
   CardContent, 
@@ -48,7 +48,7 @@ const InvoiceRow = ({ invoice }: { invoice: (typeof invoices)[0] }) => {
     >
       <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
       <TableCell className="hidden sm:table-cell">{invoice.projectName}</TableCell>
-      <TableCell className="hidden md:table-cell">{invoice.issueDate}</TableCell>
+      <TableCell className="hidden md:table-cell">{invoice.issuedAt}</TableCell>
       <TableCell className="hidden md:table-cell">{invoice.dueDate}</TableCell>
       <TableCell><Badge variant={statusVariant[invoice.status] || 'outline'}>{invoice.status}</Badge></TableCell>
       <TableCell className="text-right font-medium">{formatCurrency(invoice.amount)}</TableCell>
@@ -61,9 +61,14 @@ const ClientInvoices = () => {
 
   // Assume logged-in client is 'TechCorp Inc.' (CLI-001) for demo
   const currentClientId = 'CLI-001';
-  const clientInvoices = useMemo(() => 
-    invoices.filter(inv => inv.clientId === currentClientId)
+  
+  const clientProjectIds = useMemo(() => 
+    new Set(projects.filter(p => p.clientId === currentClientId).map(p => p.id))
   , [currentClientId]);
+
+  const clientInvoices = useMemo(() => 
+    invoices.filter(inv => clientProjectIds.has(inv.projectId))
+  , [clientProjectIds]);
 
   const filteredInvoices = useMemo(() => {
     if (statusFilter === 'all') return clientInvoices;

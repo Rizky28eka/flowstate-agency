@@ -1,7 +1,7 @@
 
 import { useOutletContext } from "react-router-dom";
 import type { Client, Invoice } from "@/types";
-import { invoices as allInvoices } from "@/lib/mock-data";
+import { invoices as allInvoices, projects } from "@/lib/mock-data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +12,8 @@ interface ClientContext {
 
 const ClientInvoices = () => {
   const { client } = useOutletContext<ClientContext>();
-  const clientInvoices = allInvoices.filter((inv) => inv.clientId === client.id);
+  const clientProjectIds = new Set(projects.filter(p => p.clientId === client.id).map(p => p.id));
+  const clientInvoices = allInvoices.filter((inv) => clientProjectIds.has(inv.projectId));
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
@@ -20,9 +21,9 @@ const ClientInvoices = () => {
 
   const getStatusVariant = (status: string) => {
     switch (status) {
-      case "Paid": return "success";
-      case "Pending": return "warning";
-      case "Draft": return "secondary";
+      case "Paid": return "default";
+      case "Pending": return "secondary";
+      case "Draft": return "outline";
       default: return "outline";
     }
   }
@@ -39,7 +40,7 @@ const ClientInvoices = () => {
               <TableHead>Invoice #</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Amount</TableHead>
-              <TableHead>Issue Date</TableHead>
+              <TableHead>Issued At</TableHead>
               <TableHead>Due Date</TableHead>
             </TableRow>
           </TableHeader>
@@ -52,7 +53,7 @@ const ClientInvoices = () => {
                     <Badge variant={getStatusVariant(invoice.status)}>{invoice.status}</Badge>
                   </TableCell>
                   <TableCell>{formatCurrency(invoice.amount)}</TableCell>
-                  <TableCell>{invoice.issueDate}</TableCell>
+                  <TableCell>{invoice.issuedAt}</TableCell>
                   <TableCell>{invoice.dueDate}</TableCell>
                 </TableRow>
               ))

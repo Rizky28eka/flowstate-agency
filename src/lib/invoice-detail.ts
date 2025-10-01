@@ -1,4 +1,4 @@
-import { invoices, clients, settings } from './mock-data';
+import { invoices, clients, projects, settings } from './mock-data';
 
 // --- INTERFACES ---
 
@@ -20,7 +20,10 @@ export const getInvoiceDetails = (invoiceId: string): InvoiceDetails | null => {
   const invoice = invoices.find(inv => inv.id === invoiceId);
   if (!invoice) return null;
 
-  const client = clients.find(c => c.id === invoice.clientId);
+  const project = projects.find(p => p.id === invoice.projectId);
+  if (!project) return null;
+
+  const client = clients.find(c => c.id === project.clientId);
   if (!client) return null; // Or handle case where client might not be found
 
   const agencyDetails = settings.company;

@@ -25,7 +25,7 @@ const ClientDashboard = () => {
     const recentUpdates = notifications.filter(
       (n) => (n.projectId && clientProjectIds.includes(n.projectId)) || n.clientId === clientId
     );
-    const dueInvoices = invoices.filter(inv => inv.clientId === clientId && inv.status === 'Pending').length;
+    const dueInvoices = invoices.filter(inv => clientProjectIds.has(inv.projectId) && inv.status === 'Pending').length;
 
     return {
       clientProjects,
@@ -38,8 +38,8 @@ const ClientDashboard = () => {
   }, [clientId]);
 
   const handleUpdateClick = (update) => {
-    if (update.type === 'payment' || update.clientId) {
-      const invoice = invoices.find(inv => inv.clientId === update.clientId);
+    if (update.type === 'payment') {
+      const invoice = invoices.find(inv => inv.projectId === update.projectId);
       if (invoice) navigate(`/dashboard/client/invoices/${invoice.id}`);
     } else if (update.projectId) {
       navigate(`/dashboard/client/projects/${update.projectId}`);

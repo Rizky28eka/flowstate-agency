@@ -1,8 +1,31 @@
-# Welcome to your Lovable project
+# Flowstate Agency
 
-## Project info
+Flowstate Agency is a comprehensive, all-in-one platform designed to streamline the operations of a modern agency. It provides a suite of tools for project management, client relations, financial tracking, and team collaboration, tailored to different roles within an organization.
+
+## Project Info
 
 **URL**: https://lovable.dev/projects/18fc41ea-b9bd-4db2-a257-22164bff3955
+
+## Key Features
+
+*   **Role-Based Dashboards:** Customized dashboards for Owners, Admins, Project Managers, Team Leads, Members, Finance, and Clients.
+*   **Project Management:** Includes Kanban boards, Gantt charts, task tracking, and resource allocation.
+*   **Financial Tools:** Invoicing, expense tracking, budget management, and profitability analysis.
+*   **Client Portal:** A dedicated space for clients to view project progress, communicate, and manage invoices.
+*   **Team Collaboration:** Tools for communication, performance tracking, and workload management.
+*   **Reporting & Analytics:** In-depth analytics and reporting features for data-driven decision-making.
+*   **Admin & Security:**
+    *   User and role management.
+    *   System health monitoring and audit logs.
+    *   Security settings and compliance center.
+
+## Technologies Used
+
+This project is built with:
+
+*   **Frontend:** React, TypeScript, Vite, Tailwind CSS, shadcn-ui
+*   **Backend:** Node.js, Express, TypeScript
+*   **Database:** PostgreSQL
 
 ## How can I edit this code?
 
@@ -49,16 +72,6 @@ npm run dev
 - Select the "Codespaces" tab.
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
 
 ## How can I deploy this project?
 

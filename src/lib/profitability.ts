@@ -60,7 +60,7 @@ export const getFinancialsForProject = (projectId: string): ProjectFinancials | 
     description: `Invoice #${inv.invoiceNumber}`,
     amount: inv.amount,
     status: inv.status,
-    date: inv.issueDate,
+    date: inv.issuedAt,
   }));
 
   // 2. Calculate Costs from Expenses and Time Entries

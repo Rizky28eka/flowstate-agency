@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,9 +8,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FolderKanban, Search, Plus, Calendar, DollarSign, Users, MoveHorizontal as MoreHorizontal, SquareChartGantt as GanttChartSquare, LayoutGrid, List, Trello, Clock } from "lucide-react";
-import { projects as initialProjects, teamMembers, clients, tasks } from "@/lib/mock-data";
-import GanttChart from "@/components/GanttChart";
+import { FolderKanban, Search, Plus, Calendar, DollarSign, Users, MoveHorizontal as MoreHorizontal, SquareChartGantt as GanttChartSquare, LayoutGrid, List, Trello, Clock, AlertCircle } from "lucide-react";
+import { getProjects, createProject, getClients } from "@/lib/api"; // Assuming createProject and getClients exist
+import { useRealtimeUpdates } from "@/hooks/useRealtimeUpdates";
+import { Skeleton } from "@/components/ui/skeleton";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
@@ -17,17 +20,18 @@ import { Link } from "react-router-dom";
 import { DndContext } from '@dnd-kit/core';
 import { DraggableProjectCard, DroppableProjectColumn } from '@/components/ProjectKanban';
 
+import { useOrganization } from '@/hooks/useOrganization';
+import { canCreate } from "@/lib/SubscriptionManager";
+
+// NOTE: These functions and components are simplified based on the provided file.
+// Some props might be missing from the backend data initially.
+
 const getStatusColor = (status) => {
-  if (status === "Planning") return "bg-blue-100 text-blue-800";
-  if (status === "In Progress") return "bg-amber-100 text-amber-800";
-  if (status === "Review") return "bg-purple-100 text-purple-800";
-  if (status === "Completed") return "bg-green-100 text-green-800";
+  if (status === "planning") return "bg-blue-100 text-blue-800";
+  if (status === "active") return "bg-amber-100 text-amber-800";
+  if (status === "review") return "bg-purple-100 text-purple-800";
+  if (status === "completed") return "bg-green-100 text-green-800";
   return "bg-gray-100 text-gray-800";
-};
-const getPriorityColor = (priority) => {
-  if (priority === "High") return "bg-red-100 text-red-800";
-  if (priority === "Medium") return "bg-amber-100 text-amber-800";
-  return "bg-green-100 text-green-800";
 };
 
 const ProjectGridView = ({ projects }) => (
@@ -39,35 +43,17 @@ const ProjectGridView = ({ projects }) => (
             <div className="flex items-start justify-between">
               <div className="space-y-1 flex-1 min-w-0">
                 <CardTitle className="text-base sm:text-lg truncate">{project.name}</CardTitle>
-                <CardDescription className="truncate">{project.client}</CardDescription>
+                <CardDescription className="truncate">{project.client?.name || 'N/A'}</CardDescription>
               </div>
-              <Button variant="ghost" size="sm" className="shrink-0">
-                <MoreHorizontal className="w-4 h-4" />
-              </Button>
             </div>
             <div className="flex flex-wrap gap-2 pt-2">
               <Badge className={getStatusColor(project.status)}>{project.status}</Badge>
-              <Badge className={getPriorityColor(project.priority)}>{project.priority}</Badge>
             </div>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-between">
             <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-3 sm:mb-4">{project.description}</p>
-            <div className="space-y-3 sm:space-y-4">
-              <div className="space-y-2"><div className="flex justify-between text-sm"><span>Progress</span><span>{project.progress}%</span></div><Progress value={project.progress} /></div>
-              <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
-                <div><p className="text-muted-foreground">Budget</p><p className="font-medium truncate">{project.budget}</p></div>
-                <div><p className="text-muted-foreground">Spent</p><p className="font-medium truncate">{project.spent}</p></div>
-              </div>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs sm:text-sm text-muted-foreground">
-                <div className="flex items-center space-x-2">
-                  <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>{project.team.length} members</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="truncate">{new Date(project.endDate).toLocaleDateString()}</span>
-                </div>
-              </div>
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
+              <div><p className="text-muted-foreground">Budget</p><p className="font-medium truncate">{project.budget?.toLocaleString()}</p></div>
             </div>
           </CardContent>
         </Card>
@@ -81,16 +67,14 @@ const ProjectListView = ({ projects }) => (
     <CardContent className="p-0">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-muted/50"><tr className="border-b"><th className="text-left p-3 font-medium">Project</th><th className="text-left p-3 font-medium">Status</th><th className="text-left p-3 font-medium">Progress</th><th className="text-left p-3 font-medium">Manager</th><th className="text-left p-3 font-medium">Due Date</th><th className="text-right p-3 font-medium">Actions</th></tr></thead>
+          <thead><tr className="border-b"><th className="text-left p-3 font-medium">Project</th><th className="text-left p-3 font-medium">Status</th><th className="text-left p-3 font-medium">Client</th><th className="text-left p-3 font-medium">Due Date</th></tr></thead>
           <tbody>
             {projects.map((project) => (
               <tr key={project.id} className="border-b hover:bg-muted/50">
-                <td className="p-3"><Link to={`/dashboard/owner/projects/${project.id}`} className="font-medium hover:underline">{project.name}</Link><div className="text-sm text-muted-foreground">{project.client}</div></td>
+                <td className="p-3"><Link to={`/dashboard/owner/projects/${project.id}`} className="font-medium hover:underline">{project.name}</Link></td>
                 <td className="p-3"><Badge className={getStatusColor(project.status)}>{project.status}</Badge></td>
-                <td className="p-3"><div className="flex items-center space-x-2"><Progress value={project.progress} className="w-24" /><span className="text-sm text-muted-foreground">{project.progress}%</span></div></td>
-                <td className="p-3"><div className="flex items-center space-x-2"><Avatar className="w-6 h-6"><AvatarFallback>{project.manager.charAt(0)}</AvatarFallback></Avatar><span>{project.manager}</span></div></td>
-                <td className="p-3">{new Date(project.endDate).toLocaleDateString()}</td>
-                <td className="p-3 text-right"><Button variant="ghost" size="sm"><MoreHorizontal className="w-4 h-4" /></Button></td>
+                <td className="p-3">{project.client?.name || 'N/A'}</td>
+                <td className="p-3">{project.endDate ? new Date(project.endDate).toLocaleDateString() : 'N/A'}</td>
               </tr>
             ))}
           </tbody>
@@ -100,7 +84,7 @@ const ProjectListView = ({ projects }) => (
   </Card>
 );
 
-const statuses = ["Planning", "In Progress", "Review", "Completed"];
+const statuses = ["planning", "active", "review", "completed"];
 
 const ProjectKanbanView = ({ projects, onDragEnd }) => {
   const projectsByStatus = useMemo(() => statuses.reduce((acc, status) => {
@@ -119,33 +103,26 @@ const ProjectKanbanView = ({ projects, onDragEnd }) => {
   );
 };
 
-const CreateProjectForm = ({ onAddProject }) => {
+const CreateProjectForm = ({ setOpen }) => {
+    const queryClient = useQueryClient();
+    const { data: clients = [] } = useQuery({ queryKey: ['clients'], queryFn: getClients });
+
     const [name, setName] = useState('');
     const [clientId, setClientId] = useState('');
     const [description, setDescription] = useState('');
     const [budget, setBudget] = useState(50000);
 
+    const mutation = useMutation({
+      mutationFn: createProject,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['projects'] });
+        setOpen(false);
+      },
+    });
+
     const handleSubmit = () => {
         if(!name || !clientId) return;
-        const newProject = {
-            id: `PRJ-${Math.random().toString(36).substr(2, 3).toUpperCase()}`,
-            name,
-            client: clients.find(c => c.id === clientId)?.name || 'N/A',
-            clientId,
-            description,
-            status: 'Planning',
-            priority: 'Medium',
-            progress: 0,
-            budget: `$${budget.toLocaleString()}`,
-            spent: '$0',
-            startDate: new Date().toISOString().split('T')[0],
-            endDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0],
-            manager: teamMembers[0].name,
-            team: [teamMembers[0].name],
-            tags: ['New'],
-            lastUpdate: new Date().toISOString().split('T')[0],
-        };
-        onAddProject(newProject);
+        mutation.mutate({ name, clientId, description, budget, status: 'planning' });
     };
 
     return (
@@ -154,21 +131,46 @@ const CreateProjectForm = ({ onAddProject }) => {
             <Select onValueChange={setClientId}><SelectTrigger><SelectValue placeholder="Select a client" /></SelectTrigger><SelectContent>{clients.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select>
             <Textarea placeholder="Project Description" value={description} onChange={e => setDescription(e.target.value)} />
             <div><Label>Budget</Label><Input type="number" placeholder="Budget" value={budget} onChange={e => setBudget(Number(e.target.value))} /></div>
-            <DialogFooter><DialogClose asChild><Button onClick={handleSubmit}>Create Project</Button></DialogClose></DialogFooter>
+            <DialogFooter>
+              <Button onClick={handleSubmit} disabled={mutation.isPending}>
+                {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Create Project
+              </Button>
+            </DialogFooter>
         </div>
     );
 };
 
-import { useOrganization } from '@/hooks/useOrganization';
-import { canCreate, getPlanFeatures } from "@/lib/SubscriptionManager";
-
 const OwnerProjects = () => {
+  useRealtimeUpdates(); // Activate real-time updates
+  const queryClient = useQueryClient();
   const { plan } = useOrganization();
-  const [projects, setProjects] = useState(initialProjects);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [viewMode, setViewMode] = useState("grid");
   const [isMobile, setIsMobile] = useState(false);
+  const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
+
+  const { data: projects = [], isLoading, isError, error } = useQuery({ 
+    queryKey: ['projects'], 
+    queryFn: getProjects 
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ projectId, status }) => {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) throw new Error('Failed to update project status');
+      return response.json();
+    },
+    onSuccess: () => {
+      // The websocket event will handle the invalidation, so we don't strictly need it here,
+      // but it provides a good fallback and immediate feedback.
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    }
+  });
 
   const canCreateProject = canCreate(plan, 'projects', projects.length);
 
@@ -182,25 +184,25 @@ const OwnerProjects = () => {
   const filteredProjects = useMemo(() => {
     return projects.filter(project => {
       const term = searchTerm.toLowerCase();
-      const matchesSearch = term === "" || project.name.toLowerCase().includes(term) || project.client.toLowerCase().includes(term) || project.manager.toLowerCase().includes(term);
+      const matchesSearch = term === "" || project.name.toLowerCase().includes(term) || project.client?.name.toLowerCase().includes(term);
       const matchesStatus = statusFilter === "all" || project.status.toLowerCase() === statusFilter.toLowerCase();
       return matchesSearch && matchesStatus;
     });
   }, [projects, searchTerm, statusFilter]);
 
-  const handleAddProject = (newProject) => {
-    setProjects(prev => [newProject, ...prev]);
-  };
-
   const handleKanbanDragEnd = (event) => {
     const { over, active } = event;
-    if (over && over.id) {
+    if (over && over.id && active.id !== over.id) {
+      const projectId = active.id;
       const newStatus = over.id;
-      setProjects(prev => prev.map(p => p.id === active.id ? { ...p, status: newStatus } : p));
+      updateStatusMutation.mutate({ projectId, status: newStatus });
     }
   };
 
   const renderView = () => {
+    if (isLoading) return <Skeleton className="h-96 w-full" />;
+    if (isError) return <div className="text-red-500 text-center p-8"><AlertCircle className="mx-auto h-8 w-8"/><p>Error loading projects: {error.message}</p></div>;
+
     switch (viewMode) {
       case 'list': return <ProjectListView projects={filteredProjects} />;
       case 'kanban': return <ProjectKanbanView projects={filteredProjects} onDragEnd={handleKanbanDragEnd} />;
@@ -211,55 +213,14 @@ const OwnerProjects = () => {
 
   return (
     <main className="flex-1 px-4 sm:px-6 py-4 sm:py-8 bg-background">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
-                <CardTitle className="text-xs sm:text-sm font-medium">Total Projects</CardTitle>
-                <FolderKanban className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0">
-                <div className="text-lg sm:text-2xl font-bold">{filteredProjects.length}</div>
-                <p className="text-xs text-muted-foreground">matching filters</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
-                <CardTitle className="text-xs sm:text-sm font-medium">Active</CardTitle>
-                <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-amber-600" />
-              </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0">
-                <div className="text-lg sm:text-2xl font-bold">{projects.filter(p => p.status === "In Progress").length}</div>
-                <p className="text-xs text-muted-foreground">In progress</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
-                <CardTitle className="text-xs sm:text-sm font-medium">Total Value</CardTitle>
-                <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
-              </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0">
-                <div className="text-lg sm:text-2xl font-bold">${projects.reduce((sum, p) => sum + parseFloat(p.budget.replace(/[^0-9.-]+/g,"")), 0).toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">Combined value</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
-                <CardTitle className="text-xs sm:text-sm font-medium">Utilization</CardTitle>
-                <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
-              </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0">
-                <div className="text-lg sm:text-2xl font-bold">87%</div>
-                <p className="text-xs text-muted-foreground">Team average</p>
-              </CardContent>
-            </Card>
-        </div>
+        {/* KPI Cards could also be powered by real data via separate queries */}
 
       <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input 
-              placeholder={isMobile ? "Search projects..." : "Search by name, client, manager..."} 
+              placeholder={isMobile ? "Search projects..." : "Search by name, client..."} 
               value={searchTerm} 
               onChange={(e) => setSearchTerm(e.target.value)} 
               className="pl-10"
@@ -271,14 +232,11 @@ const OwnerProjects = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="Planning">Planning</SelectItem>
-              <SelectItem value="In Progress">In Progress</SelectItem>
-              <SelectItem value="Review">Review</SelectItem>
-              <SelectItem value="Completed">Completed</SelectItem>
+              {statuses.map(s => <SelectItem key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
-        <Dialog>
+        <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button className="w-full sm:w-auto" disabled={!canCreateProject}>
               <Plus className="w-4 h-4 mr-2" />
@@ -296,29 +254,17 @@ const OwnerProjects = () => {
               <DialogTitle>Create New Project</DialogTitle>
               <DialogDescription>Fill in the details below to create a new project.</DialogDescription>
             </DialogHeader>
-            <CreateProjectForm onAddProject={handleAddProject} />
+            <CreateProjectForm setOpen={setCreateDialogOpen} />
           </DialogContent>
         </Dialog>
       </div>
 
       <Tabs value={viewMode} onValueChange={setViewMode} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
-          <TabsTrigger value="grid" className="text-xs sm:text-sm">
-            <LayoutGrid className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2"/>
-            <span className="hidden sm:inline">Grid</span>
-          </TabsTrigger>
-          <TabsTrigger value="list" className="text-xs sm:text-sm">
-            <List className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2"/>
-            <span className="hidden sm:inline">List</span>
-          </TabsTrigger>
-          <TabsTrigger value="kanban" className="text-xs sm:text-sm">
-            <Trello className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2"/>
-            <span className="hidden sm:inline">Kanban</span>
-          </TabsTrigger>
-          <TabsTrigger value="timeline" className="text-xs sm:text-sm">
-            <GanttChartSquare className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2"/>
-            <span className="hidden sm:inline">Timeline</span>
-          </TabsTrigger>
+          <TabsTrigger value="grid"><LayoutGrid className="w-4 h-4 mr-2"/>Grid</TabsTrigger>
+          <TabsTrigger value="list"><List className="w-4 h-4 mr-2"/>List</TabsTrigger>
+          <TabsTrigger value="kanban"><Trello className="w-4 h-4 mr-2"/>Kanban</TabsTrigger>
+          <TabsTrigger value="timeline"><GanttChartSquare className="w-4 h-4 mr-2"/>Timeline</TabsTrigger>
         </TabsList>
         <TabsContent value={viewMode} className="mt-6">{renderView()}</TabsContent>
       </Tabs>

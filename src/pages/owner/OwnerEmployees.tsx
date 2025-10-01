@@ -1,50 +1,72 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { teamMembers, securityRoles } from "@/lib/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { getEmployees } from "@/lib/api";
+import { securityRoles } from "@/lib/mock-data"; // Keep for role colors, can be moved to a config
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, Plus, User } from "lucide-react";
+import { Search, Plus, User, Loader2, AlertCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { useOrganization } from "@/hooks/useOrganization";
 import { Link } from "react-router-dom";
-import { canCreate, getPlanFeatures } from "@/lib/SubscriptionManager";
+import { canCreate } from "@/lib/SubscriptionManager";
+
+// We need to adjust the Employee type based on what the API actually returns.
+// Based on server/src/index.ts, the user object includes roles and teams.
+type Employee = {
+  id: string;
+  name: string | null;
+  email: string;
+  avatarUrl: string | null;
+  createdAt: string;
+  roles: { role: { name: string } }[];
+  teams: { team: { name: string } }[];
+};
 
 const OwnerEmployees = () => {
   const { plan } = useOrganization();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
 
-  const employees = teamMembers.filter(member => member.role !== 'Client');
+  const { data: employees = [], isLoading, isError, error } = useQuery<Employee[]>({
+    queryKey: ['employees'],
+    queryFn: getEmployees,
+  });
+
   const canAddEmployee = canCreate(plan, 'users', employees.length);
 
-  const getRoleColor = (role: string) => {
-    const roleData = securityRoles.find(r => r.role === role);
+  const getRoleColor = (roleName: string) => {
+    const roleData = securityRoles.find(r => r.role === roleName);
     return roleData ? roleData.color : "bg-gray-100 text-gray-800";
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Active": return "bg-green-100 text-green-800";
-      case "Inactive": return "bg-gray-100 text-gray-800";
-      case "On Leave": return "bg-yellow-100 text-yellow-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const filteredEmployees = employees
-    .filter(
-      (employee) =>
-        employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        employee.email.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .filter((employee) => roleFilter === "all" || employee.role === roleFilter)
-    .filter((employee) => statusFilter === "all" || employee.status === statusFilter);
+  const filteredEmployees = useMemo(() => {
+    return employees
+      .filter(employee => {
+        const name = employee.name || '';
+        const email = employee.email || '';
+        return name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               email.toLowerCase().includes(searchTerm.toLowerCase());
+      })
+      .filter(employee => {
+        if (roleFilter === "all") return true;
+        return employee.roles.some(r => r.role.name === roleFilter);
+      });
+  }, [employees, searchTerm, roleFilter]);
+  
+  const uniqueRoles = useMemo(() => {
+    const roles = new Set<string>();
+    employees.forEach(emp => {
+      emp.roles.forEach(r => roles.add(r.role.name));
+    });
+    return Array.from(roles);
+  }, [employees]);
 
   return (
     <div className="space-y-6">
@@ -57,7 +79,7 @@ const OwnerEmployees = () => {
           </Button>
           {!canAddEmployee && (
             <div className="text-sm text-red-500 mt-2">
-              You have reached the maximum number of employees for the {plan} plan. 
+              You have reached the maximum number of employees for the {plan} plan.
               <Link to="/dashboard/owner/settings" className="underline">Upgrade your plan</Link> to add more employees.
             </div>
           )}
@@ -86,22 +108,9 @@ const OwnerEmployees = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Roles</SelectItem>
-                {securityRoles
-                  .filter(role => role.id !== 'CLIENT')
-                  .map(role => (
-                  <SelectItem key={role.id} value={role.role}>{role.role}</SelectItem>
+                {uniqueRoles.map(role => (
+                  <SelectItem key={role} value={role}>{role}</SelectItem>
                 ))}
-              </SelectContent>
-            </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Inactive">Inactive</SelectItem>
-                <SelectItem value="On Leave">On Leave</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -112,38 +121,65 @@ const OwnerEmployees = () => {
                 <tr className="border-b">
                   <th className="text-left p-3">Employee</th>
                   <th className="text-left p-3">Role</th>
-                  <th className="text-left p-3 hidden md:table-cell">Department</th>
-                  <th className="text-left p-3">Status</th>
+                  <th className="text-left p-3 hidden md:table-cell">Department/Team</th>
                   <th className="text-left p-3 hidden lg:table-cell">Join Date</th>
-                  <th className="text-left p-3 hidden sm:table-cell">Projects</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredEmployees.map((employee) => (
-                  <tr key={employee.id} className="border-b hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/dashboard/owner/employees/${employee.id}`)}>
-                    <td className="p-3">
-                      <div className="flex items-center space-x-3">
-                        <Avatar>
-                          <AvatarImage src={employee.avatar} alt={employee.name} />
-                          <AvatarFallback>{employee.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{employee.name}</p>
-                          <p className="text-sm text-muted-foreground">{employee.email}</p>
+                {isLoading ? (
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <tr key={index} className="border-b">
+                      <td className="p-3">
+                        <div className="flex items-center space-x-3">
+                          <Skeleton className="h-10 w-10 rounded-full" />
+                          <div>
+                            <Skeleton className="h-4 w-24" />
+                            <Skeleton className="h-3 w-32 mt-1" />
+                          </div>
                         </div>
+                      </td>
+                      <td className="p-3"><Skeleton className="h-5 w-20" /></td>
+                      <td className="p-3 hidden md:table-cell"><Skeleton className="h-5 w-24" /></td>
+                      <td className="p-3 hidden lg:table-cell"><Skeleton className="h-5 w-28" /></td>
+                    </tr>
+                  ))
+                ) : isError ? (
+                  <tr>
+                    <td colSpan={4} className="text-center text-red-500 p-6">
+                      <div className="flex items-center justify-center gap-2">
+                        <AlertCircle className="h-4 w-4" /> Error fetching data.
                       </div>
                     </td>
-                    <td className="p-3">
-                      <Badge className={getRoleColor(employee.role)}>{employee.role}</Badge>
-                    </td>
-                    <td className="p-3 hidden md:table-cell">{employee.department}</td>
-                    <td className="p-3">
-                      <Badge className={getStatusColor(employee.status)}>{employee.status}</Badge>
-                    </td>
-                    <td className="p-3 hidden lg:table-cell">{new Date(employee.joinDate).toLocaleDateString()}</td>
-                    <td className="p-3 hidden sm:table-cell">{employee.projects}</td>
                   </tr>
-                ))}
+                ) : (
+                  filteredEmployees.map((employee) => {
+                    const mainRole = employee.roles[0]?.role.name || 'N/A';
+                    const mainTeam = employee.teams[0]?.team.name || 'N/A';
+                    const employeeName = employee.name || 'No Name';
+                    
+                    return (
+                      <tr key={employee.id} className="border-b hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/dashboard/owner/employees/${employee.id}`)}>
+                        <td className="p-3">
+                          <div className="flex items-center space-x-3">
+                            <Avatar>
+                              <AvatarImage src={employee.avatarUrl || undefined} alt={employeeName} />
+                              <AvatarFallback>{employeeName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">{employeeName}</p>
+                              <p className="text-sm text-muted-foreground">{employee.email}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-3">
+                          <Badge className={getRoleColor(mainRole)}>{mainRole}</Badge>
+                        </td>
+                        <td className="p-3 hidden md:table-cell">{mainTeam}</td>
+                        <td className="p-3 hidden lg:table-cell">{new Date(employee.createdAt).toLocaleDateString()}</td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>

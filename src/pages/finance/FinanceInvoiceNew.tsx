@@ -17,7 +17,7 @@ const FinanceInvoiceNew = () => {
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [availableProjects, setAvailableProjects] = useState<typeof projects>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
-  const [issueDate, setIssueDate] = useState<Date | undefined>(new Date());
+  const [issuedAt, setIssuedAt] = useState<Date | undefined>(new Date());
   const [dueDate, setDueDate] = useState<Date | undefined>();
   const [lineItems, setLineItems] = useState([{ description: "", quantity: 1, rate: 0, amount: 0 }]);
 
@@ -59,12 +59,10 @@ const FinanceInvoiceNew = () => {
     // Here, we'll just log it and navigate back.
     const newInvoice = {
         id: `INV-${String(Math.random()).slice(2, 7)}`,
-        clientId: selectedClientId,
-        clientName: clients.find(c => c.id === selectedClientId)?.name,
         projectId: selectedProjectId,
         projectName: projects.find(p => p.id === selectedProjectId)?.name,
         invoiceNumber: `AGF-2024-${String(Math.random()).slice(2, 6)}`,
-        issueDate: issueDate ? format(issueDate, "yyyy-MM-dd") : "",
+        issuedAt: issuedAt ? format(issuedAt, "yyyy-MM-dd") : "",
         dueDate: dueDate ? format(dueDate, "yyyy-MM-dd") : "",
         status: "Draft",
         amount: total,
@@ -113,10 +111,10 @@ const FinanceInvoiceNew = () => {
                             <PopoverTrigger asChild>
                                 <Button variant={"outline"} className="w-full justify-start font-normal">
                                     <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {issueDate ? format(issueDate, "PPP") : <span>Pick a date</span>}
+                                    {issuedAt ? format(issuedAt, "PPP") : <span>Pick a date</span>}
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0"><Calendar mode="single" selected={issueDate} onSelect={setIssueDate} initialFocus /></PopoverContent>
+                            <PopoverContent className="w-auto p-0"><Calendar mode="single" selected={issuedAt} onSelect={setIssuedAt} initialFocus /></PopoverContent>
                         </Popover>
                     </div>
                     <div>

@@ -1,6 +1,6 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "./components/ui/toaster";
+import { Toaster as Sonner } from "./components/ui/sonner";
+import { TooltipProvider } from "./components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
@@ -14,7 +14,9 @@ import DashboardProjectManager from "./pages/DashboardProjectManager";
 import DashboardTeamLead from "./pages/DashboardTeamLead";
 import DashboardMember from "./pages/DashboardMember";
 import DashboardFinance from "./pages/DashboardFinance";
-import DashboardClient from "./pages/DashboardClient";
+import DashboardClient from "./pages/ClientDashboard";
+import LoginPage from "./pages/user/LoginPage";
+import ForgotPasswordPage from "./pages/user/ForgotPasswordPage";
 
 import OwnerAnalytics from "./pages/owner/OwnerAnalytics";
 import OwnerProjects from "./pages/owner/OwnerProjects";
@@ -137,6 +139,8 @@ const App = () => (
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Index />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
             {/* Owner dashboard */}
             <Route path="/dashboard/owner" element={<DashboardOwner />}>

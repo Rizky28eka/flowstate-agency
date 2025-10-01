@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { clients } from '@/lib/mock-data';
+import { useQuery } from '@tanstack/react-query';
+import { getClients, Client } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { 
   Card, 
@@ -27,19 +28,20 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Users, DollarSign, Smile, Search, PlusCircle } from 'lucide-react';
+import { Users, DollarSign, Smile, Search, PlusCircle, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { useOrganization } from '@/hooks/useOrganization';
 import { canCreate } from "@/lib/SubscriptionManager";
 import { Link } from 'react-router-dom';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Helper to format currency
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value);
 };
 
-const ClientRow = ({ client }: { client: (typeof clients)[0] }) => {
+const ClientRow = ({ client }: { client: Client }) => {
   const navigate = useNavigate();
   
   const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
@@ -48,7 +50,8 @@ const ClientRow = ({ client }: { client: (typeof clients)[0] }) => {
     'Churned': 'destructive',
   };
 
-  const satisfactionColor = client.satisfaction >= 4.5 ? 'bg-green-500' : client.satisfaction >= 4.0 ? 'bg-yellow-500' : 'bg-red-500';
+  const satisfaction = client.satisfaction || 0;
+  const satisfactionColor = satisfaction >= 4.5 ? 'bg-green-500' : satisfaction >= 4.0 ? 'bg-yellow-500' : 'bg-red-500';
 
   return (
     <TableRow 
@@ -58,22 +61,22 @@ const ClientRow = ({ client }: { client: (typeof clients)[0] }) => {
       <TableCell>
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={client.avatar} alt={client.name} />
+            <AvatarImage src={client.avatarUrl || undefined} alt={client.name} />
             <AvatarFallback>{client.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
           </Avatar>
           <div>
             <div className="font-medium">{client.name}</div>
-            <div className="text-xs text-muted-foreground hidden sm:table-cell">{client.contact}</div>
+            <div className="text-xs text-muted-foreground hidden sm:table-cell">{client.contactName || client.email}</div>
           </div>
         </div>
       </TableCell>
       <TableCell className="hidden md:table-cell">
-        <Badge variant={statusVariant[client.status] || 'outline'}>{client.status}</Badge>
+        <Badge variant={statusVariant[client.status || ''] || 'outline'}>{client.status || 'N/A'}</Badge>
       </TableCell>
       <TableCell className="hidden sm:table-cell text-center">{client.activeProjects}</TableCell>
-      <TableCell className="hidden lg:table-cell text-right">{formatCurrency(client.totalBilled)}</TableCell>
+      <TableCell className="hidden lg:table-cell text-right">{formatCurrency(client.totalBilled || 0)}</TableCell>
       <TableCell className="hidden md:table-cell text-right">
-        <Badge className={cn("text-white", satisfactionColor)}>{client.satisfaction.toFixed(1)}</Badge>
+        <Badge className={cn("text-white", satisfactionColor)}>{satisfaction.toFixed(1)}</Badge>
       </TableCell>
     </TableRow>
   );
@@ -84,22 +87,32 @@ const OwnerClients = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
+  const { data: clients = [], isLoading, isError, error } = useQuery<Client[]>({ 
+    queryKey: ['clients'], 
+    queryFn: getClients 
+  });
+
   const canAddClient = canCreate(plan, 'clients', clients.length);
 
   const filteredClients = useMemo(() => {
     return clients.filter(c => {
-      const searchMatch = c.name.toLowerCase().includes(searchTerm.toLowerCase()) || c.contact.toLowerCase().includes(searchTerm.toLowerCase());
+      const searchMatch = c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                        (c.contactName || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                        (c.email || '').toLowerCase().includes(searchTerm.toLowerCase());
       const statusMatch = statusFilter === 'all' || c.status === statusFilter;
       return searchMatch && statusMatch;
     });
-  }, [searchTerm, statusFilter]);
+  }, [clients, searchTerm, statusFilter]);
 
   const portfolioStats = useMemo(() => {
+    if (!clients || clients.length === 0) {
+      return { activeCount: 0, totalBilled: 0, avgSatisfaction: 0 };
+    }
     const activeClients = clients.filter(c => c.status === 'Active');
-    const totalBilled = clients.reduce((sum, c) => sum + c.totalBilled, 0);
-    const avgSatisfaction = clients.length > 0 ? clients.reduce((sum, c) => sum + c.satisfaction, 0) / clients.length : 0;
+    const totalBilled = clients.reduce((sum, c) => sum + (c.totalBilled || 0), 0);
+    const avgSatisfaction = clients.length > 0 ? clients.reduce((sum, c) => sum + (c.satisfaction || 0), 0) / clients.length : 0;
     return { activeCount: activeClients.length, totalBilled, avgSatisfaction };
-  }, []);
+  }, [clients]);
 
   const kpiData = [
     { title: 'Active Clients', value: portfolioStats.activeCount, icon: Users },
@@ -130,17 +143,30 @@ const OwnerClients = () => {
       )}
 
       <div className="grid gap-6 md:grid-cols-3">
-        {kpiData.map(kpi => (
-          <Card key={kpi.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
-              <kpi.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{kpi.value}</div>
-            </CardContent>
-          </Card>
-        ))}
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, index) => (
+            <Card key={index}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Skeleton className="h-4 w-32" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-24" />
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          kpiData.map(kpi => (
+            <Card key={kpi.title}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+                <kpi.icon className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{kpi.value}</div>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
 
       <Card>
@@ -184,7 +210,25 @@ const OwnerClients = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredClients.map(c => <ClientRow key={c.id} client={c} />)}
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell><Skeleton className="h-5 w-48" /></TableCell>
+                    <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-20" /></TableCell>
+                    <TableCell className="hidden sm:table-cell text-center"><Skeleton className="h-5 w-10" /></TableCell>
+                    <TableCell className="hidden lg:table-cell text-right"><Skeleton className="h-5 w-24" /></TableCell>
+                    <TableCell className="hidden md:table-cell text-right"><Skeleton className="h-5 w-16" /></TableCell>
+                  </TableRow>
+                ))
+              ) : isError ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-red-500">
+                    <div className="flex items-center justify-center gap-2"><AlertCircle className="h-4 w-4" /> Error fetching data: {error.message}</div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredClients.map(c => <ClientRow key={c.id} client={c} />)
+              )}
             </TableBody>
           </Table>
         </CardContent>

@@ -3,10 +3,14 @@ import { RoleSidebar } from "@/components/RoleSidebar";
 import { Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { useRealtimeUpdates } from "@/hooks/useRealtimeUpdates";
 
 const DashboardOwner = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Activate real-time updates for the owner dashboard
+  useRealtimeUpdates();
 
   const handleSignOut = () => {
     // In a real app, you would clear auth tokens here
