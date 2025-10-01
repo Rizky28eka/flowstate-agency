@@ -86,10 +86,8 @@ export async function seedUsers(
           password: hashedPassword,
           organizationId: organization.id,
           status: UserStatus.ACTIVE,
-          createdAt: getRandomDate(
-            new Date(2023, 0, 1),
-            new Date(2024, 11, 31)
-          ),
+          avatarUrl: faker.image.avatar(),
+          createdAt: getRandomDate(new Date(2023, 0, 1), new Date(2024, 11, 31)),
         },
       });
 
