@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "commonjs",
+    "target": "es2016",
+    "module": "ESNext",
     "moduleResolution": "node",
-    "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
     "sourceMap": true,
     "esModuleInterop": true,

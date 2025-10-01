@@ -7,9 +7,10 @@
     "build": "tsc",
     "start": "node dist/src/index.js",
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "prisma:seed": "ts-node prisma/seed.ts",
-    "lint": "eslint \"src/**/*.ts\" --fix"
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
   },
   "keywords": [],
   "author": "",
@@ -39,6 +40,8 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.4",
+    "@babel/preset-env": "^7.28.3",
     "@faker-js/faker": "^10.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
@@ -48,8 +51,10 @@
     "@types/morgan": "^1.9.9",
     "@types/node": "^24.6.0",
     "@types/pg": "^8.15.5",
+    "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",
+    "babel-jest": "^30.2.0",
     "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
