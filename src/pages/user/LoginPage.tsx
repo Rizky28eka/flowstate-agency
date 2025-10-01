@@ -31,7 +31,36 @@ const LoginPage: React.FC = () => {
           title: 'Login Successful',
           description: 'Redirecting to dashboard...',
         });
-        navigate('/dashboard/owner'); // Redirect to owner dashboard for now
+
+        const userRole = data.user.role;
+        let redirectPath = '/';
+
+        switch (userRole) {
+          case 'OWNER':
+            redirectPath = '/dashboard/owner';
+            break;
+          case 'ADMIN':
+            redirectPath = '/dashboard/admin';
+            break;
+          case 'PROJECT_MANAGER':
+            redirectPath = '/dashboard/project-manager';
+            break;
+          case 'TEAM_LEAD':
+            redirectPath = '/dashboard/team-lead';
+            break;
+          case 'MEMBER':
+            redirectPath = '/dashboard/member';
+            break;
+          case 'FINANCE':
+            redirectPath = '/dashboard/finance';
+            break;
+          case 'CLIENT':
+            redirectPath = '/dashboard/client';
+            break;
+          default:
+            redirectPath = '/'; // Fallback for unrecognized roles
+        }
+        navigate(redirectPath);
       } else {
         toast({
           title: 'Login Failed',

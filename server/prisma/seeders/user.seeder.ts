@@ -51,7 +51,7 @@ export async function seedUsers(prisma: PrismaClient, organization: Organization
       
       const email = `${userName.toLowerCase().replace(/\s+/g, '.').slice(0, 20)}${faker.string.uuid()}@${organization.name.toLowerCase().replace(/\s+/g, '')}.com`;
       
-      const hashedPassword = await bcrypt.hash('password123', 10);
+      const hashedPassword = await bcrypt.hash('password', 10);
       const user = await prisma.user.create({
         data: {
           email,
