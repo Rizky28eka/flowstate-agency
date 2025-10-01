@@ -220,8 +220,8 @@ const OwnerSettings: React.FC = () => {
     branding: {
       primaryColor: '#6D28D9',
       secondaryColor: '#EC4899',
-      logoUrl: '/api/placeholder/256/256',
-      favicon: '/api/placeholder/32/32',
+      logoUrl: '',
+      favicon: '',
       customCSS: '',
     },
     notifications: {

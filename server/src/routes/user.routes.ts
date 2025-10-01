@@ -24,15 +24,12 @@ router.get('/me', async (req: Request, res: Response, next: NextFunction) => {
 
 router.patch('/me', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { name, avatarUrl, bio, phoneNumber } = req.body;
+    const { avatarUrl } = req.body;
 
     const updatedUser = await prisma.user.update({
       where: { id: req.userId },
       data: {
-        name,
         avatarUrl,
-        bio,
-        phoneNumber,
       },
       select: { id: true, email: true, name: true, avatarUrl: true, bio: true, phoneNumber: true, organizationId: true, roles: { include: { role: true } } },
     });
