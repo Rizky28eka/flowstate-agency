@@ -15,7 +15,6 @@ import { Separator } from "@/components/ui/separator";
 import { AlertTriangle, Settings, Building2, Palette, Bell, CreditCard, Lock, Users, Upload, Check, X, Save, RefreshCw, Eye, EyeOff, Shield, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { securityRoles as mockSecurityRoles, permissionMatrix as mockPermissionMatrix } from "@/lib/mock-data";
 import { getCurrentUser, updateCurrentUser, getOrganizationSettings, updateOrganizationSettings, getRoles, getPermissions, updateRolePermissions, UserProfile, OrganizationSettings, Role, Permission } from '@/lib/api';
 
 const Toast = ({ message, type = "success", onClose }: { message: string; type?: string; onClose: () => void }) => {
