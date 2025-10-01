@@ -225,7 +225,10 @@ const OwnerSettings = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-white shadow-sm">
+          <TabsList className="grid w-full grid-cols-7 bg-white shadow-sm">
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <Users className="w-4 h-4"/>Profile
+            </TabsTrigger>
             <TabsTrigger value="general" className="flex items-center gap-2">
               <Building2 className="w-4 h-4"/>General
             </TabsTrigger>
@@ -245,6 +248,99 @@ const OwnerSettings = () => {
               <Users className="w-4 h-4"/>Roles
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="profile" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Personal Information</CardTitle>
+                <CardDescription>Update your personal details and avatar</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center space-x-6">
+                  <Avatar className="w-24 h-24 border-2 border-gray-200">
+                    <AvatarImage src={settings.profile.avatar} alt="User Avatar" />
+                    <AvatarFallback className="text-lg font-bold">
+                      {settings.profile.name.split(' ').map(n => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleFileUpload('profile.avatar')}
+                    className="flex items-center gap-2"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Upload Avatar
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="profile-name">Full Name</Label>
+                    <Input 
+                      id="profile-name" 
+                      value={settings.profile.name} 
+                      onChange={e => handleSettingChange('profile.name', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="profile-email">Email</Label>
+                    <Input 
+                      id="profile-email" 
+                      type="email"
+                      value={settings.profile.email} 
+                      onChange={e => handleSettingChange('profile.email', e.target.value)}
+                      disabled // Email is often not directly editable
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="profile-bio">Bio</Label>
+                  <Textarea 
+                    id="profile-bio" 
+                    value={settings.profile.bio} 
+                    onChange={e => handleSettingChange('profile.bio', e.target.value)}
+                    rows={3}
+                  />
+                </div>
+                <Button 
+                  onClick={() => handleSaveChanges('Profile Information')} 
+                  disabled={loading}
+                  className="flex items-center gap-2"
+                >
+                  {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  Save Profile
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Change Password</CardTitle>
+                <CardDescription>Update your account password</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="current-password">Current Password</Label>
+                  <Input id="current-password" type="password" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">New Password</Label>
+                  <Input id="new-password" type="password" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Confirm New Password</Label>
+                  <Input id="confirm-password" type="password" />
+                </div>
+                <Button 
+                  onClick={() => handleSaveChanges('Password')} 
+                  disabled={loading}
+                  className="flex items-center gap-2"
+                >
+                  {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  Change Password
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="general" className="space-y-6">
             <Card>

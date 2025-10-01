@@ -1184,6 +1184,12 @@ export const risks = [
 ];
 
 export const settings = {
+  profile: {
+    name: "John Doe",
+    email: "john.doe@example.com",
+    avatar: "/api/placeholder/128/128",
+    bio: "Lead developer and project manager with 10+ years of experience."
+  },
   company: {
     name: "Future Analytics Inc.",
     website: "https://futureanalytics.com",
