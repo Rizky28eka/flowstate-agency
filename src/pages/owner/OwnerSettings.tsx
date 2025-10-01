@@ -114,6 +114,7 @@ import { useOrganization } from "@/hooks/useOrganization";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 
 // Main Component
+const OwnerSettings: React.FC = () => {
   const { plan, setPlan } = useOrganization();
   const queryClient = useQueryClient();
   const [settings, setSettings] = useState<any>({
@@ -1182,5 +1183,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
     </div>
   );
 };
+
 
 export default OwnerSettings;
