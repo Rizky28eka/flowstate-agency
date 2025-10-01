@@ -214,3 +214,75 @@ export const updateCurrentUser = async (userData: Partial<UserProfile>): Promise
   const updatedUser = await response.json();
   return updatedUser;
 };
+
+export interface OrganizationSettings {
+  company: {
+    name: string;
+    website?: string;
+    address?: string;
+    logo?: string;
+    description?: string;
+    industry?: string;
+    size?: string;
+    founded?: string;
+  };
+  branding?: {
+    primaryColor?: string;
+    secondaryColor?: string;
+    logoUrl?: string;
+    favicon?: string;
+    customCSS?: string;
+  };
+  notifications?: {
+    emailNotifications?: boolean;
+    projectDeadlines?: boolean;
+    teamUpdates?: boolean;
+    systemMaintenance?: boolean;
+    securityAlerts?: boolean;
+    weeklyReports?: boolean;
+    frequency?: string;
+  };
+  billing?: {
+    currency?: string;
+    taxRate?: number;
+    paymentTerms?: string;
+    invoicePrefix?: string;
+    autoRenewal?: boolean;
+    billingAddress?: string;
+    paymentMethod?: string;
+  };
+  security?: {
+    enforce2FA?: boolean;
+    sessionTimeout?: number;
+    passwordPolicy?: {
+      minLength?: number;
+      requireSpecialChars?: boolean;
+      requireNumbers?: boolean;
+      requireUppercase?: boolean;
+    };
+    ipWhitelist?: string[];
+    auditLogging?: boolean;
+    dataRetention?: number;
+  };
+}
+
+export const getOrganizationSettings = async (): Promise<OrganizationSettings> => {
+  const response = await fetchWithAuth(`${API_BASE_URL}/api/organization/me/settings`);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const settings = await response.json();
+  return settings;
+};
+
+export const updateOrganizationSettings = async (settingsData: Partial<OrganizationSettings>): Promise<OrganizationSettings> => {
+  const response = await fetchWithAuth(`${API_BASE_URL}/api/organization/me/settings`, {
+    method: 'PATCH',
+    body: JSON.stringify(settingsData),
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const updatedSettings = await response.json();
+  return updatedSettings;
+};

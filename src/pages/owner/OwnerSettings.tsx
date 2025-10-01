@@ -16,7 +16,7 @@ import { AlertTriangle, Settings, Building2, Palette, Bell, CreditCard, Lock, Us
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { securityRoles, permissionMatrix } from "@/lib/mock-data";
-import { getCurrentUser, updateCurrentUser, UserProfile } from '@/lib/api';
+import { getCurrentUser, updateCurrentUser, getOrganizationSettings, updateOrganizationSettings, UserProfile, OrganizationSettings } from '@/lib/api';
 const Toast = ({ message, type = "success", onClose }) => {
   useEffect(() => {
     const timer = setTimeout(onClose, 3000);
@@ -114,7 +114,6 @@ import { useOrganization } from "@/hooks/useOrganization";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 
 // Main Component
-const OwnerSettings = () => {
   const { plan, setPlan } = useOrganization();
   const queryClient = useQueryClient();
   const [settings, setSettings] = useState<any>({
@@ -137,6 +136,11 @@ const OwnerSettings = () => {
     queryFn: getCurrentUser,
   });
 
+  const { data: organizationSettings, isLoading: isOrgSettingsLoading, isError: isOrgSettingsError } = useQuery<OrganizationSettings>({
+    queryKey: ['organizationSettings'],
+    queryFn: getOrganizationSettings,
+  });
+
   useEffect(() => {
     if (currentUser) {
       setSettings(prev => ({
@@ -147,10 +151,22 @@ const OwnerSettings = () => {
           avatar: currentUser.avatarUrl || '/api/placeholder/128/128',
           bio: currentUser.bio || '',
         },
-        // Populate other settings from currentUser.preferences or organization settings if available
       }));
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    if (organizationSettings) {
+      setSettings(prev => ({
+        ...prev,
+        company: organizationSettings.company || { name: '', website: '', address: '', logo: '', description: '', industry: '', size: '', founded: '' },
+        branding: organizationSettings.branding || { primaryColor: '', secondaryColor: '', logoUrl: '', favicon: '', customCSS: '' },
+        notifications: organizationSettings.notifications || { emailNotifications: false, projectDeadlines: false, teamUpdates: false, systemMaintenance: false, securityAlerts: false, weeklyReports: false, frequency: 'immediate' },
+        billing: organizationSettings.billing || { currency: '', taxRate: 0, paymentTerms: '', invoicePrefix: '', autoRenewal: false, billingAddress: '', paymentMethod: '' },
+        security: organizationSettings.security || { enforce2FA: false, sessionTimeout: 0, passwordPolicy: { minLength: 0, requireSpecialChars: false, requireNumbers: false, requireUppercase: false }, ipWhitelist: [], auditLogging: false, dataRetention: 0 }
+      }));
+    }
+  }, [organizationSettings]);
 
   const updateProfileMutation = useMutation({
     mutationFn: updateCurrentUser,
@@ -161,6 +177,18 @@ const OwnerSettings = () => {
     },
     onError: (error) => {
       showToast(`Failed to update profile: ${error.message}`, 'error');
+    },
+  });
+
+  const updateOrganizationSettingsMutation = useMutation({
+    mutationFn: updateOrganizationSettings,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organizationSettings'] });
+      showToast('Organization settings updated successfully!', 'success');
+      setUnsavedChanges(false);
+    },
+    onError: (error) => {
+      showToast(`Failed to update organization settings: ${error.message}`, 'error');
     },
   });
 
@@ -200,8 +228,28 @@ const OwnerSettings = () => {
           avatarUrl: settings.profile.avatar,
           bio: settings.profile.bio,
         });
+      } else if (tabName === 'General') {
+        await updateOrganizationSettingsMutation.mutateAsync({
+          company: settings.company,
+        });
+      } else if (tabName === 'Branding') {
+        await updateOrganizationSettingsMutation.mutateAsync({
+          branding: settings.branding,
+        });
+      } else if (tabName === 'Notification') {
+        await updateOrganizationSettingsMutation.mutateAsync({
+          notifications: settings.notifications,
+        });
+      } else if (tabName === 'Billing') {
+        await updateOrganizationSettingsMutation.mutateAsync({
+          billing: settings.billing,
+        });
+      } else if (tabName === 'Security') {
+        await updateOrganizationSettingsMutation.mutateAsync({
+          security: settings.security,
+        });
       } else {
-        // Simulate API call for other settings
+        // Fallback for other tabs or if no specific mutation is defined
         await new Promise(resolve => setTimeout(resolve, 1000));
         console.log(`Saving ${tabName} settings:`, settings);
         showToast(`${tabName} settings saved successfully!`, "success");
@@ -246,12 +294,12 @@ const OwnerSettings = () => {
     }
   };
 
-  if (isUserLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading profile...</div>;
+  if (isUserLoading || isOrgSettingsLoading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading settings...</div>;
   }
 
-  if (isUserError) {
-    return <div className="flex items-center justify-center min-h-screen text-red-500">Error loading profile. Please try again.</div>;
+  if (isUserError || isOrgSettingsError) {
+    return <div className="flex items-center justify-center min-h-screen text-red-500">Error loading settings. Please try again.</div>;
   }
 
   return (
