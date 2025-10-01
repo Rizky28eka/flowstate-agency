@@ -280,7 +280,7 @@ const OwnerSettings: React.FC = () => {
         profile: {
           name: currentUser.name || '',
           email: currentUser.email || '',
-          avatar: currentUser.avatarUrl || '/api/placeholder/128/128',
+          avatar: currentUser.avatarUrl || '',
           bio: currentUser.bio || '',
         },
       }));
