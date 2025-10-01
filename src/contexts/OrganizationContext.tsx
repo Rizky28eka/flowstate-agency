@@ -6,11 +6,13 @@ import { Organization } from '@/types';
 
 export const OrganizationProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
+  const token = localStorage.getItem('token');
 
   const { data: organization, isLoading } = useQuery<Organization>({
     queryKey: ['organization'],
     queryFn: getOrganization,
     staleTime: Infinity, // Organization data is stable, no need to refetch often
+    enabled: !!token, // Only fetch if token exists
   });
 
   // The plan is derived from the organization data, with a fallback to 'Free'

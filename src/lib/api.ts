@@ -3,12 +3,13 @@ import { User as Employee } from '../types';
 const API_BASE_URL = 'http://localhost:3001';
 
 // TODO: Replace this with a dynamic ID from your authentication context
-const MOCK_USER_ID = 'clvns5o5e000107jlb20l3d3a'; // Replace with a real user ID from your DB
-
-const getAuthHeaders = () => ({
-  'Content-Type': 'application/json',
-  'X-User-Id': MOCK_USER_ID,
-});
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` }),
+  };
+};
 
 export const getEmployees = async (): Promise<Employee[]> => {
   try {
