@@ -49,7 +49,15 @@ export async function seedUsers(prisma: PrismaClient, organization: Organization
         userName = `${roleTitle} ${i + 1}`;
       }
       
-      const email = `${userName.toLowerCase().replace(/\s+/g, '.').slice(0, 20)}${faker.string.uuid()}@${organization.name.toLowerCase().replace(/\s+/g, '')}.com`;
+      let baseEmail = `${userName.toLowerCase().replace(/\s+/g, '.')}@${organization.name.toLowerCase().replace(/\s+/g, '')}.com`;
+      let email = baseEmail;
+      let emailCounter = 1;
+
+      // Ensure email uniqueness
+      while (await prisma.user.findUnique({ where: { email } })) {
+        email = `${userName.toLowerCase().replace(/\s+/g, '.')}${emailCounter}@${organization.name.toLowerCase().replace(/\s+/g, '')}.com`;
+        emailCounter++;
+      }
       
       const hashedPassword = await bcrypt.hash('password', 10);
       const user = await prisma.user.create({
