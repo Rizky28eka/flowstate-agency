@@ -190,6 +190,7 @@ export interface UserProfile {
   name: string;
   avatarUrl?: string;
   bio?: string;
+  phoneNumber?: string;
   organizationId: string;
   roles: Array<{ role: { name: string } }>;
 }

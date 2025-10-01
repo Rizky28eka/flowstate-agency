@@ -200,12 +200,61 @@ const OwnerSettings: React.FC = () => {
   const { plan, setPlan } = useOrganization();
   const queryClient = useQueryClient();
   const [settings, setSettings] = useState<any>({
-    profile: { name: '', email: '', avatar: '', bio: '' },
-    company: { name: '', website: '', address: '', logo: '', description: '', industry: '', size: '', founded: '' },
-    branding: { primaryColor: '', secondaryColor: '', logoUrl: '', favicon: '', customCSS: '' },
-    notifications: { emailNotifications: false, projectDeadlines: false, teamUpdates: false, systemMaintenance: false, securityAlerts: false, weeklyReports: false, frequency: 'immediate' },
-    billing: { currency: '', taxRate: 0, paymentTerms: '', invoicePrefix: '', autoRenewal: false, billingAddress: '', paymentMethod: '' },
-    security: { enforce2FA: false, sessionTimeout: 0, passwordPolicy: { minLength: 0, requireSpecialChars: false, requireNumbers: false, requireUppercase: false }, ipWhitelist: [], auditLogging: false, dataRetention: 0 }
+    profile: {
+      name: '',
+      email: '',
+      avatar: '/api/placeholder/128/128',
+      bio: '',
+      phoneNumber: '',
+    },
+    company: {
+      name: '',
+      website: '',
+      address: '',
+      logo: '/api/placeholder/256/256',
+      description: '',
+      industry: '',
+      size: '',
+      founded: '',
+    },
+    branding: {
+      primaryColor: '#6D28D9',
+      secondaryColor: '#EC4899',
+      logoUrl: '/api/placeholder/256/256',
+      favicon: '/api/placeholder/32/32',
+      customCSS: '',
+    },
+    notifications: {
+      emailNotifications: true,
+      projectDeadlines: true,
+      teamUpdates: false,
+      systemMaintenance: true,
+      securityAlerts: true,
+      weeklyReports: false,
+      frequency: 'immediate',
+    },
+    billing: {
+      currency: 'USD',
+      taxRate: 8.5,
+      paymentTerms: 'Net 30',
+      invoicePrefix: 'INV-2024',
+      autoRenewal: true,
+      billingAddress: '',
+      paymentMethod: 'Credit Card ending in 4242',
+    },
+    security: {
+      enforce2FA: true,
+      sessionTimeout: 120,
+      passwordPolicy: {
+        minLength: 8,
+        requireSpecialChars: true,
+        requireNumbers: true,
+        requireUppercase: true,
+      },
+      ipWhitelist: [],
+      auditLogging: true,
+      dataRetention: 365,
+    },
   });
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<any>(null);

@@ -10,10 +10,7 @@ router.get('/me', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.userId },
-      include: {
-        roles: { include: { role: true } },
-        organization: true,
-      },
+      select: { id: true, email: true, name: true, avatarUrl: true, bio: true, phoneNumber: true, organizationId: true, roles: { include: { role: true } } },
     });
 
     if (!user) {
@@ -27,7 +24,7 @@ router.get('/me', async (req: Request, res: Response, next: NextFunction) => {
 
 router.patch('/me', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { name, avatarUrl, bio } = req.body;
+    const { name, avatarUrl, bio, phoneNumber } = req.body;
 
     const updatedUser = await prisma.user.update({
       where: { id: req.userId },
@@ -35,11 +32,9 @@ router.patch('/me', async (req: Request, res: Response, next: NextFunction) => {
         name,
         avatarUrl,
         bio,
+        phoneNumber,
       },
-      include: {
-        roles: { include: { role: true } },
-        organization: true,
-      },
+      select: { id: true, email: true, name: true, avatarUrl: true, bio: true, phoneNumber: true, organizationId: true, roles: { include: { role: true } } },
     });
 
     io.emit('user_updated', updatedUser);
