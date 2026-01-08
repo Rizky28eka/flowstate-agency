@@ -2,12 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import prisma from '../config/db';
 import { JWT_SECRET } from '../config/env';
+import { ApiError } from '../utils/ApiError';
+import { asyncHandler } from '../utils/asyncHandler';
 
-export const userAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const userAuthMiddleware = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Unauthorized: No token provided' });
+    throw new ApiError(401, 'Unauthorized: No token provided');
   }
 
   const token = authHeader.split(' ')[1];
@@ -23,21 +25,23 @@ export const userAuthMiddleware = async (req: Request, res: Response, next: Next
       role: string;
     };
 
+    if (!decoded.userId || !decoded.organizationId) {
+      throw new ApiError(401, 'Unauthorized: Invalid token payload');
+    }
+
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
     });
 
     if (!user) {
-      return res.status(401).json({ error: 'Unauthorized: User not found' });
+      throw new ApiError(401, 'Unauthorized: User not found');
     }
 
     req.userId = decoded.userId;
     req.organizationId = decoded.organizationId;
     next();
   } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(401).json({ error: 'Unauthorized: Invalid token' });
-    }
-    next(error);
+    console.error("Auth Middleware Error:", error);
+    throw new ApiError(401, 'Unauthorized: Invalid or expired token');
   }
-};
+});

@@ -25,7 +25,7 @@ This project is built with:
 
 *   **Frontend:** React, TypeScript, Vite, Tailwind CSS, shadcn-ui
 *   **Backend:** Node.js, Express, TypeScript
-*   **Database:** PostgreSQL
+*   **Database:** MySQL
 
 ## How can I edit this code?
 

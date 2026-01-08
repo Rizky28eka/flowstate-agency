@@ -1,85 +1,129 @@
-import { PrismaClient } from '@prisma/client';
-import { seedOrganization } from './seeders/organization.seeder';
-import { seedRoles } from './seeders/role.seeder';
-import { seedUsers } from './seeders/user.seeder';
-import { seedTeams } from './seeders/team.seeder';
-import { seedClients } from './seeders/client.seeder';
-import { seedProjects } from './seeders/project.seeder';
-import { seedTasks } from './seeders/task.seeder';
-import { seedInvoices } from './seeders/invoice.seeder';
-import { seedApiKeys } from './seeders/apiKey.seeder';
+import { PrismaClient, UserStatus } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
-const AGENCY_COUNT = 20;
-const agencyNames = [
-  'Quantum Leap Digital', 'Zenith Creative Labs', 'Stellar Solutions', 'Momentum Dynamics', 'Apex Innovations',
-  'Nusantara Scale', 'Cipta Kreasi Bangsa', 'Sinergi Digital Raya', 'Bintang Lima Tech', 'Garuda Innovations',
-  'Evolve Media Group', 'Fusion Forward', 'Ignite Growth', 'Pixel Perfect', 'Blue Ocean Strategies',
-  'Warna Warni Nusantara', 'Jaya Abadi Creative', 'Pilar Teknologi', 'VisioNet', 'Karya Anak Bangsa Digital'
-];
-
 async function main() {
-  console.log('🚀 Starting UNIVERSAL AGENCY seed process...\n');
-  console.log('📊 Supports: Software, Creative, Marketing, Consulting, PR, Events, and more!\n');
-  console.log('=' .repeat(60));
-  
-  const totalStart = Date.now();
+  console.log('🌱 Starting seed...');
 
-  // 1. Seed all organizations
-  console.log('\n📊 Step 2: Seeding organizations...');
-  console.log('=' .repeat(60));
-  
-  for (let i = 0; i < AGENCY_COUNT; i++) {
-    console.log(`\n🏢 [${i + 1}/${AGENCY_COUNT}] Seeding: ${agencyNames[i]}`);
-    const startTime = Date.now();
+  // Optional: Clean up specific seed data to avoid conflicts if re-running
+  // Be careful with deleteMany in production!
+  await prisma.userRole.deleteMany({});
+  await prisma.user.deleteMany({
+    where: {
+      email: {
+        in: ['superadmin@flowstate.agency', 'admin@agencyone.com']
+      }
+    }
+  });
+  await prisma.role.deleteMany({
+    where: {
+      slug: {
+        in: ['super-admin', 'admin']
+      },
+      organization: {
+        slug: {
+          in: ['flowstate-hq', 'agency-one']
+        }
+      }
+    }
+  });
+  await prisma.organization.deleteMany({
+    where: {
+      slug: {
+        in: ['flowstate-hq', 'agency-one']
+      }
+    }
+  });
 
-    const organization = await seedOrganization(prisma, agencyNames[i]);
-    const roleMap = await seedRoles(prisma, organization.id);
-    const { allUsers, usersByRole } = await seedUsers(prisma, organization, roleMap);
-    const teams = await seedTeams(prisma, organization, usersByRole);
-    const clients = await seedClients(prisma, organization, allUsers);
-    const projects = await seedProjects(prisma, organization, clients, teams, allUsers);
-    const totalTasks = await seedTasks(prisma, projects, allUsers, usersByRole);
-    const totalInvoices = await seedInvoices(prisma, organization.id, projects, clients);
-    const totalApiKeys = await seedApiKeys(prisma, organization, usersByRole);
+  // 1. Create the Main Organization (for Super Admin)
+  const mainOrg = await prisma.organization.create({
+    data: {
+      name: 'Flowstate HQ',
+      slug: 'flowstate-hq',
+      domain: 'flowstate.agency',
+      subscriptionTier: 'ENTERPRISE',
+    },
+  });
 
-    const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-    console.log(`   ⏱️  Completed in ${duration}s`);
-  }
+  // 2. Create Super Admin Role
+  const superAdminRole = await prisma.role.create({
+    data: {
+      name: 'Super Admin',
+      slug: 'super-admin',
+      description: 'Platform Super Administrator',
+      organizationId: mainOrg.id,
+      level: 100,
+      isSystem: true,
+    },
+  });
 
-  // 3. Summary
-  const totalDuration = ((Date.now() - totalStart) / 1000).toFixed(2);
-  console.log('\n' + '=' .repeat(60));
-  console.log('🎉 SEEDING COMPLETED SUCCESSFULLY!\n');
-  
-  const stats = {
-    organizations: await prisma.organization.count(),
-    users: await prisma.user.count(),
-    teams: await prisma.team.count(),
-    projects: await prisma.project.count(),
-    tasks: await prisma.task.count(),
-    invoices: await prisma.invoice.count(),
-    clients: await prisma.client.count(),
-    apiKeys: await prisma.apiKey.count(),
-  };
+  // 3. Create Super Admin User
+  const superAdminPassword = await bcrypt.hash('password123', 10);
+  const superAdmin = await prisma.user.create({
+    data: {
+      email: 'superadmin@flowstate.agency',
+      name: 'Super Administrator',
+      password: superAdminPassword,
+      organizationId: mainOrg.id,
+      status: UserStatus.ACTIVE,
+      emailVerified: true,
+      roles: {
+        create: {
+          roleId: superAdminRole.id,
+        },
+      },
+    },
+  });
 
-  console.log('📈STATISTICS:');
-  console.log(`   Organizations: ${stats.organizations}`);
-  console.log(`   Users: ${stats.users}`);
-  console.log(`   Teams: ${stats.teams}`);
-  console.log(`   Clients: ${stats.clients}`);
-  console.log(`   Projects: ${stats.projects}`);
-  console.log(`   Tasks: ${stats.tasks}`);
-  console.log(`   Invoices: ${stats.invoices}`);
-  console.log(`   API Keys: ${stats.apiKeys}`);
-  console.log(`\n⏱️  Total time: ${totalDuration}s`);
-  console.log('=' .repeat(60));
+  console.log(`✅ Created Super Admin: ${superAdmin.email} / password123`);
+
+  // 4. Create a Client Agency
+  const agencyOrg = await prisma.organization.create({
+    data: {
+      name: 'Agency One',
+      slug: 'agency-one',
+      domain: 'agencyone.com',
+      subscriptionTier: 'PRO',
+    },
+  });
+
+  // 5. Create Admin Role for Agency
+  const adminRole = await prisma.role.create({
+    data: {
+      name: 'Admin',
+      slug: 'admin',
+      description: 'Agency Administrator',
+      organizationId: agencyOrg.id,
+      level: 50,
+      isSystem: true,
+    },
+  });
+
+  // 6. Create Admin User for Agency
+  const adminPassword = await bcrypt.hash('password123', 10);
+  const agencyAdmin = await prisma.user.create({
+    data: {
+      email: 'admin@agencyone.com',
+      name: 'Agency Admin',
+      password: adminPassword,
+      organizationId: agencyOrg.id,
+      status: UserStatus.ACTIVE,
+      emailVerified: true,
+      roles: {
+        create: {
+          roleId: adminRole.id,
+        },
+      },
+    },
+  });
+
+  console.log(`✅ Created Agency Admin: ${agencyAdmin.email} / password123`);
+  console.log('🚀 Seed completed successfully.');
 }
 
 main()
   .catch((e) => {
-    console.error('\n❌ An error occurred during seeding:');
     console.error(e);
     process.exit(1);
   })

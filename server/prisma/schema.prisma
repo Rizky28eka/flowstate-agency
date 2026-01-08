@@ -2,13 +2,12 @@
 // Multi-Tenant SaaS Platform for Project & Business Management
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearchPostgres"]
 }
 
 enum UserStatus {
@@ -481,6 +480,7 @@ model Organization {
 model User {
   id               String     @id @default(cuid())
   email            String     @unique @db.VarChar(255)
+  googleId         String?    @unique @db.VarChar(255)
   name             String?    @db.VarChar(255)
   firstName        String?    @db.VarChar(100)
   lastName         String?    @db.VarChar(100)
@@ -652,8 +652,8 @@ model Project {
   template   ProjectTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
   templateId String?
 
-  createdBy   User   @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
-  createdById String
+  createdBy   User?   @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
 
   // Relations
   tasks       Task[]
@@ -755,8 +755,8 @@ model Task {
   assignee   User?   @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
   assigneeId String?
 
-  createdBy   User   @relation("TaskCreator", fields: [createdById], references: [id], onDelete: SetNull)
-  createdById String
+  createdBy   User?   @relation("TaskCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
 
   milestone   Milestone? @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
   milestoneId String?
@@ -858,8 +858,8 @@ model Client {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String
 
-  createdBy   User   @relation("ClientCreator", fields: [createdById], references: [id], onDelete: SetNull)
-  createdById String
+  createdBy   User?   @relation("ClientCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
 
   // Relations
   projects   Project[]
@@ -901,8 +901,8 @@ model Contact {
   client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
   clientId String
 
-  createdBy   User   @relation("ContactCreator", fields: [createdById], references: [id], onDelete: SetNull)
-  createdById String
+  createdBy   User?   @relation("ContactCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
 
   @@index([clientId])
   @@index([email])
@@ -1148,8 +1148,8 @@ model Document {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String
 
-  uploadedBy   User   @relation("DocumentUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
-  uploadedById String
+  uploadedBy   User?   @relation("DocumentUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
+  uploadedById String?
 
   project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String?

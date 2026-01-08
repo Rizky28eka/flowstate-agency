@@ -54,9 +54,9 @@ describe('Client Routes', () => {
     const res = await request(app).get('/api/clients');
 
     expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveLength(2);
-    expect(res.body[0].activeProjects).toEqual(1);
-    expect(res.body[1].activeProjects).toEqual(1);
+    expect(res.body.data).toHaveLength(2);
+    expect(res.body.data[0].activeProjects).toEqual(1);
+    expect(res.body.data[1].activeProjects).toEqual(1);
     expect(prisma.client.findMany).toHaveBeenCalledWith({
       where: { organizationId: 'test-org-id' },
       include: { projects: true },
@@ -94,12 +94,12 @@ describe('Client Routes', () => {
       .send(newClientData);
 
     expect(res.statusCode).toEqual(201);
-    expect(res.body).toEqual(createdClient);
+    expect(res.body.data).toEqual(createdClient);
     expect(prisma.client.create).toHaveBeenCalledWith({
       data: {
         ...newClientData,
-        organizationId: 'test-org-id',
-        createdById: 'test-user-id',
+        organization: { connect: { id: 'test-org-id' } },
+        createdBy: { connect: { id: 'test-user-id' } },
       },
     });
   });

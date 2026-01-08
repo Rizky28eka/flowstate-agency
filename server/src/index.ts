@@ -1,6 +1,6 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
 import http from 'http';
-import { Server } from 'socket.io';
+import { io } from './config/socket';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -17,15 +17,12 @@ import invoiceRoutes from './routes/invoice.routes';
 import organizationRoutes from './routes/organization.routes';
 import analyticsRoutes from './routes/analytics.routes';
 import authRoutes from './routes/auth.routes';
+import taskRoutes from './routes/task.routes';
+
 
 const app: Express = express();
 const server = http.createServer(app);
-export const io = new Server(server, {
-  cors: {
-    origin: "*", // In production, restrict this to your frontend's URL
-    methods: ["GET", "POST"]
-  }
-});
+io.attach(server);
 
 const port = PORT;
 
@@ -36,10 +33,10 @@ app.use(helmet());
 app.use(morgan('dev'));
 
 const apiLimiter = rateLimit({
-	windowMs: 15 * 60 * 1000,
-	max: 100,
-	standardHeaders: true,
-	legacyHeaders: false,
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
   message: 'Too many requests from this IP, please try again after 15 minutes'
 });
 app.use('/api', apiLimiter);
@@ -60,6 +57,8 @@ apiRouter.use('/reports', reportRoutes);
 apiRouter.use('/invoices', invoiceRoutes);
 apiRouter.use('/organization', organizationRoutes);
 apiRouter.use('/analytics', analyticsRoutes);
+apiRouter.use('/tasks', taskRoutes);
+
 
 app.use('/api', apiRouter);
 
@@ -70,10 +69,16 @@ app.use(errorHandlingMiddleware);
 io.on('connection', (socket) => {
   console.log('A user connected with socket ID:', socket.id);
 
+  socket.on('join_organization', (organizationId: string) => {
+    socket.join(organizationId);
+    console.log(`User ${socket.id} joined organization room: ${organizationId}`);
+  });
+
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });
 });
+
 
 // Start the HTTP server
 server.listen(port, () => {
