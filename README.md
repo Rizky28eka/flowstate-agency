@@ -1,86 +1,87 @@
-# Flowstate Agency
+# AgencyFlow - Integrated Project & Client Management Platform
 
-Flowstate Agency is a comprehensive, all-in-one platform designed to streamline the operations of a modern agency. It provides a suite of tools for project management, client relations, financial tracking, and team collaboration, tailored to different roles within an organization.
+## 📖 Deskripsi Sistem
+AgencyFlow adalah platform Software as a Service (SaaS) yang dirancang khusus untuk agency software dan kreatif. Platform ini mengintegrasikan seluruh siklus hidup proyek—dari quotation, manajemen tugas, hingga invoicing—dalam satu ekosistem terpadu.
 
-## Project Info
+Sistem ini dibangun untuk mengatasi masalah fragmentasi tools, kurangnya transparansi ke klien, dan inefisiensi administrasi yang sering dialami oleh agency.
 
-**URL**: https://lovable.dev/projects/18fc41ea-b9bd-4db2-a257-22164bff3955
+## 🏗 Arsitektur Monorepo
+Project ini menggunakan arsitektur **Monorepo** untuk menyatukan Frontend dan Backend dalam satu repository. Hal ini memudahkan pengelolaan kode, sharing type definitions, dan deployment.
 
-## Key Features
-
-*   **Role-Based Dashboards:** Customized dashboards for Owners, Admins, Project Managers, Team Leads, Members, Finance, and Clients.
-*   **Project Management:** Includes Kanban boards, Gantt charts, task tracking, and resource allocation.
-*   **Financial Tools:** Invoicing, expense tracking, budget management, and profitability analysis.
-*   **Client Portal:** A dedicated space for clients to view project progress, communicate, and manage invoices.
-*   **Team Collaboration:** Tools for communication, performance tracking, and workload management.
-*   **Reporting & Analytics:** In-depth analytics and reporting features for data-driven decision-making.
-*   **Admin & Security:**
-    *   User and role management.
-    *   System health monitoring and audit logs.
-    *   Security settings and compliance center.
-
-## Technologies Used
-
-This project is built with:
-
-*   **Frontend:** React, TypeScript, Vite, Tailwind CSS, shadcn-ui
-*   **Backend:** Node.js, Express, TypeScript
-*   **Database:** MySQL
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/18fc41ea-b9bd-4db2-a257-22164bff3955) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Struktur Folder
+```
+flowstate-agency/
+├── frontend/                 # React + Vite (Web App)
+│   ├── src/
+│   │   ├── components/       # Reusable UI Components
+│   │   ├── services/         # API Integration
+│   │   ├── store/            # State Management
+│   │   └── App.tsx           # Main Entry
+│   ├── package.json
+│   └── vite.config.ts
+├── server/                   # Node.js + Express (API)
+│   ├── src/
+│   │   ├── modules/          # Feature-based Modules (Auth, Projects, etc.)
+│   │   ├── shared/           # Shared Utils, DB Config, Middleware
+│   │   ├── app.ts            # Express Setup
+│   │   └── index.ts          # Server Entry
+│   ├── package.json
+│   └── tsconfig.json
+├── package.json              # Root Workspace Config
+└── README.md
 ```
 
-**Edit a file directly in GitHub**
+## 🛠 Teknologi yang Digunakan
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Frontend
+- **Framework**: React.js (TypeScript) + Vite
+- **Styling**: Tailwind CSS
+- **State Management**: Context API / Hooks
+- **Data Fetching**: Axios / Fetch
+- **Real-time**: Socket.io Client
 
-**Use GitHub Codespaces**
+### Backend
+- **Runtime**: Node.js (TypeScript)
+- **Framework**: Express.js
+- **Database**: PostgreSQL (via `pg` driver)
+- **Real-time**: Socket.io
+- **Security**: Helmet, CORS, JWT Auth
+- **Validation**: Zod (planned)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🚀 Cara Setup dan Menjalankan Project
 
-## How can I deploy this project?
+### Prasyarat
+- Node.js (v18+)
+- PostgreSQL Database
 
-Simply open [Lovable](https://lovable.dev/projects/18fc41ea-b9bd-4db2-a257-22164bff3955) and click on Share -> Publish.
+### Langkah-langkah
+1. **Clone & Install Dependencies**
+   Jalankan perintah ini di root folder untuk menginstall dependencies di root, frontend, dan backend.
+   ```bash
+   npm install && cd frontend && npm install && cd ../server && npm install
+   ```
+   *(Note: Script root sudah disiapkan untuk kemudahan)*
 
-## Can I connect a custom domain to my Lovable project?
+2. **Konfigurasi Environment Database**
+   Buat file `.env` di folder `server/` (copy dari `.env.example`).
+   ```bash
+   cp server/.env.example server/.env
+   ```
+   Isi `DATABASE_URL` dengan koneksi PostgreSQL Anda.
 
-Yes, you can!
+3. **Menjalankan Aplikasi (Development Mode)**
+   Dari root folder, jalankan perintah berikut untuk menyalakan Frontend dan Backend secara bersamaan:
+   ```bash
+   npm run dev
+   ```
+   - Frontend akan berjalan di: `http://localhost:5173`
+   - Backend akan berjalan di: `http://localhost:5001`
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## ✨ Fitur Utama (Implementasi Skripsi)
+1. **Manajemen Proyek & Task**: Kanban board, deadline tracking, task assignment.
+2. **Quotation Builder**: Pembuatan penawaran harga otomatis dan konversi ke proyek.
+3. **Client Portal**: Akses khusus klien untuk memantau progress dan approve deliverables.
+4. **Invoicing & Finance**: Pembuatan invoice otomatis dan tracking status pembayaran.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+---
+*Dibuat untuk memenuhi kebutuhan Skripsi - Program Studi Teknik Informatika.*

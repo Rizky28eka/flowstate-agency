@@ -1,0 +1,866 @@
+# AGENCYFLOW - PLATFORM MANAJEMEN PROYEK & KLIEN TERINTEGRASI
+## Dokumentasi Pengembangan Project (Extended Version)
+
+---
+
+## BAGIAN 1: EXECUTIVE SUMMARY
+
+### Ringkasan Proyek
+AgencyFlow adalah platform Software as a Service (SaaS) yang dirancang khusus untuk mengatasi fragmentasi alur kerja di software agency dan creative agency skala kecil hingga menengah. Platform ini mengintegrasikan seluruh siklus hidup proyek—dari pembuatan quotation, manajemen tugas, komunikasi klien, hingga invoicing—dalam satu ekosistem terpadu.
+
+### Value Proposition
+"Satu Platform, Semua Alur Kerja Agency Anda" - AgencyFlow mengeliminasi kebutuhan akan 5-7 tools berbeda yang biasanya digunakan agency, menghemat waktu hingga 15-20 jam per bulan untuk tugas administratif.
+
+### Target Market
+- Software development agencies (5-50 karyawan)
+- Creative & design agencies
+- Digital marketing agencies
+- Freelancer teams & collective
+- Estimasi: 50,000+ potential agencies di Indonesia, 500,000+ di Asia Tenggara
+
+---
+
+## BAGIAN 2: PROBLEM STATEMENT (DEEP DIVE)
+
+### 2.1 Masalah Utama yang Diselesaikan
+
+#### Pain Point #1: Fragmentasi Tools
+**Situasi Saat Ini:**
+- Quotation: Google Sheets/Excel/Word
+- Komunikasi: WhatsApp, Email, Telegram (terpisah-pisah)
+- Task Management: Trello, Asana, Notion (tidak terintegrasi dengan klien)
+- Time Tracking: Manual atau tools terpisah
+- Invoicing: Software akuntansi atau manual
+- File Sharing: Google Drive, Dropbox (tersebar)
+
+**Dampak Negatif:**
+- Informasi penting terselip di berbagai platform
+- Waktu terbuang 2-3 jam/hari untuk switching context
+- Risiko kehilangan data historis percakapan
+- Onboarding karyawan baru memakan waktu 2-3 minggu
+
+#### Pain Point #2: Lack of Client Transparency
+**Situasi Saat Ini:**
+- Klien tidak tahu progress real-time
+- Pertanyaan berulang: "Sudah sampai mana proyeknya?"
+- Trust issues karena kurangnya visibilitas
+- Screenshot dan manual update via chat/email
+
+**Dampak Negatif:**
+- 30-40% waktu PM habis untuk update status ke klien
+- Ketidakpuasan klien meski proyek on-track
+- Reputasi agency menurun
+- Churn rate klien meningkat
+
+#### Pain Point #3: Inaccurate Project Estimation
+**Situasi Saat Ini:**
+- Estimasi berbasis "feeling" atau pengalaman
+- Tidak ada data historis yang terstruktur
+- Scope creep tidak terdokumentasi dengan baik
+- Profitabilitas proyek tidak terukur
+
+**Dampak Negatif:**
+- 40-50% proyek melebihi budget waktu
+- Margin profit terkikis tanpa disadari
+- Tim overworked karena salah estimasi
+- Sulit melakukan pricing yang kompetitif namun profitable
+
+#### Pain Point #4: Invoicing & Payment Delays
+**Situasi Saat Ini:**
+- Invoice dibuat manual setelah milestone
+- Follow-up pembayaran via chat manual
+- Tidak ada sistem reminder otomatis
+- Riwayat pembayaran tidak terorganisir
+
+**Dampak Negatif:**
+- Cash flow tidak sehat
+- Average payment delay: 15-30 hari lebih lama
+- Waktu admin terbuang untuk follow-up
+- Potensi bad debt meningkat
+
+### 2.2 Data & Statistik Pendukung
+- 68% agency menggunakan 4+ tools berbeda (Survey fictional)
+- Average waktu administratif: 25-30% dari total working hours
+- Client satisfaction meningkat 45% dengan transparency tools
+- ROI positif tercapai dalam 3-6 bulan setelah adopsi unified platform
+
+---
+
+## BAGIAN 3: SOLUTION OVERVIEW
+
+### 3.1 Visi Produk
+AgencyFlow menjadi "Operating System" bagi modern agencies, di mana semua aspek bisnis—dari sales hingga delivery dan finance—berjalan dalam satu ekosistem yang seamless.
+
+### 3.2 Core Philosophy
+1. **Simplicity First**: Interface yang intuitif, tidak memerlukan training ekstensif
+2. **Client-Centric**: Setiap fitur dirancang dengan mempertimbangkan experience klien
+3. **Data-Driven**: Semua keputusan bisnis didukung oleh data dan analytics
+4. **Scalable**: Dari freelancer 1 orang hingga agency 100+ karyawan
+
+### 3.3 Unique Selling Points (USP)
+1. **One-Click Quotation to Project**: Fitur konversi otomatis yang tidak dimiliki kompetitor
+2. **Client Portal as Standard**: Bukan add-on, tapi core feature
+3. **Indonesian-First**: UI/UX, language, dan workflow disesuaikan dengan kultur bisnis Indonesia
+4. **Affordable Pricing**: 70-80% lebih murah dari kompetitor internasional untuk market Indonesia
+
+---
+
+## BAGIAN 4: DETAILED FEATURES SPECIFICATION
+
+### 4.1 MODUL 1: PROJECT & TASK MANAGEMENT
+
+#### 4.1.1 Dashboard Proyek
+**User Story**: "Sebagai Project Manager, saya ingin melihat semua proyek aktif dalam satu layar agar saya bisa mengidentifikasi bottleneck dengan cepat."
+
+**Fitur Detail:**
+- **Visual Cards**: Setiap proyek ditampilkan sebagai card dengan:
+  - Nama proyek & klien
+  - Progress bar (%)
+  - Status badge (On-going, On-hold, Completed, At-risk)
+  - Team members avatar
+  - Deadline countdown
+  - Budget vs Actual hours indicator
+
+- **Filter & Sort Options**:
+  - Filter by: Status, Client, Team Member, Date Range
+  - Sort by: Deadline, Priority, Progress, Alphabetical
+  - Search functionality dengan autocomplete
+
+- **Quick Actions**:
+  - Hover menu untuk akses cepat: View Details, Edit, Archive, Generate Report
+  - Bulk actions: Update status multiple projects, Export data
+
+**Technical Specs:**
+- Real-time updates menggunakan WebSocket
+- Lazy loading untuk performance (load 20 projects per scroll)
+- Responsive design: Grid view (desktop), List view (tablet/mobile)
+
+#### 4.1.2 Kanban Board & Task Management
+**User Story**: "Sebagai Developer, saya ingin melihat task saya dalam format visual yang jelas dan bisa mengupdate status dengan mudah."
+
+**Fitur Detail:**
+- **Customizable Columns**: 
+  - Default: Backlog, To-Do, In Progress, Review, Done
+  - User bisa menambah/edit/hapus column sesuai workflow
+  - Color coding per column
+
+- **Task Card Information**:
+  - Title & description (rich text editor)
+  - Priority indicator (High/Medium/Low dengan warna)
+  - Assignee avatar (multiple assignees supported)
+  - Due date dengan visual countdown
+  - Tags/labels untuk kategorisasi
+  - Attachment count icon
+  - Comment count icon
+  - Checklist progress (e.g., 3/5 subtasks done)
+  - Time tracked icon & duration
+
+- **Drag & Drop Functionality**:
+  - Smooth animation saat drag
+  - Auto-scroll saat drag ke edge
+  - Undo action (Ctrl+Z)
+  - Batch move (select multiple cards)
+
+- **List View Alternative**:
+  - Table format dengan sortable columns
+  - Inline editing untuk quick updates
+  - Bulk edit mode
+
+**Technical Specs:**
+- Library: React Beautiful DnD atau dnd-kit
+- State management: Redux atau Zustand
+- Optimistic updates untuk instant feedback
+
+#### 4.1.3 Task Detail Page
+**Komponen:**
+- **Header Section**:
+  - Task title (editable inline)
+  - Breadcrumb navigation (Project > Column > Task)
+  - Action buttons: Edit, Delete, Duplicate, Convert to Template
+
+- **Main Content**:
+  - Rich text description editor (support Markdown, mentions, emoji)
+  - Sub-tasks (checklist) dengan progress tracking
+  - Custom fields (dropdown, text, number, date) untuk data spesifik
+
+- **Sidebar**:
+  - Assignee selector (dengan avatar)
+  - Due date picker (dengan calendar view)
+  - Priority selector
+  - Labels/Tags management
+  - Time tracking widget (Start/Stop timer + manual entry)
+  - Linked tasks (dependencies)
+  - Activity log (who did what, when)
+
+- **Tabs Section**:
+  - Comments: Threaded discussions, @mentions, emoji reactions
+  - Attachments: File upload (drag & drop), preview, version history
+  - History: Audit trail of all changes
+
+**Technical Specs:**
+- Autosave every 3 seconds
+- Real-time collaboration (show who's viewing)
+- Attachment storage: AWS S3 atau Google Cloud Storage
+- Max file size: 50MB per file, 500MB total per task
+
+#### 4.1.4 Time Tracking
+**Fitur:**
+- **Timer Widget**:
+  - Start/Pause/Stop button
+  - Display current tracked time
+  - Shortcut keyboard: Space untuk start/pause
+
+- **Manual Time Entry**:
+  - Form untuk input tanggal, durasi, description
+  - Bulk time entry untuk multiple days
+
+- **Timesheet View**:
+  - Calendar view showing time per day/week/month
+  - Export to CSV/Excel
+  - Approval workflow (team member submit → PM approve)
+
+- **Reports**:
+  - Time by project, task, or team member
+  - Billable vs non-billable hours
+  - Utilization rate per team member
+  - Profitability analysis (budget vs actual)
+
+**Business Logic:**
+- Overtime detection & warning
+- Integration dengan invoicing (auto-calculate billable amount)
+- Reminder untuk fill timesheet (setiap hari EOD)
+
+#### 4.1.5 Gantt Chart / Timeline View
+**User Story**: "Sebagai PM, saya ingin melihat timeline keseluruhan proyek dan dependencies antar task untuk planning yang lebih baik."
+
+**Fitur:**
+- **Visual Timeline**:
+  - Horizontal bars menunjukkan durasi task
+  - Task dependencies dengan arrow connector
+  - Milestone markers
+  - Today indicator line
+
+- **Interaction**:
+  - Drag to adjust start/end date
+  - Resize bar untuk ubah durasi
+  - Click bar untuk open task detail
+  - Zoom in/out (day, week, month view)
+
+- **Critical Path Highlighting**:
+  - Otomatis highlight jalur kritis (tasks yang delay akan impact deadline)
+  - Warning badge pada task yang at-risk
+
+**Technical Specs:**
+- Library: dhtmlxGantt, Frappe Gantt, atau custom build dengan D3.js
+- Performance optimization untuk 500+ tasks
+
+### 4.2 MODUL 2: QUOTATION & PROPOSAL
+
+#### 4.2.1 Quotation Builder
+**User Story**: "Sebagai Sales/PM, saya ingin membuat quotation profesional dalam 10 menit tanpa harus mulai dari nol."
+
+**Fitur Detail:**
+- **Template System**:
+  - Pre-built templates: Web Development, Mobile App, UI/UX Design, Digital Marketing
+  - Custom template builder dengan drag-and-drop sections
+  - Template variables: {client_name}, {date}, {company_name}, dll.
+
+- **Service/Item Library**:
+  - Master data semua services yang dijual:
+    - Nama service
+    - Default description (editable)
+    - Unit (hour, day, page, feature)
+    - Rate/price
+    - Category tags
+  - Import/Export service list (Excel/CSV)
+
+- **Quotation Form**:
+  - Client information (auto-complete dari database klien existing)
+  - Project details: Name, Description, Timeline
+  - Line items:
+    - Drag service dari library atau add manual
+    - Quantity adjustment
+    - Custom discount (% atau fixed amount)
+    - Tax calculation (PPN 11%)
+  - Payment terms:
+    - Milestones-based (30%-40%-30%)
+    - Monthly retainer
+    - Custom schedule
+  - Terms & Conditions section (rich text editor)
+
+- **Preview & Styling**:
+  - Live preview saat edit
+  - Upload company logo
+  - Brand color customization
+  - Font selection
+
+**Output Options:**
+- PDF download dengan professional formatting
+- Share via unique link (trackable)
+- Send via email langsung dari platform
+- Embed signature field (e-signature)
+
+**Technical Implementation:**
+- PDF generation: jsPDF atau Puppeteer (HTML to PDF)
+- Template engine: Handlebars atau EJS
+- Rich text editor: TipTap atau Quill
+
+#### 4.2.2 Quotation Tracking & Analytics
+**Dashboard Metrics:**
+- Total quotations sent (this month/year)
+- Conversion rate (Approved / Total Sent)
+- Average deal size
+- Average time to approval
+- Win/Loss analysis
+
+**Individual Quotation Tracking:**
+- Status labels: Draft, Sent, Viewed, Approved, Rejected, Negotiating
+- View count & last viewed timestamp
+- Client actions log (opened email, clicked link, downloaded PDF)
+- Reminder system untuk follow-up
+
+**Integration:**
+- Email tracking pixel (know when client opens)
+- Expiry date untuk quotation (auto-status change)
+- Notification ke sales team saat quotation viewed/approved
+
+#### 4.2.3 One-Click Quotation to Project Conversion
+**Proses Otomatis:**
+1. User klik "Convert to Project" pada approved quotation
+2. System creates:
+   - **New Project** dengan details dari quotation:
+     - Project name, description
+     - Client assignment
+     - Project timeline/deadline
+     - Budget (total quotation value)
+   
+   - **Task List** based pada quotation line items:
+     - Setiap service item → 1 parent task
+     - Auto-assign to relevant team based on service category
+     - Estimated hours dari quotation → task time budget
+     - Task dependencies (optional, based on template)
+   
+   - **Invoice Schedule**:
+     - Sesuai payment terms di quotation
+     - Due dates calculated
+     - Status: Pending (belum waktunya issue)
+   
+   - **Client Portal Access**:
+     - Auto-generate credentials
+     - Send welcome email dengan login link
+
+3. Confirmation dialog menampilkan summary sebelum execute
+4. Option untuk customize sebelum finalize
+
+**Benefit:**
+- Hemat 2-3 jam setup manual per project
+- Zero data entry errors
+- Consistency antara quotation dan execution
+- Instant project kick-off
+
+### 4.3 MODUL 3: CLIENT PORTAL
+
+#### 4.3.1 Client Dashboard
+**First Impression Design**: Saat client login pertama kali, mereka langsung melihat overview yang clear dan confidence-building.
+
+**Layout Sections:**
+
+**A. Hero Section**:
+- Welcome message: "Hi, {Client Name}! Here's your project status"
+- Project name & tagline
+- Overall progress bar dengan percentage
+- Next milestone & countdown
+
+**B. Key Metrics Cards**:
+- Tasks completed (X of Y)
+- Days remaining
+- Pending approvals count
+- Upcoming meetings/deadlines
+
+**C. Timeline Visualization**:
+- Simplified Gantt chart atau milestone timeline
+- Color-coded: Completed (green), In-progress (blue), Upcoming (gray), Delayed (red)
+- Clickable milestones untuk detail
+
+**D. Recent Updates Feed**:
+- Activity stream showing:
+  - Task completed
+  - File uploaded
+  - Comment from team
+  - Invoice issued
+- Max 10 recent items, "View all" button
+
+**E. Quick Actions**:
+- Upload file
+- Request change
+- Message team
+- View invoices
+- Download project files
+
+**Technical Consideration:**
+- Read-only access (client tidak bisa edit internal tasks)
+- Filtered view (client hanya lihat task/info yang di-share)
+- Mobile-responsive (banyak client akses via mobile)
+
+#### 4.3.2 Feedback & Approval System
+**Use Cases:**
+1. Review mockup/design
+2. Approve milestone deliverable
+3. Request revision
+
+**Workflow:**
+
+**Step 1: Team Upload Deliverable**
+- Team member upload file (image, PDF, Figma link, dll.)
+- Pilih "Request Client Approval"
+- Tambahkan note/instruction untuk client
+- Client dapat notifikasi email + in-app
+
+**Step 2: Client Review**
+- Client akses file dari portal
+- Preview langsung di browser (untuk supported formats)
+- Annotation tools:
+  - Click pada image untuk add comment (dengan pin marker)
+  - Text selection untuk comment pada dokumen
+  - Drawing tools untuk markup
+- Overall comment box
+
+**Step 3: Client Decision**
+- **Approve**: Klik tombol hijau "Approve"
+  - Konfirmasi dialog
+  - Timestamp & logged
+  - Notifikasi ke team
+  - Status milestone → Completed
+  
+- **Request Revision**: Klik tombol orange "Request Changes"
+  - Wajib isi alasan/feedback
+  - Feedback masuk ke task sebagai comment
+  - Notifikasi ke assignee
+  - Status → Needs Revision
+
+**Step 4: Revision Loop** (if needed)
+- Team perbaiki dan re-upload
+- Client dapat notifikasi untuk review ulang
+- History tracking (version 1, 2, 3, dst.)
+
+**Features:**
+- Side-by-side comparison (previous vs current version)
+- Approval history log
+- Download approved version
+- Approval reminder (jika client tidak respond dalam 3 hari)
+
+**Technical Implementation:**
+- Image annotation: Fabric.js atau Annotorious
+- PDF annotation: PSPDFKit atau pdf.js
+- Version control: Simple versioning dengan metadata
+
+#### 4.3.3 Document & File Hub
+**Organization Structure:**
+- **Folders**:
+  - Contracts & Agreements
+  - Proposals & Quotations
+  - Design Files
+  - Development Documents
+  - Final Deliverables
+  - Invoices & Receipts
+
+**File Management:**
+- **Upload**: Team side only (client tidak bisa upload arbitrary files, hanya via designated areas)
+- **Preview**: In-browser preview untuk images, PDFs, videos
+- **Download**: Individual file atau bulk download per folder (ZIP)
+- **Search**: Full-text search pada file names dan metadata
+- **Permissions**: Fine-grained (per-file visibility to client)
+
+**Special Features:**
+- **Version History**: See previous versions, restore if needed
+- **File Comments**: Discuss specific files
+- **Direct Links**: Shareable links untuk individual files
+- **Expiry Links**: Link yang expire setelah X hari (untuk sensitive files)
+
+#### 4.3.4 Invoice & Payment Section
+**Invoice List View:**
+- Table showing:
+  - Invoice number & date
+  - Description
+  - Amount
+  - Due date
+  - Status (Paid, Pending, Overdue)
+  - Actions (View, Download PDF, Pay Now)
+
+**Invoice Detail Page:**
+- Professional invoice layout matching brand
+- Line items breakdown
+- Payment information (bank account, transfer instructions)
+- Payment proof upload area (jika client transfer manual)
+- Payment status timeline
+
+**Payment Integration** (Future):
+- Payment gateway buttons: Midtrans, Xendit, Stripe
+- Click "Pay Now" → redirect to payment page
+- Callback handling untuk update status otomatis
+- Receipt generation otomatis
+
+**Payment History:**
+- List semua payment yang sudah dilakukan
+- Total paid vs outstanding
+- Download all receipts
+
+### 4.4 MODUL 4: INVOICING & FINANCE
+
+#### 4.4.1 Invoice Creation
+
+**Automatic Invoice Generation:**
+Trigger otomatis saat:
+- Milestone project selesai & approved client
+- Recurring date untuk retainer project
+- Manual trigger oleh admin
+
+**Process:**
+1. System ambil data dari:
+   - Project details
+   - Quotation line items (untuk milestone-based)
+   - Time tracking data (untuk hourly-based)
+   - Payment schedule yang sudah ditetapkan
+
+2. Generate invoice number (auto-increment dengan format: INV-2024-001)
+
+3. Populate invoice dengan:
+   - Client billing information
+   - Invoice date & due date
+   - Line items dengan descriptions
+   - Subtotal, tax, total
+   - Payment instructions
+   - Terms & conditions
+
+4. Review dialog untuk admin (bisa edit sebelum issue)
+
+5. Issue invoice:
+   - Save ke database
+   - Generate PDF
+   - Send email ke client (dengan PDF attachment)
+   - Update client portal
+
+**Manual Invoice Creation:**
+Form untuk create invoice dari nol:
+- Select client
+- Select project (optional, bisa untuk misc. billing)
+- Add line items manually
+- Set dates & terms
+- Preview & send
+
+**Recurring Invoices:**
+Untuk retainer clients:
+- Set frequency (monthly, quarterly, annually)
+- Set start date & end date (atau "until cancelled")
+- System auto-generate sesuai schedule
+- Preview & approval workflow sebelum send (optional)
+
+#### 4.4.2 Invoice Management Dashboard
+
+**Overview Metrics:**
+- **Revenue Cards**:
+  - Total revenue (this month, this year)
+  - Paid invoices total
+  - Outstanding invoices total
+  - Overdue amount (dengan alert warna merah)
+
+- **Charts**:
+  - Revenue trend (bar chart, monthly)
+  - Invoice status distribution (pie chart)
+  - Top clients by revenue (horizontal bar)
+
+**Invoice List:**
+- Filter by: Status, Client, Date range, Project
+- Search by invoice number or client name
+- Columns: Number, Client, Date, Due Date, Amount, Status, Actions
+- Bulk actions: Send reminder, Mark as paid, Export selected
+
+**Status Workflow:**
+- **Draft**: Invoice dibuat tapi belum dikirim
+- **Sent**: Sudah dikirim ke client, belum dibayar
+- **Paid**: Pembayaran sudah diterima & verified
+- **Partially Paid**: Untuk invoice dengan payment installments
+- **Overdue**: Melewati due date belum dibayar
+- **Cancelled**: Invoice dibatalkan
+
+#### 4.4.3 Payment Tracking & Reminders
+
+**Payment Recording:**
+- Admin input payment details:
+  - Amount received
+  - Payment date
+  - Payment method (bank transfer, cash, e-wallet, dll.)
+  - Reference number
+  - Notes
+- Upload proof of payment (photo/PDF)
+- System update invoice status
+- Send confirmation email ke client (receipt)
+
+**Automatic Reminders:**
+Configurable reminder schedule:
+- **Before due date**: 7 days before, 3 days before, 1 day before
+- **On due date**: Email di pagi hari
+- **After due date**: 3 days overdue, 7 days overdue, 14 days overdue
+
+Reminder content:
+- Friendly tone (bukan menakuti)
+- Invoice details & amount
+- Direct link untuk view/pay invoice
+- Payment instructions
+- Contact info jika ada pertanyaan
+
+**Escalation Process:**
+- After X days overdue, flag untuk manual follow-up
+- Notification ke Account Manager atau Owner
+- Option untuk pause project (jika payment sangat terlambat)
+
+#### 4.4.4 Financial Reports
+
+**Reports Available:**
+
+**1. Revenue Report:**
+- Group by: Month, Quarter, Year, Project, Client
+- Visualization: Line chart, bar chart
+- Export to Excel/PDF
+
+**2. Profitability Report (Per Project):**
+- Revenue (invoice total)
+- Cost (team hours × hourly rate)
+- Profit margin (%)
+- Comparison: Estimated vs Actual
+- Highlight profitable & unprofitable projects
+
+**3. Outstanding Invoices Report:**
+- Aging analysis: 0-30 days, 31-60 days, 61-90 days, 90+ days
+- Action items untuk follow-up
+- Risk assessment
+
+**4. Client Lifetime Value:**
+- Total revenue per client (all-time)
+- Average project value
+- Project frequency
+- Retention period
+- Identify top-tier clients
+
+**5. Tax Report:**
+- Total revenue (for tax calculation)
+- PPN collected
+- Export format sesuai standar perpajakan Indonesia
+
+**Features:**
+- Date range selector
+- Multiple currency support (future)
+- Export: PDF, Excel, CSV
+- Email scheduled reports (weekly/monthly)
+- Dashboard widgets (pin favorite reports)
+
+---
+
+## BAGIAN 5: TECHNICAL ARCHITECTURE
+
+### 5.1 System Architecture Overview
+
+**Architecture Pattern**: Microservices (untuk scalability) atau Modular Monolith (untuk development speed di awal)
+
+**High-Level Components:**
+```
+┌─────────────────────────────────────────────────┐
+│          Frontend (React / Vue.js)               │
+│  - Web App (Admin/Team)                          │
+│  - Client Portal                                  │
+│  - Mobile Web (Responsive)                       │
+└──────────────┬──────────────────────────────────┘
+               │ HTTPS / REST API / GraphQL
+               │
+┌──────────────▼──────────────────────────────────┐
+│         API Gateway / Load Balancer              │
+│         (Nginx / AWS ALB)                         │
+└──────────────┬──────────────────────────────────┘
+               │
+    ┌──────────┴──────────┐
+    │                      │
+┌───▼────────┐      ┌─────▼──────────┐
+│  Auth       │      │  Core API       │
+│  Service    │      │  (Node.js)      │
+│  (JWT)      │      │                 │
+└─────────────┘      └─────┬───────────┘
+                            │
+         ┌──────────────────┼──────────────────┐
+         │                  │                   │
+    ┌────▼─────┐    ┌──────▼──────┐    ┌──────▼──────┐
+    │ Project  │    │  Invoice     │    │   File      │
+    │ Service  │    │  Service     │    │   Storage   │
+    └──────────┘    └──────────────┘    │  (S3/GCS)   │
+                                         └─────────────┘
+         │                  │
+    ┌────▼──────────────────▼─────┐
+    │   PostgreSQL Database         │
+    │   - Primary Data Store        │
+    └───────────────────────────────┘
+    
+    ┌───────────────────────────────┐
+    │   Redis Cache                  │
+    │   - Session Store              │
+    │   - Real-time Data             │
+    └───────────────────────────────┘
+    
+    ┌───────────────────────────────┐
+    │   Message Queue                │
+    │   (RabbitMQ / AWS SQS)        │
+    │   - Email sending              │
+    │   - Report generation          │
+    │   - Notifications              │
+    └───────────────────────────────┘
+```
+
+### 5.2 Technology Stack Detail
+
+#### Frontend
+**Framework**: React.js (dengan TypeScript)
+- **Rationale**: 
+  - Large ecosystem & community
+  - Rich component libraries (Material-UI, Ant Design, Chakra UI)
+  - Strong TypeScript support untuk type safety
+  - Excellent developer tooling
+
+**State Management**: Redux Toolkit atau Zustand
+- Redux untuk complex state
+- Zustand untuk simpler, performant solution
+
+**Styling**: Tailwind CSS + Styled Components
+- Tailwind untuk rapid development
+- Styled Components untuk dynamic, component-scoped styling
+
+**Form Handling**: React Hook Form + Zod (validation)
+
+**Data Fetching**: React Query (TanStack Query)
+- Caching, background refetching
+- Optimistic updates
+- Infinite scroll
+
+**Real-time**: Socket.io Client
+- Real-time notifications
+- Live updates pada task boards
+- Multi-user collaboration indicators
+
+**Build Tool**: Vite (faster than Create React App)
+
+**Testing**: Jest + React Testing Library + Cypress (E2E)
+
+#### Backend
+**Runtime**: Node.js v18+ LTS
+
+**Framework**: Express.js atau Fastify
+- Express: Mature, extensive middleware ecosystem
+- Fastify: Faster performance, built-in schema validation
+
+**Language**: TypeScript
+- Type safety mengurangi runtime errors
+- Better IDE support & autocomplete
+- Easier refactoring
+
+**API Architecture**: RESTful API (primary) + GraphQL (optional, untuk complex queries)
+
+**Authentication**: 
+- JSON Web Tokens (JWT) untuk stateless auth
+- Refresh token strategy untuk security
+- OAuth 2.0 untuk third-party integrations (future: Google, Slack)
+
+**Authorization**: Role-Based Access Control (RBAC)
+- Roles: Owner, Admin, Project Manager, Team Member, Client
+- Permissions matrix per resource
+
+**Validation**: Joi atau Zod
+- Schema validation untuk semua input
+- Type-safe dengan TypeScript
+
+**File Upload**: Multer + Sharp (image processing)
+
+**PDF Generation**: Puppeteer (HTML to PDF)
+- Customizable templates
+- Support untuk complex layouts
+
+**Email Service**: 
+- Nodemailer + SMTP (untuk start)
+- SendGrid / AWS SES (untuk scale, better deliverability)
+
+**Scheduled Jobs**: node-cron atau Bull (dengan Redis)
+- Recurring invoices
+- Payment reminders
+- Report generation
+
+**Logging**: Winston atau Pino
+- Structured logging
+- Multiple transports (console, file, external service)
+
+**Monitoring**: 
+- Application Performance Monitoring (APM): New Relic / DataDog
+- Error tracking: Sentry
+
+#### Database
+**Primary Database**: PostgreSQL 14+
+- **Rationale**:
+  - ACID compliance (critical untuk financial data)
+  - Rich data types (JSONB untuk flexible schemas)
+  - Full-text search capabilities
+  - Excellent performance untuk complex queries
+  - Strong community & tooling
+
+**Schema Design Highlights**:
+- Normalized design (3NF) untuk data integrity
+- Indexes pada foreign keys & frequently queried columns
+- Partitioning untuk large tables (logs, time tracking)
+- Database migrations: Knex.js atau Prisma Migrate
+
+**ORM**: Prisma atau TypeORM
+- Prisma: Type-safe, auto-generated client, excellent DX
+- TypeORM: More flexible, Active Record pattern
+
+**Caching Layer**: Redis 7+
+- Session storage
+- Cache frequently accessed data (user permissions, settings)
+- Real-time features (pub/sub)
+- Rate limiting
+
+**Full-Text Search** (Optional, future): Elasticsearch
+- Untuk advanced search features
+- Log analytics
+
+#### DevOps & Infrastructure
+
+**Containerization**: Docker
+- Dockerfile untuk setiap service
+- Docker Compose untuk local development
+
+**Orchestration**: Kubernetes (untuk production scale) atau Docker Swarm (simpler alternative)
+
+**CI/CD**: GitHub Actions atau GitLab CI
+- Pipeline: Lint → Test → Build → Deploy
+- Automated testing pada setiap PR
+- Automated deployment ke staging/production
+
+**Cloud Provider**: Google Cloud Platform (GCP) atau AWS
+- **GCP**:
+  - Cloud Run (container hosting, auto-scaling)
+  - Cloud SQL (managed PostgreSQL)
+  - Cloud Storage (file storage)
+  - Cloud CDN
+  
+- **AWS Alternative**:
+  - ECS / EKS (container orchestration)
+  - RDS PostgreSQL
+  - S3 + CloudFront
+  
+**Estimated Cost** (untuk 100 active users):
+- GCP Cloud Run: $50-100/month
+- Cloud SQL: $50-80/month
+- Cloud Storage: $10-20/month
+- CDN & misc: $20-30/month
+- **Total**: ~$150-250/month
+
+**Domain & SSL**: 
+- Domain registrar: Cloudflare atau Namecheap
+- SSL: Let's Encrypt (free, auto-renewal via Certbot)
+
+**Monitoring & Logging**:
+- GCP Cloud Monitoring / AWS CloudWatch
