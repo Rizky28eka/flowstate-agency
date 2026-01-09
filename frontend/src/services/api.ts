@@ -80,7 +80,7 @@ export const invoicesAPI = {
 
 export const quotationsAPI = {
     getAll: () => api.get('/quotations'),
-    create: (data: any) => api.post('/quotations', data),
+    create: (data: { client_id: number; title: string; description: string; amount: number }) => api.post('/quotations', data),
     updateStatus: (id: number, status: string) => api.put(`/quotations/${id}/status`, { status }),
     convertToProject: (id: number) => api.post(`/quotations/${id}/convert`),
 };

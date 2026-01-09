@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { Task } from '../../types';
 import { tasksAPI, projectsAPI } from '../../services/api';
-import { MoreHorizontal, Plus, Calendar, User as UserIcon, MoreVertical, Clock, Play, Square, Loader2 } from 'lucide-react';
+import { MoreHorizontal, Plus, Calendar, User as UserIcon, Clock, Play, Square } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -213,7 +213,7 @@ export default function KanbanBoard({ tasks, onTaskUpdate }: KanbanBoardProps) {
                                                 <span>{new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                                             </div>
                                         )}
-                                        {task.actual_hours > 0 && (
+                                        {task.actual_hours != null && task.actual_hours > 0 && (
                                             <div className="flex items-center gap-1 text-indigo-500 text-[10px] font-bold">
                                                 <Clock size={12} />
                                                 <span>{task.actual_hours.toFixed(1)}h</span>

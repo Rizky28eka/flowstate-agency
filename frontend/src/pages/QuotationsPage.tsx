@@ -66,8 +66,8 @@ export default function QuotationsPage() {
             setIsModalOpen(false);
             setFormData({ client_id: '', title: '', description: '', amount: '' });
             fetchData();
-        } catch (err: any) {
-            setError(err.response?.data?.error || 'Failed to create quotation');
+        } catch (err) {
+            setError((err as { response?: { data?: { error?: string } } }).response?.data?.error || 'Failed to create quotation');
         } finally {
             setIsSubmitting(false);
         }
