@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+// Trigger restart after DB migration fix
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
@@ -41,10 +42,20 @@ io.on('connection', (socket) => {
 import authRoutes from './modules/auth/routes';
 import projectRoutes from './modules/projects/routes';
 import taskRoutes from './modules/tasks/routes';
+import clientRoutes from './modules/clients/routes';
+import userRoutes from './modules/users/routes';
+import invoiceRoutes from './modules/invoices/routes';
+import quotationRoutes from './modules/quotations/routes';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
+import timerRoutes from './modules/tasks/timerRoutes';
+app.use('/api/tasks', timerRoutes);
+app.use('/api/clients', clientRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/quotations', quotationRoutes);
 
 
 export { httpServer, io };

@@ -1,13 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
-
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    role: 'superadmin' | 'admin' | 'member' | 'client';
-}
+import type { User } from '../types';
 
 interface AuthContextType {
     user: User | null;

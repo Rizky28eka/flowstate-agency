@@ -42,6 +42,12 @@ io.on('connection', (socket) => {
 const routes_1 = __importDefault(require("./modules/auth/routes"));
 const routes_2 = __importDefault(require("./modules/projects/routes"));
 const routes_3 = __importDefault(require("./modules/tasks/routes"));
+const routes_4 = __importDefault(require("./modules/clients/routes"));
+const routes_5 = __importDefault(require("./modules/users/routes"));
+const routes_6 = __importDefault(require("./modules/invoices/routes"));
 app.use('/api/auth', routes_1.default);
 app.use('/api/projects', routes_2.default);
 app.use('/api/tasks', routes_3.default);
+app.use('/api/clients', routes_4.default);
+app.use('/api/users', routes_5.default);
+app.use('/api/invoices', routes_6.default);

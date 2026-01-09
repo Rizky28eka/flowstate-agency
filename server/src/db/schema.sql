@@ -60,9 +60,56 @@ INSERT INTO projects (name, description, client_id, status, progress) VALUES
 ('Marketing Campaign', 'Q1 2026 digital marketing strategy', 2, 'Completed', 100)
 ON CONFLICT DO NOTHING;
 
+-- Invoices Table
+CREATE TABLE IF NOT EXISTS invoices (
+  id SERIAL PRIMARY KEY,
+  project_id INTEGER REFERENCES projects(id) ON DELETE SET NULL,
+  client_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  invoice_number VARCHAR(50) UNIQUE NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  status VARCHAR(50) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Paid', 'Overdue', 'Cancelled')),
+  due_date DATE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Quotations Table
+CREATE TABLE IF NOT EXISTS quotations (
+  id SERIAL PRIMARY KEY,
+  client_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  amount DECIMAL(12, 2),
+  status VARCHAR(50) DEFAULT 'Draft' CHECK (status IN ('Draft', 'Sent', 'Accepted', 'Rejected')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Seed Data: Invoices
+INSERT INTO invoices (project_id, client_id, invoice_number, amount, status, due_date) VALUES 
+(1, 2, 'INV-2026-001', 5000.00, 'Paid', '2026-01-15'),
+(1, 2, 'INV-2026-002', 2500.00, 'Pending', '2026-02-15')
+ON CONFLICT DO NOTHING;
+
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_projects_client_id ON projects(client_id);
 CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
 CREATE INDEX IF NOT EXISTS idx_tasks_project_id ON tasks(project_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_assigned_to ON tasks(assigned_to);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_invoices_client_id ON invoices(client_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_project_id ON invoices(project_id);
+
+-- Time Logs Table
+CREATE TABLE IF NOT EXISTS time_logs (
+  id SERIAL PRIMARY KEY,
+  task_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE,
+  user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  start_time TIMESTAMP WITH TIME ZONE NOT NULL,
+  end_time TIMESTAMP WITH TIME ZONE,
+  duration_minutes INTEGER,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_time_logs_task_id ON time_logs(task_id);

@@ -18,17 +18,17 @@ router.use(auth_1.authMiddleware);
 // GET /api/projects
 router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Attempt to fetch from DB
-        const result = yield (0, database_1.query)('SELECT * FROM projects ORDER BY created_at DESC');
+        const result = yield (0, database_1.query)(`
+            SELECT p.*, u.name as client 
+            FROM projects p 
+            LEFT JOIN users u ON p.client_id = u.id 
+            ORDER BY p.created_at DESC
+        `);
         res.json(result.rows);
     }
     catch (error) {
         console.error('Database Error:', error);
-        // Fallback for demo purposes if DB is not set up
-        res.json([
-            { id: 1, name: 'Demo Project (DB Error)', client: 'Fallback Client', status: 'In Progress', progress: 50 },
-            { id: 2, name: 'Setup Database', client: 'System', status: 'On Hold', progress: 0 }
-        ]);
+        res.status(500).json({ error: 'Failed to fetch projects' });
     }
 }));
 // GET /api/projects/:id

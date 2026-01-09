@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { Task } from '../../types';
-import { tasksAPI } from '../../services/api';
-import { MoreHorizontal, Plus, Calendar, User as UserIcon } from 'lucide-react';
+import { tasksAPI, projectsAPI } from '../../services/api';
+import { MoreHorizontal, Plus, Calendar, User as UserIcon, MoreVertical, Clock, Play, Square, Loader2 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -23,6 +23,61 @@ const PRIORITY_COLORS = {
     Medium: 'bg-blue-100 text-blue-700',
     High: 'bg-orange-100 text-orange-700',
     Urgent: 'bg-red-100 text-red-700',
+};
+
+const TimerButton = ({ taskId, onUpdate }: { taskId: number, onUpdate: () => void }) => {
+    const [running, setRunning] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const checkStatus = async () => {
+            try {
+                const res = await projectsAPI.getTimerStatus(taskId);
+                setRunning(res.data.running);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        checkStatus();
+    }, [taskId]);
+
+    const handleToggle = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setLoading(true);
+        try {
+            if (running) {
+                await projectsAPI.stopTimer(taskId);
+                setRunning(false);
+            } else {
+                await projectsAPI.startTimer(taskId);
+                setRunning(true);
+            }
+            onUpdate();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) return <div className="w-4 h-4 border-2 border-slate-200 border-t-indigo-600 rounded-full animate-spin"></div>;
+
+    return (
+        <button
+            onClick={handleToggle}
+            className={clsx(
+                "flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold transition-all",
+                running
+                    ? "bg-red-50 text-red-600 border border-red-100 animate-pulse"
+                    : "bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100"
+            )}
+        >
+            {running ? <Square size={8} fill="currentColor" /> : <Play size={8} fill="currentColor" />}
+            {running ? 'STOP' : 'START'}
+        </button>
+    );
 };
 
 export default function KanbanBoard({ tasks, onTaskUpdate }: KanbanBoardProps) {
@@ -101,19 +156,19 @@ export default function KanbanBoard({ tasks, onTaskUpdate }: KanbanBoardProps) {
     };
 
     return (
-        <div className="flex h-full overflow-x-auto pb-4 gap-4">
+        <div className="flex h-full overflow-x-auto pb-4 gap-4 text-left">
             {COLUMNS.map(col => (
-                <div 
-                    key={col.id} 
-                    className={twMerge("min-w-[280px] w-[280px] flex flex-col rounded-lg border", col.color)}
+                <div
+                    key={col.id}
+                    className={twMerge("min-w-[280px] w-[280px] flex flex-col rounded-lg border shadow-sm", col.color)}
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, col.id)}
                 >
                     {/* Column Header */}
                     <div className="p-3 flex items-center justify-between border-b border-black/5">
                         <div className="flex items-center gap-2">
-                            <span className="font-semibold text-sm text-gray-700">{col.label}</span>
-                            <span className="bg-white/50 text-gray-600 text-xs px-2 py-0.5 rounded-full font-medium">
+                            <span className="font-bold text-sm text-gray-700">{col.label}</span>
+                            <span className="bg-white/50 text-gray-600 text-[10px] px-2 py-0.5 rounded-full font-bold">
                                 {getTasksByStatus(col.id).length}
                             </span>
                         </div>
@@ -123,42 +178,53 @@ export default function KanbanBoard({ tasks, onTaskUpdate }: KanbanBoardProps) {
                     </div>
 
                     {/* Task List */}
-                    <div className="flex-1 p-2 flex flex-col gap-2 overflow-y-auto min-h-[150px]">
+                    <div className="flex-1 p-2 flex flex-col gap-3 overflow-y-auto min-h-[150px]">
                         {getTasksByStatus(col.id).map(task => (
                             <div
                                 key={task.id}
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, task.id)}
                                 className={clsx(
-                                    "bg-white p-3 rounded shadow-sm border border-transparent hover:border-blue-300 cursor-grab active:cursor-grabbing group transition-all",
+                                    "bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-indigo-300 cursor-grab active:cursor-grabbing group transition-all",
                                     draggedTaskId === task.id && "opacity-50"
                                 )}
                             >
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className={clsx("text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider", PRIORITY_COLORS[task.priority])}>
-                                        {task.priority}
-                                    </span>
+                                <div className="flex justify-between items-start mb-3">
+                                    <div className="flex gap-1.5">
+                                        <span className={clsx("text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider", PRIORITY_COLORS[task.priority])}>
+                                            {task.priority}
+                                        </span>
+                                        <TimerButton taskId={task.id} onUpdate={onTaskUpdate} />
+                                    </div>
                                     <button className="text-gray-300 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <MoreHorizontal size={16} />
                                     </button>
                                 </div>
-                                
-                                <h4 className="text-sm font-medium text-gray-800 mb-3 leading-snug">
+
+                                <h4 className="text-sm font-semibold text-gray-800 mb-4 leading-snug">
                                     {task.title}
                                 </h4>
 
                                 <div className="flex items-center justify-between mt-auto">
-                                    {task.due_date && (
-                                        <div className="flex items-center gap-1 text-gray-400 text-xs">
-                                            <Calendar size={12} />
-                                            <span>{new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-                                        </div>
-                                    )}
-                                    
+                                    <div className="flex items-center gap-3">
+                                        {task.due_date && (
+                                            <div className="flex items-center gap-1 text-gray-400 text-[10px] font-medium">
+                                                <Calendar size={12} />
+                                                <span>{new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                                            </div>
+                                        )}
+                                        {task.actual_hours > 0 && (
+                                            <div className="flex items-center gap-1 text-indigo-500 text-[10px] font-bold">
+                                                <Clock size={12} />
+                                                <span>{task.actual_hours.toFixed(1)}h</span>
+                                            </div>
+                                        )}
+                                    </div>
+
                                     {task.assignee_avatar ? (
-                                        <img src={task.assignee_avatar} alt="Assignee" className="w-6 h-6 rounded-full border border-white" />
+                                        <img src={task.assignee_avatar} alt="Assignee" className="w-6 h-6 rounded-full border-2 border-white shadow-sm" title={task.assignee_name} />
                                     ) : (
-                                        <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 border border-white">
+                                        <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 border-2 border-white shadow-sm" title={task.assignee_name}>
                                             <UserIcon size={12} />
                                         </div>
                                     )}
