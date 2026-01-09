@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import AuthPage from './pages/AuthPage';
+import ProjectDetail from './pages/ProjectDetail';
 import ProtectedRoute from './components/shared/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 
@@ -17,6 +18,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/projects/:id"
+            element={
+              <ProtectedRoute>
+                <ProjectDetail />
               </ProtectedRoute>
             }
           />

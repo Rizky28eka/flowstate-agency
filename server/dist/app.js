@@ -39,5 +39,9 @@ io.on('connection', (socket) => {
     });
 });
 // Routes
-const routes_1 = __importDefault(require("./modules/projects/routes"));
-app.use('/api/projects', routes_1.default);
+const routes_1 = __importDefault(require("./modules/auth/routes"));
+const routes_2 = __importDefault(require("./modules/projects/routes"));
+const routes_3 = __importDefault(require("./modules/tasks/routes"));
+app.use('/api/auth', routes_1.default);
+app.use('/api/projects', routes_2.default);
+app.use('/api/tasks', routes_3.default);

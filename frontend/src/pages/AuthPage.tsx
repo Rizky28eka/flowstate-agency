@@ -25,8 +25,8 @@ const AuthPage = () => {
                 }
                 await register(email, password, name);
             }
-        } catch (err: any) {
-            setError(err.message || 'An error occurred');
+        } catch (err) {
+            setError((err as { message?: string }).message || 'An error occurred');
         }
     };
 

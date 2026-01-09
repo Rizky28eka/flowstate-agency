@@ -1,23 +1,39 @@
 import { useState, useEffect } from 'react'
-import { LayoutDashboard, Users, FileText, Settings, LogOut, Bell, Search, Plus } from 'lucide-react'
+import { LayoutDashboard, Users, FileText, Settings, LogOut, Bell, Search, Plus, ArrowRight } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { projectsAPI } from '../services/api'
 import type { Project } from '../types'
 
 function Dashboard() {
     const [status, setStatus] = useState<string>('Connecting...');
     const [projects, setProjects] = useState<Project[]>([]);
+    const [loading, setLoading] = useState(true);
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
+        // Check health status
         fetch('/api/health')
             .then(res => res.json())
             .then(() => setStatus(`Online`))
             .catch(() => setStatus('Offline'));
 
-        fetch('/api/projects')
-            .then(res => res.json())
-            .then(data => setProjects(data))
-            .catch(() => console.log('Projects endpoint not ready'));
+        // Fetch projects with authentication
+        const fetchProjects = async () => {
+            try {
+                setLoading(true);
+                const response = await projectsAPI.getAll();
+                setProjects(response.data || []);
+            } catch (error) {
+                console.error('Failed to fetch projects:', error);
+                setProjects([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProjects();
     }, [])
 
     return (
@@ -103,7 +119,7 @@ function Dashboard() {
                     {/* Stats Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                         {[
-                            { label: 'Active Projects', value: projects.length.toString() || '0' },
+                            { label: 'Active Projects', value: (projects?.length ?? 0).toString() },
                             { label: 'Pending Invoices', value: '3' },
                             { label: 'Revenue (Jan)', value: '$12,450' },
                             { label: 'Avg. Turnaround', value: '14 days' },
@@ -121,8 +137,17 @@ function Dashboard() {
                             <h3 className="font-semibold text-slate-900">Recent Projects</h3>
                         </div>
                         <div className="divide-y divide-slate-100">
-                            {projects.length > 0 ? projects.map((project: Project) => (
-                                <div key={project.id} className="p-6 hover:bg-slate-50 transition-colors flex items-center justify-between group">
+                            {loading ? (
+                                <div className="p-12 text-center">
+                                    <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-3"></div>
+                                    <p className="text-slate-500 text-sm">Loading projects...</p>
+                                </div>
+                            ) : projects.length > 0 ? projects.map((project: Project) => (
+                                <div 
+                                    key={project.id} 
+                                    onClick={() => navigate(`/projects/${project.id}`)}
+                                    className="p-6 hover:bg-slate-50 transition-colors flex items-center justify-between group cursor-pointer"
+                                >
                                     <div>
                                         <div className="flex items-center gap-3 mb-1">
                                             <h4 className="font-medium text-slate-900">{project.name}</h4>
@@ -163,8 +188,5 @@ function Dashboard() {
         </div>
     )
 }
-
-// Importing Icon here to avoid 'ArrowRight is not defined' if removed from top
-import { ArrowRight } from 'lucide-react'
 
 export default Dashboard

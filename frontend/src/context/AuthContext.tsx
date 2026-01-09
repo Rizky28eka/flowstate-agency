@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     const response = await authAPI.getCurrentUser();
                     setUser(response.data.user);
                     localStorage.setItem('agencyflow_user', JSON.stringify(response.data.user));
-                } catch (error) {
+                } catch {
                     // Token invalid, clear storage
                     localStorage.removeItem('agencyflow_token');
                     localStorage.removeItem('agencyflow_user');
@@ -57,8 +57,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             localStorage.setItem('agencyflow_user', JSON.stringify(userData));
             setUser(userData);
             navigate('/dashboard');
-        } catch (error: any) {
-            const message = error.response?.data?.error || 'Login failed';
+        } catch (error) {
+            const message = (error as { response?: { data?: { error?: string } } }).response?.data?.error || 'Login failed';
             throw new Error(message);
         } finally {
             setIsLoading(false);
@@ -75,8 +75,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             localStorage.setItem('agencyflow_user', JSON.stringify(userData));
             setUser(userData);
             navigate('/dashboard');
-        } catch (error: any) {
-            const message = error.response?.data?.error || 'Registration failed';
+        } catch (error) {
+            const message = (error as { response?: { data?: { error?: string } } }).response?.data?.error || 'Registration failed';
             throw new Error(message);
         } finally {
             setIsLoading(false);

@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 
 const API_URL = '/api';
@@ -45,9 +46,16 @@ export const authAPI = {
 export const projectsAPI = {
     getAll: () => api.get('/projects'),
     getById: (id: number) => api.get(`/projects/${id}`),
-    create: (data: any) => api.post('/projects', data),
-    update: (id: number, data: any) => api.put(`/projects/${id}`, data),
+    create: (data: { name: string; description?: string; client?: string; status?: 'Planning' | 'In Progress' | 'Completed'; start_date?: string; end_date?: string; progress?: number }) => api.post('/projects', data),
+    update: (id: number, data: { name?: string; description?: string; client?: string; status?: 'Planning' | 'In Progress' | 'Completed'; start_date?: string; end_date?: string; progress?: number }) => api.put(`/projects/${id}`, data),
     delete: (id: number) => api.delete(`/projects/${id}`),
+    getTasks: (id: number) => api.get(`/projects/${id}/tasks`),
+    createTask: (id: number, data: { title: string; description?: string; priority: 'Low' | 'Medium' | 'High' | 'Urgent'; status?: 'Backlog' | 'To Do' | 'In Progress' | 'Review' | 'Done'; due_date?: string; assignee_id?: number }) => api.post(`/projects/${id}/tasks`, data),
+};
+
+export const tasksAPI = {
+    update: (id: number, data: { title?: string; description?: string; priority?: 'Low' | 'Medium' | 'High' | 'Urgent'; status?: 'Backlog' | 'To Do' | 'In Progress' | 'Review' | 'Done'; due_date?: string; assignee_id?: number }) => api.put(`/tasks/${id}`, data),
+    delete: (id: number) => api.delete(`/tasks/${id}`),
 };
 
 export default api;

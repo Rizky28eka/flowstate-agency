@@ -40,9 +40,11 @@ io.on('connection', (socket) => {
 // Routes
 import authRoutes from './modules/auth/routes';
 import projectRoutes from './modules/projects/routes';
+import taskRoutes from './modules/tasks/routes';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
+app.use('/api/tasks', taskRoutes);
 
 
 export { httpServer, io };
